@@ -15,6 +15,12 @@
       },
       activePetId: "pet_owl",
       unlockedPets: ["pet_owl"],
+      unlockedStickers: ["stk_star", "stk_blossom", "stk_crown"],
+      lobbyBg: "bg_meadow",
+      lobbyStickers: [
+        { id: "init_stk_1", stickerId: "stk_star", x: 22, y: 28, scale: 1.0, flip: false },
+        { id: "init_stk_2", stickerId: "stk_blossom", x: 78, y: 68, scale: 1.0, flip: false }
+      ],
       levelProgress: {}, // nodeId -> { stars: 0..3, completions: 0, bestAvgMs: null }
       factStats: {}, // "7x8" -> { a, b, attempts, correct, wrong, timeouts, totalTimeMs, bestTimeMs, lastSeen }
       shopRewards: JSON.parse(JSON.stringify(window.GAME_DATA.defaultShopRewards)),
@@ -31,12 +37,25 @@
       if (!raw) return createDefaultState();
       const parsed = JSON.parse(raw);
       const def = createDefaultState();
-      return {
+      const merged = {
         ...def,
         ...parsed,
         settings: { ...def.settings, ...(parsed.settings || {}) },
         dailyStreak: { ...def.dailyStreak, ...(parsed.dailyStreak || {}) }
       };
+      if (!Array.isArray(merged.unlockedStickers) || merged.unlockedStickers.length === 0) {
+        merged.unlockedStickers = [...def.unlockedStickers];
+      }
+      if (!Array.isArray(merged.lobbyStickers)) {
+        merged.lobbyStickers = [...def.lobbyStickers];
+      }
+      if (
+        Array.isArray(merged.shopRewards) &&
+        !merged.shopRewards.some((r) => r.type === "sticker_pack")
+      ) {
+        merged.shopRewards.unshift(JSON.parse(JSON.stringify(window.GAME_DATA.defaultShopRewards[0])));
+      }
+      return merged;
     } catch (e) {
       return createDefaultState();
     }
@@ -317,9 +336,295 @@
   });
 
   // =========================================================
-  // TAB 1: ADVENTURE PATH RENDERER
+  // TAB 1: INTERACTIVE PET LOBBY & ADVENTURE PATH RENDERER
   // =========================================================
+  let selectedPlacedStickerId = null;
+  let stickerDrawerOpen = false;
+
+  function getStickerById(stkId) {
+    return (window.GAME_DATA.stickers || []).find((s) => s.id === stkId) || window.GAME_DATA.stickers[0];
+  }
+
+  function addStickerToLobby(stickerId) {
+    if (!Array.isArray(state.lobbyStickers)) state.lobbyStickers = [];
+    // Randomize safe spot away from exact center so multiple stickers don't stack invisibly
+    const angle = Math.random() * Math.PI * 2;
+    const rx = 26 + Math.random() * 14;
+    const ry = 22 + Math.random() * 14;
+    const x = Math.round(Math.min(88, Math.max(12, 50 + Math.cos(angle) * rx)));
+    const y = Math.round(Math.min(82, Math.max(18, 50 + Math.sin(angle) * ry)));
+    const newItem = {
+      id: "stk_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
+      stickerId,
+      x,
+      y,
+      scale: 1.0,
+      flip: false
+    };
+    state.lobbyStickers.push(newItem);
+    selectedPlacedStickerId = newItem.id;
+    saveState();
+    renderLobbyScene();
+  }
+
+  function renderLobbyScene() {
+    const canvas = document.getElementById("lobby-scene-canvas");
+    if (!canvas) return;
+
+    const pet = getActivePet();
+    const totalStickers = (window.GAME_DATA.stickers || []).length;
+    const unlockedCount = (state.unlockedStickers || []).length;
+
+    const titleEl = document.getElementById("lobby-room-title");
+    if (titleEl) titleEl.textContent = `🏡 ${state.settings.playerName}'s Pet Lobby`;
+
+    const badgeEl = document.getElementById("lobby-sticker-count-badge");
+    if (badgeEl) badgeEl.textContent = `✨ ${unlockedCount} / ${totalStickers} Stickers`;
+
+    const petEmojiEl = document.getElementById("lobby-pet-emoji");
+    const petTagEl = document.getElementById("lobby-pet-tag");
+    if (petEmojiEl) petEmojiEl.textContent = pet.emoji;
+    if (petTagEl) petTagEl.textContent = pet.name;
+
+    // Apply chosen lobby background
+    const bgs = window.GAME_DATA.lobbyBackgrounds || [];
+    const activeBg = bgs.find((b) => b.id === state.lobbyBg) || bgs[0];
+    if (activeBg) {
+      canvas.style.background = activeBg.css;
+    }
+
+    canvas.classList.toggle("decorating-active", stickerDrawerOpen);
+
+    // Clear previous placed sticker DOM elements
+    canvas.querySelectorAll(".placed-sticker-item").forEach((el) => el.remove());
+
+    // Render placed stickers with pointer drag support
+    (state.lobbyStickers || []).forEach((item) => {
+      const stkMeta = getStickerById(item.stickerId);
+      if (!stkMeta) return;
+
+      const el = document.createElement("div");
+      el.className = `placed-sticker-item ${item.id === selectedPlacedStickerId ? "selected-sticker" : ""}`;
+      el.textContent = stkMeta.emoji;
+      el.title = `${stkMeta.name} (Drag to move)`;
+      const scale = item.scale || 1.0;
+      const flipX = item.flip ? -1 : 1;
+      el.style.left = `${item.x}%`;
+      el.style.top = `${item.y}%`;
+      el.style.transform = `translate(-50%, -50%) scale(${(scale * flipX).toFixed(2)}, ${scale.toFixed(2)})`;
+
+      // Unified Pointer Events for smooth iPad / Phone / Mouse dragging
+      let isDragging = false;
+      let startX = 0;
+      let startY = 0;
+
+      el.addEventListener("pointerdown", (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        selectedPlacedStickerId = item.id;
+        isDragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        el.setPointerCapture(e.pointerId);
+        renderStickerToolbar();
+        canvas.querySelectorAll(".placed-sticker-item").forEach((node) => node.classList.remove("selected-sticker"));
+        el.classList.add("selected-sticker");
+      });
+
+      el.addEventListener("pointermove", (e) => {
+        if (!isDragging) return;
+        e.preventDefault();
+        const rect = canvas.getBoundingClientRect();
+        if (!rect.width || !rect.height) return;
+        const pctX = ((e.clientX - rect.left) / rect.width) * 100;
+        const pctY = ((e.clientY - rect.top) / rect.height) * 100;
+        item.x = Math.round(Math.min(93, Math.max(7, pctX)) * 10) / 10;
+        item.y = Math.round(Math.min(88, Math.max(12, pctY)) * 10) / 10;
+        el.style.left = `${item.x}%`;
+        el.style.top = `${item.y}%`;
+      });
+
+      const finishDrag = (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        try {
+          el.releasePointerCapture(e.pointerId);
+        } catch (_) {}
+        if (Math.hypot(e.clientX - startX, e.clientY - startY) > 3) {
+          window.soundFX.tap();
+        }
+        saveState();
+      };
+
+      el.addEventListener("pointerup", finishDrag);
+      el.addEventListener("pointercancel", finishDrag);
+
+      canvas.appendChild(el);
+    });
+
+    renderStickerToolbar();
+    if (stickerDrawerOpen) {
+      renderStickerDrawer();
+    }
+  }
+
+  function renderStickerToolbar() {
+    const toolbar = document.getElementById("lobby-sticker-toolbar");
+    if (!toolbar) return;
+    const item = (state.lobbyStickers || []).find((s) => s.id === selectedPlacedStickerId);
+    if (!item) {
+      toolbar.style.display = "none";
+      return;
+    }
+    const meta = getStickerById(item.stickerId);
+    toolbar.style.display = "flex";
+    const label = document.getElementById("toolbar-selected-label");
+    if (label && meta) {
+      label.textContent = `Selected: ${meta.emoji} ${meta.name}`;
+    }
+  }
+
+  function renderStickerDrawer() {
+    const bgPillsContainer = document.getElementById("lobby-bg-pills");
+    const trayGrid = document.getElementById("sticker-tray-grid");
+    const mysteryBtn = document.getElementById("btn-buy-mystery-sticker");
+    if (!bgPillsContainer || !trayGrid) return;
+
+    // 1. Render Backdrop Pills
+    bgPillsContainer.innerHTML = "";
+    (window.GAME_DATA.lobbyBackgrounds || []).forEach((bg) => {
+      const btn = document.createElement("button");
+      btn.className = `bg-choice-pill ${(state.lobbyBg || "bg_meadow") === bg.id ? "active" : ""}`;
+      btn.textContent = bg.name;
+      btn.addEventListener("click", () => {
+        window.soundFX.tap();
+        state.lobbyBg = bg.id;
+        saveState();
+        renderLobbyScene();
+      });
+      bgPillsContainer.appendChild(btn);
+    });
+
+    if (mysteryBtn) {
+      const lockedLeft = (window.GAME_DATA.stickers || []).filter(
+        (s) => !(state.unlockedStickers || []).includes(s.id)
+      ).length;
+      mysteryBtn.disabled = state.gems < 25 || lockedLeft === 0;
+      mysteryBtn.textContent =
+        lockedLeft === 0 ? "🌟 All 24 Unlocked!" : `🎁 Mystery Sticker (💎 25)`;
+    }
+
+    // 2. Render Sticker Tray (Unlocked -> Tap to Place, Locked -> Tap to Buy with Gems)
+    trayGrid.innerHTML = "";
+    (window.GAME_DATA.stickers || []).forEach((stk) => {
+      const isUnlocked = (state.unlockedStickers || []).includes(stk.id);
+      const btn = document.createElement("button");
+      btn.className = `sticker-tray-btn ${isUnlocked ? "unlocked" : "locked"}`;
+      btn.innerHTML = `
+        <span class="stk-btn-emoji">${stk.emoji}</span>
+        <span class="stk-btn-label">${stk.name}</span>
+        <span class="stk-btn-action">${isUnlocked ? "➕ Place" : `💎 ${stk.cost}`}</span>
+      `;
+
+      btn.addEventListener("click", () => {
+        if (isUnlocked) {
+          window.soundFX.correct(2);
+          addStickerToLobby(stk.id);
+        } else {
+          if (state.gems < stk.cost) {
+            window.soundFX.reset();
+            return;
+          }
+          state.gems -= stk.cost;
+          state.unlockedStickers.push(stk.id);
+          window.soundFX.chestOpen();
+          burstConfetti(45);
+          addStickerToLobby(stk.id);
+          renderHUD();
+        }
+      });
+
+      trayGrid.appendChild(btn);
+    });
+  }
+
+  // Bind Lobby Controls
+  document.getElementById("btn-toggle-sticker-drawer").addEventListener("click", () => {
+    window.soundFX.tap();
+    stickerDrawerOpen = !stickerDrawerOpen;
+    const drawer = document.getElementById("lobby-sticker-drawer");
+    const btn = document.getElementById("btn-toggle-sticker-drawer");
+    drawer.style.display = stickerDrawerOpen ? "block" : "none";
+    btn.textContent = stickerDrawerOpen ? "✓ Done Decorating" : "🎨 Decorate & Stickers";
+    if (!stickerDrawerOpen) {
+      selectedPlacedStickerId = null;
+    }
+    renderLobbyScene();
+  });
+
+  document.getElementById("lobby-scene-canvas").addEventListener("pointerdown", () => {
+    if (selectedPlacedStickerId) {
+      selectedPlacedStickerId = null;
+      renderLobbyScene();
+    }
+  });
+
+  document.getElementById("lobby-pet-centerpiece").addEventListener("click", (e) => {
+    e.stopPropagation();
+    window.soundFX.correct(3);
+    burstConfetti(25);
+  });
+
+  document.getElementById("btn-stk-bigger").addEventListener("click", () => {
+    const item = (state.lobbyStickers || []).find((s) => s.id === selectedPlacedStickerId);
+    if (!item) return;
+    window.soundFX.tap();
+    item.scale = Math.min(2.0, (item.scale || 1.0) + 0.2);
+    saveState();
+    renderLobbyScene();
+  });
+
+  document.getElementById("btn-stk-smaller").addEventListener("click", () => {
+    const item = (state.lobbyStickers || []).find((s) => s.id === selectedPlacedStickerId);
+    if (!item) return;
+    window.soundFX.tap();
+    item.scale = Math.max(0.6, (item.scale || 1.0) - 0.2);
+    saveState();
+    renderLobbyScene();
+  });
+
+  document.getElementById("btn-stk-flip").addEventListener("click", () => {
+    const item = (state.lobbyStickers || []).find((s) => s.id === selectedPlacedStickerId);
+    if (!item) return;
+    window.soundFX.tap();
+    item.flip = !item.flip;
+    saveState();
+    renderLobbyScene();
+  });
+
+  document.getElementById("btn-stk-remove").addEventListener("click", () => {
+    if (!selectedPlacedStickerId) return;
+    window.soundFX.tap();
+    state.lobbyStickers = (state.lobbyStickers || []).filter((s) => s.id !== selectedPlacedStickerId);
+    selectedPlacedStickerId = null;
+    saveState();
+    renderLobbyScene();
+  });
+
+  document.getElementById("btn-buy-mystery-sticker").addEventListener("click", () => {
+    const packItem = {
+      id: "reward_sticker_pack",
+      title: "Mystery Lobby Sticker Pack",
+      cost: 25,
+      icon: "✨",
+      type: "sticker_pack"
+    };
+    if (state.gems < packItem.cost) return;
+    redeemShopItem(packItem);
+  });
+
   function renderAdventureMap() {
+    renderLobbyScene();
     document.getElementById("map-streak-label").textContent = state.settings.defaultStreakLength;
 
     // Sync speed selector pills
@@ -685,7 +990,34 @@
     const popupModal = document.getElementById("reward-popup-modal");
     const popupContent = document.getElementById("reward-popup-content");
 
-    if (item.type === "egg") {
+    if (item.type === "sticker_pack") {
+      const lockedStickers = (window.GAME_DATA.stickers || []).filter(
+        (s) => !(state.unlockedStickers || []).includes(s.id)
+      );
+      if (lockedStickers.length > 0) {
+        const won = lockedStickers[Math.floor(Math.random() * lockedStickers.length)];
+        state.unlockedStickers.push(won.id);
+        addStickerToLobby(won.id);
+        popupContent.innerHTML = `
+          <h2 style="font-size:1.7rem; font-weight:900; margin:0 0 8px;">✨ Sticker Pack Opened!</h2>
+          <div class="hatched-pet-box">
+            <div style="font-size:4.2rem; margin:8px 0;">${won.emoji}</div>
+            <h3 style="margin:0; font-size:1.4rem; font-weight:900;">${won.name}</h3>
+            <p style="margin:6px 0 0; font-size:0.9rem; font-weight:700;">
+              Added straight to ${state.settings.playerName}'s Pet Lobby! Drag it anywhere you like!
+            </p>
+          </div>
+          <button class="btn-3d btn-green" id="btn-close-reward-popup" style="width:100%;">Awesome! 🎨</button>
+        `;
+      } else {
+        state.gems += 25;
+        popupContent.innerHTML = `
+          <h2 style="font-size:1.6rem; font-weight:900;">🌟 All 24 Stickers Collected!</h2>
+          <p style="font-weight:700;">${state.settings.playerName} already owns every sticker! Here are your 25 Gems back!</p>
+          <button class="btn-3d btn-green" id="btn-close-reward-popup" style="width:100%;">Yay!</button>
+        `;
+      }
+    } else if (item.type === "egg") {
       // Find locked pets
       const lockedPets = window.GAME_DATA.pets.filter((p) => !state.unlockedPets.includes(p.id));
       if (lockedPets.length > 0) {
@@ -748,6 +1080,7 @@
     saveState();
     renderHUD();
     renderShop();
+    renderLobbyScene();
     popupModal.classList.add("active");
 
     document.getElementById("btn-close-reward-popup").addEventListener("click", () => {
@@ -1744,6 +2077,34 @@
       `;
     }
 
+    // Bonus Lobby Sticker Reward from Treasure Chest (100% on 0-reset flawless runs, 50% otherwise)
+    const stickerContainer = document.getElementById("victory-new-sticker-container");
+    if (stickerContainer) {
+      stickerContainer.style.display = "none";
+      stickerContainer.innerHTML = "";
+      const lockedStickers = (window.GAME_DATA.stickers || []).filter(
+        (s) => !(state.unlockedStickers || []).includes(s.id)
+      );
+      const winSticker =
+        lockedStickers.length > 0 && (currentSession.resets === 0 || Math.random() < 0.55);
+      if (winSticker) {
+        const wonStk = lockedStickers[Math.floor(Math.random() * lockedStickers.length)];
+        state.unlockedStickers.push(wonStk.id);
+        addStickerToLobby(wonStk.id);
+        stickerContainer.style.display = "block";
+        stickerContainer.innerHTML = `
+          <div style="background:#f0fdf4; border:2px solid #86efac; border-radius:16px; padding:10px 14px; margin-top:10px;">
+            <div style="font-size:0.76rem; font-weight:900; color:#15803d; text-transform:uppercase;">
+              🎨 Bonus Lobby Sticker Won!
+            </div>
+            <div style="font-size:2.4rem; margin:4px 0;">${wonStk.emoji}</div>
+            <div style="font-size:1rem; font-weight:900;">${wonStk.name}</div>
+            <div style="font-size:0.78rem; font-weight:700; color:var(--text-muted);">Placed in your Pet Lobby!</div>
+          </div>
+        `;
+      }
+    }
+
     // Log to recentRuns
     const nowStr = new Date().toLocaleDateString(undefined, {
       month: "short",
@@ -1819,7 +2180,7 @@
     const container = document.getElementById("parent-rewards-manage-list");
     container.innerHTML = "";
     state.shopRewards.forEach((r, idx) => {
-      if (r.type === "egg") return; // keep Mystery Egg permanent
+      if (r.type === "egg" || r.type === "sticker_pack") return; // keep Mystery Egg & Sticker Pack permanent
       const row = document.createElement("div");
       row.style.cssText =
         "display:flex; justify-content:space-between; align-items:center; padding:6px 10px; background:var(--bg-main); border-radius:10px; margin-bottom:6px; font-weight:800; font-size:0.88rem;";

@@ -126,10 +126,21 @@
     const newer = remoteTs >= localTs ? remote : local;
     const older = remoteTs >= localTs ? local : remote;
 
-    // 1. Union of unlocked pets
+    // 1. Union of unlocked pets & unlocked stickers
     const unlockedPets = Array.from(
       new Set([...(local.unlockedPets || ["pet_owl"]), ...(remote.unlockedPets || ["pet_owl"])])
     );
+    const unlockedStickers = Array.from(
+      new Set([
+        ...(local.unlockedStickers || ["stk_star", "stk_blossom", "stk_crown"]),
+        ...(remote.unlockedStickers || ["stk_star", "stk_blossom", "stk_crown"])
+      ])
+    );
+    const lobbyStickers =
+      (newer.lobbyStickers && newer.lobbyStickers.length > 0)
+        ? newer.lobbyStickers
+        : (older.lobbyStickers || []);
+    const lobbyBg = newer.lobbyBg || older.lobbyBg || "bg_meadow";
 
     // 2. Best level progress per node
     const levelProgress = { ...(older.levelProgress || {}) };
@@ -191,6 +202,9 @@
       ...newer,
       gems,
       unlockedPets,
+      unlockedStickers,
+      lobbyStickers,
+      lobbyBg,
       levelProgress,
       factStats,
       coupons,

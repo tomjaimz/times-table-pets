@@ -597,6 +597,14 @@ window.GAME_DATA = {
 
   defaultShopRewards: [
     {
+      id: "reward_sticker_pack",
+      title: "Mystery Lobby Sticker Pack",
+      description: "Peel open a shiny sticker pack to win a new draggable sticker for your Pet Lobby!",
+      cost: 25,
+      icon: "✨",
+      type: "sticker_pack"
+    },
+    {
       id: "reward_mystery_egg",
       title: "Mystery Magical Pet Egg",
       description: "Hatch a random new collectible pet for your Sanctuary! (Or +25 bonus sparkles if all collected)",
@@ -636,5 +644,55 @@ window.GAME_DATA = {
       icon: "🌙",
       type: "coupon"
     }
+  ],
+
+  lobbyBackgrounds: [
+    {
+      id: "bg_meadow",
+      name: "🌈 Rainbow Meadow",
+      css: "linear-gradient(180deg, #bae6fd 0%, #e0f2fe 58%, #86efac 58%, #4ade80 100%)"
+    },
+    {
+      id: "bg_castle",
+      name: "🏰 Crystal Cloud",
+      css: "linear-gradient(180deg, #f3e8ff 0%, #fae8ff 60%, #f9a8d4 60%, #f472b6 100%)"
+    },
+    {
+      id: "bg_galaxy",
+      name: "🌌 Starlight Galaxy",
+      css: "linear-gradient(180deg, #1e1b4b 0%, #312e81 62%, #4c1d95 62%, #6d28d9 100%)"
+    },
+    {
+      id: "bg_beach",
+      name: "🏖️ Sunny Lagoon",
+      css: "linear-gradient(180deg, #7dd3fc 0%, #38bdf8 56%, #fde68a 56%, #fcd34d 100%)"
+    }
+  ],
+
+  stickers: [
+    { id: "stk_star", name: "Golden Star", emoji: "⭐", cost: 20 },
+    { id: "stk_blossom", name: "Cherry Blossom", emoji: "🌸", cost: 20 },
+    { id: "stk_crown", name: "Royal Crown", emoji: "👑", cost: 30 },
+    { id: "stk_rainbow", name: "Magic Rainbow", emoji: "🌈", cost: 30 },
+    { id: "stk_cupcake", name: "Sprinkle Cupcake", emoji: "🧁", cost: 25 },
+    { id: "stk_wand", name: "Fairy Wand", emoji: "🪄", cost: 35 },
+    { id: "stk_heart", name: "Sparkle Heart", emoji: "💖", cost: 20 },
+    { id: "stk_castle", name: "Fairy Castle", emoji: "🏰", cost: 45 },
+    { id: "stk_butterfly", name: "Blue Butterfly", emoji: "🦋", cost: 25 },
+    { id: "stk_donut", name: "Frosted Donut", emoji: "🍩", cost: 25 },
+    { id: "stk_guitar", name: "Rockstar Guitar", emoji: "🎸", cost: 35 },
+    { id: "stk_rocket", name: "Space Rocket", emoji: "🚀", cost: 35 },
+    { id: "stk_teddy", name: "Cozy Teddy", emoji: "🧸", cost: 30 },
+    { id: "stk_diamond", name: "Mega Diamond", emoji: "💎", cost: 40 },
+    { id: "stk_balloon", name: "Party Balloon", emoji: "🎈", cost: 20 },
+    { id: "stk_icecream", name: "Swirl Cone", emoji: "🍦", cost: 25 },
+    { id: "stk_sun", name: "Happy Sun", emoji: "🌞", cost: 25 },
+    { id: "stk_moon", name: "Crescent Moon", emoji: "🌙", cost: 25 },
+    { id: "stk_bow", name: "Pink Ribbon", emoji: "🎀", cost: 20 },
+    { id: "stk_mushroom", name: "Fairy Toadstool", emoji: "🍄", cost: 25 },
+    { id: "stk_crystal", name: "Fortune Orb", emoji: "🔮", cost: 40 },
+    { id: "stk_pizza", name: "Pizza Slice", emoji: "🍕", cost: 25 },
+    { id: "stk_ufo", name: "Cosmic UFO", emoji: "🛸", cost: 40 },
+    { id: "stk_trophy", name: "Champion Trophy", emoji: "🏆", cost: 45 }
   ]
 };

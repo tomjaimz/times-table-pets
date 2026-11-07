@@ -46,6 +46,60 @@
 
     <!-- TAB 1: ADVENTURE PATH (Duolingo-style Worlds) -->
     <section class="tab-view active" id="view-adventure">
+      <!-- Interactive Magical Pet Lobby & Sticker Scene -->
+      <div class="lobby-card" id="lobby-card">
+        <div class="lobby-header">
+          <div class="lobby-title-wrap">
+            <span class="lobby-title" id="lobby-room-title">🏡 Jemima's Pet Lobby</span>
+            <span class="lobby-subtitle" id="lobby-sticker-count-badge">3 / 24 Stickers</span>
+          </div>
+          <div class="lobby-actions">
+            <button class="btn-3d btn-purple lobby-btn" id="btn-toggle-sticker-drawer">
+              🎨 Decorate &amp; Stickers
+            </button>
+          </div>
+        </div>
+
+        <!-- Draggable Sticker Canvas -->
+        <div class="lobby-scene-canvas" id="lobby-scene-canvas">
+          <!-- Placed stickers rendered here dynamically -->
+          <div class="lobby-pet-centerpiece" id="lobby-pet-centerpiece" title="Tap your pet!">
+            <div class="lobby-pet-emoji" id="lobby-pet-emoji">🦉</div>
+            <div class="lobby-pet-tag" id="lobby-pet-tag">Pippin</div>
+          </div>
+          <div class="lobby-drag-hint" id="lobby-drag-hint">👆 Drag any sticker to move it!</div>
+        </div>
+
+        <!-- Selected Sticker Toolbar (appears when a placed sticker is tapped in Decorate mode) -->
+        <div class="lobby-sticker-toolbar" id="lobby-sticker-toolbar" style="display:none;">
+          <span class="toolbar-label" id="toolbar-selected-label">Selected: ⭐</span>
+          <div class="toolbar-btns">
+            <button class="toolbar-mini-btn" id="btn-stk-bigger" title="Make Bigger">➕ Bigger</button>
+            <button class="toolbar-mini-btn" id="btn-stk-smaller" title="Make Smaller">➖ Smaller</button>
+            <button class="toolbar-mini-btn" id="btn-stk-flip" title="Flip Mirror">↔️ Flip</button>
+            <button class="toolbar-mini-btn toolbar-btn-del" id="btn-stk-remove" title="Put Back in Tray">🗑️ Remove</button>
+          </div>
+        </div>
+
+        <!-- Collapsible Sticker Drawer & Shop -->
+        <div class="lobby-sticker-drawer" id="lobby-sticker-drawer" style="display:none;">
+          <div class="drawer-section-row">
+            <span class="drawer-label">🖼️ Scene Backdrop:</span>
+            <div class="lobby-bg-pills" id="lobby-bg-pills"></div>
+          </div>
+
+          <div class="drawer-section-row" style="margin-top:8px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; width:100%; flex-wrap:wrap; gap:6px;">
+              <span class="drawer-label">✨ Tap an Unlocked Sticker to Add to Lobby (or Buy New Ones with 💎):</span>
+              <button class="btn-3d btn-orange" id="btn-buy-mystery-sticker" style="padding:5px 11px; font-size:0.76rem;">
+                🎁 Mystery Sticker (💎 25)
+              </button>
+            </div>
+            <div class="sticker-tray-grid" id="sticker-tray-grid"></div>
+          </div>
+        </div>
+      </div>
+
       <div class="speed-selector-bar">
         <div class="speed-selector-title">
           <span>⏱️ Timer Speed & Streak Goal (<span id="map-streak-label">10</span> in a row):</span>
@@ -349,6 +403,7 @@
         </div>
 
         <div id="victory-new-pet-container" style="display:none;"></div>
+        <div id="victory-new-sticker-container" style="display:none;"></div>
 
         <div style="display:flex; gap:10px; justify-content:center; margin-top:18px; flex-wrap:wrap;">
           <button class="btn-3d btn-white" id="btn-victory-replay">🔄 Play Again</button>
