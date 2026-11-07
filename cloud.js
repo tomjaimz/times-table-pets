@@ -330,33 +330,41 @@
     }
   }
 
+  let unsubscribeSnapshot = null;
+
   function attachRealtimeListener(user) {
     if (!db || !user) return;
-    if (userStateRef) {
-      userStateRef.off();
+    if (unsubscribeSnapshot) {
+      unsubscribeSnapshot();
+      unsubscribeSnapshot = null;
     }
 
-    userStateRef = db.ref(`users/${user.uid}/state`);
-    const deviceRef = db.ref(`users/${user.uid}/devices/${getOrCreateDeviceId()}`);
+    userStateRef = db.collection("users").doc(user.uid);
+    const deviceRef = userStateRef.collection("devices").doc(getOrCreateDeviceId());
 
     // Register this device under the parent's account
-    deviceRef.set({
-      deviceId: getOrCreateDeviceId(),
-      label: getDeviceLabel(),
-      lastSeen: Date.now()
-    }).catch(() => {});
+    deviceRef
+      .set(
+        {
+          deviceId: getOrCreateDeviceId(),
+          label: getDeviceLabel(),
+          lastSeen: Date.now()
+        },
+        { merge: true }
+      )
+      .catch(() => {});
 
-    userStateRef.on(
-      "value",
-      (snapshot) => {
-        const remoteState = snapshot.val();
+    unsubscribeSnapshot = userStateRef.onSnapshot(
+      (docSnap) => {
+        const docData = docSnap.exists ? docSnap.data() : null;
+        const remoteState = docData && docData.state ? docData.state : docData;
         const localState = getLocalStateCallback ? getLocalStateCallback() : null;
 
         if (!remoteState && localState) {
           // First time this account syncs: upload current local progress to cloud
           pushStateToCloud(localState);
           syncStatus = "synced";
-          statusMessage = `Synced live with ${user.email}`;
+          statusMessage = `Synced live with ${user.email || "Parent Account"}`;
           updateCloudUI();
           return;
         }
@@ -371,18 +379,28 @@
 
           // If merging added local progress not yet in remote, push merged back
           if ((merged.updatedAt || 0) > (remoteState.updatedAt || 0)) {
-            userStateRef.set(merged).catch(() => {});
+            userStateRef
+              .set(
+                {
+                  state: merged,
+                  updatedAt: merged.updatedAt,
+                  email: user.email || "",
+                  lastModifiedByDevice: getOrCreateDeviceId()
+                },
+                { merge: true }
+              )
+              .catch(() => {});
           }
         }
 
         syncStatus = "synced";
-        statusMessage = `Synced live with ${user.email}`;
+        statusMessage = `Synced live with ${user.email || "Parent Account"}`;
         updateCloudUI();
       },
       (err) => {
-        console.warn("Realtime DB listener error:", err);
+        console.warn("Firestore listener error:", err);
         syncStatus = "error";
-        statusMessage = `Database rule/sync error: ${err.message}`;
+        statusMessage = `Cloud sync notice: ${err.message}`;
         updateCloudUI();
       }
     );
@@ -393,17 +411,26 @@
     syncStatus = "syncing";
     updateCloudUI();
 
-    const payload = {
+    const nowTs = Date.now();
+    const stateWithTs = {
       ...stateObj,
-      updatedAt: Date.now(),
+      updatedAt: nowTs,
       lastModifiedByDevice: getOrCreateDeviceId()
     };
 
     userStateRef
-      .set(payload)
+      .set(
+        {
+          state: stateWithTs,
+          updatedAt: nowTs,
+          email: currentUser.email || "",
+          lastModifiedByDevice: getOrCreateDeviceId()
+        },
+        { merge: true }
+      )
       .then(() => {
         syncStatus = "synced";
-        statusMessage = `Synced live with ${currentUser.email}`;
+        statusMessage = `Synced live with ${currentUser.email || "Parent Account"}`;
         updateCloudUI();
       })
       .catch((err) => {
@@ -435,7 +462,7 @@
           ? window.firebase.app()
           : window.firebase.initializeApp(cfg);
         auth = window.firebase.auth();
-        db = window.firebase.database();
+        db = window.firebase.firestore();
 
         // Persist auth indefinitely in localStorage/IndexedDB without expiry
         auth.setPersistence(window.firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
@@ -444,16 +471,17 @@
           currentUser = user;
           if (user) {
             syncStatus = "connecting";
-            statusMessage = `Connecting as ${user.email}...`;
+            statusMessage = `Connecting as ${user.email || "Parent Account"}...`;
             updateCloudUI();
             attachRealtimeListener(user);
           } else {
-            if (userStateRef) {
-              userStateRef.off();
-              userStateRef = null;
+            if (unsubscribeSnapshot) {
+              unsubscribeSnapshot();
+              unsubscribeSnapshot = null;
             }
+            userStateRef = null;
             syncStatus = "local";
-            statusMessage = "Ready to sign in with Parent Magic Link";
+            statusMessage = "Ready to sign in with Parent Magic Link (Optional)";
             updateCloudUI();
           }
         });
@@ -507,10 +535,11 @@
   }
 
   async function signOutCloud() {
-    if (userStateRef) {
-      userStateRef.off();
-      userStateRef = null;
+    if (unsubscribeSnapshot) {
+      unsubscribeSnapshot();
+      unsubscribeSnapshot = null;
     }
+    userStateRef = null;
     if (auth) {
       await auth.signOut();
     }

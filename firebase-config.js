@@ -1,17 +1,12 @@
 // Firebase Project Configuration for Jemima's Magical Pet Academy
-// Note: Firebase client config keys are public by design. Security is enforced
-// by Firebase Authentication + Realtime Database Security Rules (/users/$uid).
-//
-// Once you create your free Firebase project at https://console.firebase.google.com/
-// you can either paste the config below (and git push) OR paste it directly in the
-// in-app Cloud Sync modal!
+// Project: jemima-pet-academy
 
 window.FIREBASE_CONFIG = {
-  apiKey: "",
-  authDomain: "",
-  databaseURL: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: ""
+  apiKey: "AIzaSyCNoKp5A-GbTlKX7glegV8DXXBVGKK-wNI",
+  authDomain: "jemima-pet-academy.firebaseapp.com",
+  databaseURL: "https://jemima-pet-academy-default-rtdb.firebaseio.com",
+  projectId: "jemima-pet-academy",
+  storageBucket: "jemima-pet-academy.firebasestorage.app",
+  messagingSenderId: "833031603049",
+  appId: "1:833031603049:web:98398b3986b780bc85b3f8"
 };

@@ -1,0 +1,19 @@
+{
+  "auth": {
+    "providers": {
+      "anonymous": true,
+      "emailPassword": true,
+      "googleSignIn": {
+        "oAuthBrandDisplayName": "Jemima Pet Academy",
+        "supportEmail": "tomjaimz@gmail.com",
+        "authorizedRedirectUris": [
+          "https://jemima-pet-academy.firebaseapp.com/__/auth/handler",
+          "https://tomjaimz.github.io/times-table-pets/"
+        ]
+      }
+    }
+  },
+  "firestore": {
+    "rules": "firestore.rules"
+  }
+}

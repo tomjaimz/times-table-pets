@@ -1,0 +1,223 @@
+rules_version = '2';
+
+// ===============================================================
+// Assumed Data Model
+// ===============================================================
+//
+// This security rules file assumes the following data structures for
+// "Jemima's Magical Pet Academy":
+//
+// Collection: /users/{userId}
+// Document ID: {userId} (matches Firebase Auth UID)
+// Fields:
+//   - state: map (optional, max 50 keys) - nested game state object
+//   - updatedAt: number | timestamp (optional, >= 0) - last modification timestamp
+//   - createdAt: number | timestamp (optional, immutable) - creation timestamp
+//   - email: string (optional, max 320 chars) - linked parent/account email (PII, owner-only)
+//   - lastModifiedByDevice: string (optional, 1..128 chars) - ID of device that last synced
+//   - uid: string (optional, immutable, must match userId) - owner UID
+//   - settings: map (optional, max 30 keys) - top-level or synced game settings
+//   - gems: number (optional, 0..1000000000) - player gem balance
+//   - dailyStreak: map (optional, max 10 keys) - streak count and lastDate
+//   - activePetId: string (optional, max 64 chars) - currently equipped pet ID
+//   - unlockedPets: list (optional, max 100 items) - unlocked pet IDs
+//   - unlockedStickers: list (optional, max 200 items) - unlocked sticker IDs
+//   - lobbyBg: string (optional, max 64 chars) - selected room background ID
+//   - lobbyStickers: list (optional, max 200 items) - placed room stickers
+//   - levelProgress: map (optional, max 200 keys) - per-level stars and best times
+//   - factStats: map (optional, max 300 keys) - 12x12 multiplication mastery stats
+//   - shopRewards: list (optional, max 100 items) - parent reward shop items
+//   - coupons: list (optional, max 500 items) - earned reward coupons
+//   - recentRuns: list (optional, max 100 items) - recent quiz run history
+//   - devices: map (optional, max 50 keys) - optional embedded device map
+//
+// Subcollection: /users/{userId}/devices/{deviceId}
+// Document ID: {deviceId} (1..128 chars)
+// Fields:
+//   - deviceId: string (required, immutable, must match {deviceId}, 1..128 chars)
+//   - label: string (required, 1..128 chars) - human-readable device label
+//   - lastSeen: number | timestamp (required, >= 0) - last active timestamp
+//   - uid: string (optional, immutable, must match userId)
+//   - createdAt: number | timestamp (optional, immutable)
+//
+// ===============================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+
+    // Check if the user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Check if the authenticated user owns the resource by path userId
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Verify optional uid field matches the authenticated user on create
+    function uidUnchanged(userId) {
+      return !('uid' in request.resource.data) ||
+        (request.resource.data.uid is string && request.resource.data.uid == userId);
+    }
+
+    // Ensure uid field is not modified on update
+    function uidNotModified(userId) {
+      return !('uid' in request.resource.data) ||
+        (request.resource.data.uid is string &&
+         request.resource.data.uid == userId &&
+         (!('uid' in resource.data) || request.resource.data.uid == resource.data.uid));
+    }
+
+    // Ensure createdAt field is not modified on update if already set
+    function createdAtNotModified() {
+      return !('createdAt' in resource.data) ||
+        ('createdAt' in request.resource.data &&
+         request.resource.data.createdAt == resource.data.createdAt);
+    }
+
+    // Validate required fields exist
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    // Validate that the document contains only the allowed fields
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    // Validate optional string field length
+    function isValidOptionalString(data, field, minLen, maxLen) {
+      return !(field in data) ||
+        (data[field] is string &&
+         data[field].size() >= minLen &&
+         data[field].size() <= maxLen);
+    }
+
+    // Validate optional timestamp or epoch millisecond number
+    function isValidOptionalTime(data, field) {
+      return !(field in data) ||
+        data[field] is timestamp ||
+        (data[field] is number && data[field] >= 0 && data[field] <= 9999999999999);
+    }
+
+    // Validate optional bounded map
+    function isValidOptionalMap(data, field, maxKeys) {
+      return !(field in data) ||
+        (data[field] is map && data[field].size() <= maxKeys);
+    }
+
+    // Validate optional bounded list
+    function isValidOptionalList(data, field, maxItems) {
+      return !(field in data) ||
+        (data[field] is list && data[field].size() <= maxItems);
+    }
+
+    // ===============================================================
+    // Domain Validators (Used in BOTH create and update rules)
+    // ===============================================================
+
+    function isValidUserStateDoc(data, userId) {
+      let allowedFields = [
+        'state',
+        'updatedAt',
+        'createdAt',
+        'email',
+        'lastModifiedByDevice',
+        'uid',
+        'settings',
+        'gems',
+        'dailyStreak',
+        'activePetId',
+        'unlockedPets',
+        'unlockedStickers',
+        'lobbyBg',
+        'lobbyStickers',
+        'levelProgress',
+        'factStats',
+        'shopRewards',
+        'coupons',
+        'recentRuns',
+        'devices'
+      ];
+      return data.keys().size() >= 1 &&
+        hasOnlyAllowedFields(allowedFields) &&
+        uidUnchanged(userId) &&
+        isValidOptionalMap(data, 'state', 50) &&
+        isValidOptionalTime(data, 'updatedAt') &&
+        isValidOptionalTime(data, 'createdAt') &&
+        isValidOptionalString(data, 'email', 0, 320) &&
+        isValidOptionalString(data, 'lastModifiedByDevice', 1, 128) &&
+        isValidOptionalMap(data, 'settings', 30) &&
+        (!('gems' in data) || (data.gems is number && data.gems >= 0 && data.gems <= 1000000000)) &&
+        isValidOptionalMap(data, 'dailyStreak', 10) &&
+        isValidOptionalString(data, 'activePetId', 1, 64) &&
+        isValidOptionalList(data, 'unlockedPets', 100) &&
+        isValidOptionalList(data, 'unlockedStickers', 200) &&
+        isValidOptionalString(data, 'lobbyBg', 1, 64) &&
+        isValidOptionalList(data, 'lobbyStickers', 200) &&
+        isValidOptionalMap(data, 'levelProgress', 200) &&
+        isValidOptionalMap(data, 'factStats', 300) &&
+        isValidOptionalList(data, 'shopRewards', 100) &&
+        isValidOptionalList(data, 'coupons', 500) &&
+        isValidOptionalList(data, 'recentRuns', 100) &&
+        isValidOptionalMap(data, 'devices', 50);
+    }
+
+    function isValidDeviceDoc(data, userId, deviceId) {
+      let allowedFields = ['deviceId', 'label', 'lastSeen', 'uid', 'createdAt'];
+      let requiredFields = ['deviceId', 'label', 'lastSeen'];
+      return hasRequiredFields(requiredFields) &&
+        hasOnlyAllowedFields(allowedFields) &&
+        uidUnchanged(userId) &&
+        data.deviceId is string &&
+        data.deviceId == deviceId &&
+        data.deviceId.size() >= 1 &&
+        data.deviceId.size() <= 128 &&
+        data.label is string &&
+        data.label.size() >= 1 &&
+        data.label.size() <= 128 &&
+        (data.lastSeen is timestamp ||
+         (data.lastSeen is number && data.lastSeen >= 0 && data.lastSeen <= 9999999999999)) &&
+        isValidOptionalTime(data, 'createdAt');
+    }
+
+    // ===============================================================
+    // Collection Rules
+    // ===============================================================
+
+    // User game state document (strictly owner-only read and write)
+    match /users/{userId} {
+      allow get, list: if isOwner(userId);
+      allow create: if isOwner(userId) &&
+        isValidUserStateDoc(request.resource.data, userId);
+      allow update: if isOwner(userId) &&
+        isValidUserStateDoc(request.resource.data, userId) &&
+        uidNotModified(userId) &&
+        createdAtNotModified();
+      allow delete: if isOwner(userId);
+
+      // Linked device metadata subcollection (strictly owner-only read and write)
+      match /devices/{deviceId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) &&
+          isValidDeviceDoc(request.resource.data, userId, deviceId);
+        allow update: if isOwner(userId) &&
+          isValidDeviceDoc(request.resource.data, userId, deviceId) &&
+          request.resource.data.deviceId == resource.data.deviceId &&
+          uidNotModified(userId) &&
+          createdAtNotModified();
+        allow delete: if isOwner(userId);
+      }
+    }
+
+    // Default deny all other collections and documents
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
