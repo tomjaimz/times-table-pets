@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Jemima's Pets" />
+  <title>Jemima's Magical Pet Academy — Times Tables</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Confetti Canvas -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- Top HUD Bar -->
+  <header class="top-hud">
+    <div class="brand-group">
+      <button class="companion-pill" id="hud-companion-btn" title="Change Companion Pet">
+        <span class="pet-mini-emoji" id="hud-pet-emoji">🦉</span>
+        <span id="hud-pet-name">Pippin</span>
+      </button>
+      <h1 class="academy-title" id="hud-academy-title">Jemima's Magical Pet Academy</h1>
+    </div>
+
+    <div class="hud-stats">
+      <div class="stat-pill streak-pill" title="Daily Practice Streak">
+        <span>🔥</span>
+        <span id="hud-daily-streak">1</span>
+      </div>
+      <div class="stat-pill gem-pill" id="hud-gems-pill" title="Open Reward Shop">
+        <span>💎</span>
+        <span id="hud-gems">50</span>
+      </div>
+      <button class="icon-btn" id="hud-sound-btn" title="Toggle Sound">🔊</button>
+      <button class="icon-btn" id="hud-parent-btn" title="Parent Settings & Fine-Tuning">⚙️</button>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="app-container">
+
+    <!-- TAB 1: ADVENTURE PATH (Duolingo-style Worlds) -->
+    <section class="tab-view active" id="view-adventure">
+      <div class="speed-selector-bar">
+        <div class="speed-selector-title">
+          <span>⏱️ Timer Speed & Streak Goal (<span id="map-streak-label">10</span> in a row):</span>
+        </div>
+        <div class="speed-pills" id="map-speed-pills">
+          <button class="speed-pill active" data-seconds="3">⚡ 3s Blitz (2× 💎)</button>
+          <button class="speed-pill" data-seconds="5">⭐ 5s Fast (1.5× 💎)</button>
+          <button class="speed-pill" data-seconds="8">🌱 8s Warmup (1× 💎)</button>
+        </div>
+      </div>
+
+      <div id="adventure-worlds-container"></div>
+    </section>
+
+    <!-- TAB 2: CUSTOM PRACTICE & TRICKY FACTS -->
+    <section class="tab-view" id="view-practice">
+      <div class="section-card" style="background: linear-gradient(135deg, #fff5f5 0%, #fff0f6 100%); border-color: #fda4af;">
+        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+          <div>
+            <h2 style="color:#9f1239;">⚡ Tricky Facts Booster</h2>
+            <p class="sub" style="margin-bottom:0; color:#be123c;" id="practice-tricky-summary">
+              Focuses automatically on the exact times table facts Jemima has missed or answered slowly!
+            </p>
+          </div>
+          <button class="btn-3d btn-red" id="btn-start-tricky">🎯 Practice My Tricky Facts</button>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <h2>🎛️ Build Your Custom Run</h2>
+        <p class="sub">Pick which times tables (up to 12) to include in your streak challenge:</p>
+
+        <div style="display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap;">
+          <button class="btn-3d btn-white" id="btn-select-all-tables" style="padding:7px 14px; font-size:0.88rem;">Select All (1–12)</button>
+          <button class="btn-3d btn-white" id="btn-select-hard-tables" style="padding:7px 14px; font-size:0.88rem;">Tricky Tables (6, 7, 8, 9, 12)</button>
+          <button class="btn-3d btn-white" id="btn-clear-tables" style="padding:7px 14px; font-size:0.88rem;">Clear</button>
+        </div>
+
+        <div class="tables-grid" id="custom-tables-grid"></div>
+
+        <div class="config-row">
+          <div class="config-box">
+            <label>⏱️ Time Limit per Question</label>
+            <div class="option-pills" id="custom-timer-pills">
+              <button class="opt-pill active" data-val="3">⚡ 3 Seconds (Blitz)</button>
+              <button class="opt-pill" data-val="5">⭐ 5 Seconds (Fast)</button>
+              <button class="opt-pill" data-val="8">🌱 8 Seconds (Chill)</button>
+            </div>
+          </div>
+
+          <div class="config-box">
+            <label>🏁 Streak Length (Questions in a Row to Win)</label>
+            <div class="option-pills" id="custom-streak-pills">
+              <button class="opt-pill" data-val="5">5</button>
+              <button class="opt-pill" data-val="8">8</button>
+              <button class="opt-pill active" data-val="10">10 (Default)</button>
+              <button class="opt-pill" data-val="12">12</button>
+              <button class="opt-pill" data-val="15">15</button>
+              <button class="opt-pill" data-val="20">20</button>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn-3d btn-green" id="btn-start-custom" style="width:100%; font-size:1.25rem; padding:16px;">
+          🚀 Launch Custom Streak Run!
+        </button>
+      </div>
+    </section>
+
+    <!-- TAB 3: MAGICAL PET SANCTUARY -->
+    <section class="tab-view" id="view-pets">
+      <div class="section-card">
+        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+          <div>
+            <h2>🐾 Magical Pet Sanctuary</h2>
+            <p class="sub" style="margin-bottom:0;">Beat Adventure levels or hatch Mystery Eggs in the Shop to collect all 24 pets!</p>
+          </div>
+          <div class="stat-pill" style="font-size:1rem;">
+            <span>Unlocked:</span>
+            <span id="pets-unlocked-count">1 / 24</span>
+          </div>
+        </div>
+
+        <div class="pets-grid" id="pets-sanctuary-grid"></div>
+      </div>
+    </section>
+
+    <!-- TAB 4: GEM SHOP & REAL-LIFE PARENT COUPONS -->
+    <section class="tab-view" id="view-shop">
+      <div class="section-card">
+        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+          <div>
+            <h2>🎁 Magical Gem Shop</h2>
+            <p class="sub" style="margin-bottom:0;">Trade the Gems you earn from completing streaks for Mystery Eggs or Golden Coupons!</p>
+          </div>
+          <button class="btn-3d btn-white" id="btn-open-parent-from-shop" style="font-size:0.88rem; padding:8px 14px;">
+            ⚙️ Edit Rewards (Parent)
+          </button>
+        </div>
+
+        <div class="shop-grid" id="shop-items-grid"></div>
+      </div>
+
+      <div class="section-card">
+        <h2>🎟️ Jemima's Golden Coupons</h2>
+        <p class="sub">Show an active Golden Coupon to Mum or Dad to redeem your reward!</p>
+        <div class="coupon-list" id="coupons-history-list"></div>
+      </div>
+    </section>
+
+    <!-- TAB 5: PROGRESS & MASTERY METRICS -->
+    <section class="tab-view" id="view-stats">
+      <div class="kpi-grid" id="stats-kpi-grid"></div>
+
+      <!-- Top Tricky Facts Card -->
+      <div class="section-card">
+        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:12px;">
+          <div>
+            <h2>🎯 Top Tricky Facts to Conquer</h2>
+            <p class="sub" style="margin-bottom:0;">Automatically ranked by misses, timeouts, and response speed:</p>
+          </div>
+          <button class="btn-3d btn-orange" id="btn-stats-practice-tricky">⚡ Drill Tricky Facts</button>
+        </div>
+        <div id="tricky-facts-pills" style="display:flex; flex-wrap:wrap; gap:10px;"></div>
+      </div>
+
+      <!-- Interactive 12x12 Mastery Heatmap -->
+      <div class="section-card">
+        <h2>🗺️ 12×12 Times Table Mastery Heatmap</h2>
+        <p class="sub">Tap any square to inspect Jemima's exact accuracy and average speed (in seconds) for that fact:</p>
+
+        <div class="heatmap-legend">
+          <div class="legend-item"><span class="legend-swatch mastery-gold"></span> 👑 Mastered (≥90% &amp; &lt;2.2s)</div>
+          <div class="legend-item"><span class="legend-swatch mastery-green"></span> 🟢 Strong (≥80% &amp; &lt;3.5s)</div>
+          <div class="legend-item"><span class="legend-swatch mastery-yellow"></span> 🟡 Learning</div>
+          <div class="legend-item"><span class="legend-swatch mastery-red"></span> 🔴 Needs Practice</div>
+          <div class="legend-item"><span class="legend-swatch mastery-none"></span> ⚪ Not Tested Yet</div>
+        </div>
+
+        <div class="heatmap-wrapper">
+          <table class="heatmap-table" id="mastery-heatmap-table"></table>
+        </div>
+
+        <div class="fact-detail-banner" id="heatmap-fact-detail">
+          <span>👆 Tap any cell in the 12×12 grid above to see detailed speed &amp; accuracy metrics!</span>
+        </div>
+      </div>
+
+      <!-- Per-Table Mastery Breakdown -->
+      <div class="section-card">
+        <h2>📈 Mastery by Times Table (×1 to ×12)</h2>
+        <p class="sub">Percentage of facts practiced &amp; mastered in each table, plus average answer speed:</p>
+        <div class="table-progress-list" id="per-table-progress-list"></div>
+      </div>
+
+      <!-- Recent Streak Runs History -->
+      <div class="section-card">
+        <h2>📜 Recent Streak Runs Log</h2>
+        <p class="sub">Tracks completed runs, timer speeds, average response times, and how many resets were overcome:</p>
+        <div id="recent-runs-list"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Bottom Tab Navigation -->
+  <nav class="bottom-nav">
+    <button class="nav-tab active" data-tab="adventure">
+      <span class="nav-icon">🗺️</span>
+      <span>Adventure</span>
+    </button>
+    <button class="nav-tab" data-tab="practice">
+      <span class="nav-icon">🎯</span>
+      <span>Practice</span>
+    </button>
+    <button class="nav-tab" data-tab="pets">
+      <span class="nav-icon">🐾</span>
+      <span>Pets</span>
+    </button>
+    <button class="nav-tab" data-tab="shop">
+      <span class="nav-icon">🎁</span>
+      <span>Shop</span>
+    </button>
+    <button class="nav-tab" data-tab="stats">
+      <span class="nav-icon">📊</span>
+      <span>Metrics</span>
+    </button>
+  </nav>
+
+  <!-- =========================================================
+       FULL-SCREEN GAME OVERLAY (The 3-Second Streak Challenge)
+       ========================================================= -->
+  <div class="game-overlay" id="game-overlay">
+    <div class="game-top-bar">
+      <button class="icon-btn" id="btn-quit-game" title="Exit to Map">✕</button>
+
+      <div class="streak-track-wrap">
+        <div class="streak-bar-outer">
+          <div class="streak-bar-fill" id="game-streak-fill"></div>
+        </div>
+        <div class="streak-counter-badge" id="game-streak-text">0 / 10</div>
+        <div class="chest-goal-icon" id="game-chest-icon">🧰</div>
+      </div>
+
+      <div class="stat-pill" id="game-resets-pill" title="Resets this run">
+        <span>🔄</span>
+        <span id="game-resets-count">0</span>
+      </div>
+    </div>
+
+    <div class="game-stage">
+      <!-- Active Pet Companion & Dynamic Cheer / Reset Teaching Bubble -->
+      <div class="companion-cheer-row">
+        <div class="stage-pet-avatar" id="stage-pet-avatar">🦉</div>
+        <div class="speech-bubble" id="stage-speech-bubble">
+          Ready, Jemima? Answer before the bar runs out!
+        </div>
+      </div>
+
+      <!-- Precision Countdown Timer Bar -->
+      <div class="timer-bar-container">
+        <span style="font-size:1.2rem;">⏱️</span>
+        <div class="timer-track">
+          <div class="timer-fill" id="game-timer-fill"></div>
+        </div>
+        <div class="timer-text" id="game-timer-text">3.0s</div>
+      </div>
+
+      <!-- Multiplication Problem Card -->
+      <div class="problem-card" id="game-problem-card">
+        <h2 class="problem-equation" id="game-equation">7 × 8 = ?</h2>
+        <div class="problem-sub-hint" id="game-sub-hint">Tap the right answer below!</div>
+      </div>
+
+      <!-- 4 Multiple Choice Buttons -->
+      <div class="choices-grid" id="game-choices-grid">
+        <button class="choice-btn" data-idx="0">48</button>
+        <button class="choice-btn" data-idx="1">54</button>
+        <button class="choice-btn" data-idx="2">56</button>
+        <button class="choice-btn" data-idx="3">64</button>
+      </div>
+    </div>
+
+    <div style="text-align:center; font-size:0.82rem; font-weight:800; color:var(--text-muted);">
+      <span id="game-mode-footer">Level: 1× &amp; 2× Sprout Path • ⚡ 3s Blitz Mode</span>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       VICTORY & TREASURE CHEST MODAL
+       ========================================================= -->
+  <div class="modal-backdrop" id="victory-modal">
+    <div class="modal-card">
+      <h2 style="font-size:1.8rem; font-weight:900; margin:0 0 6px;" id="victory-title">Streak Complete! 🎉</h2>
+      <p style="font-weight:800; color:var(--text-muted); margin:0 0 12px;" id="victory-subtitle">
+        Jemima conquered all 10 in a row!
+      </p>
+
+      <!-- Step 1: Tap to Open Chest -->
+      <div id="chest-unopened-view">
+        <button class="chest-big-btn" id="btn-open-chest" title="Tap to Open Treasure Chest!">🎁</button>
+        <p style="font-weight:900; color:var(--duo-orange-dark);">👆 Tap the Treasure Chest to claim your reward!</p>
+      </div>
+
+      <!-- Step 2: Opened Rewards & Hatched Pet -->
+      <div id="chest-opened-view" style="display:none;">
+        <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap; margin:12px 0;">
+          <div class="stat-pill gem-pill" style="font-size:1.2rem; padding:10px 18px;">
+            <span>💎</span>
+            <span id="victory-gems-earned">+40 Gems</span>
+          </div>
+          <div class="stat-pill streak-pill" style="font-size:1.1rem; padding:10px 16px;">
+            <span>⚡ Avg:</span>
+            <span id="victory-avg-speed">1.6s</span>
+          </div>
+        </div>
+
+        <div id="victory-new-pet-container" style="display:none;"></div>
+
+        <div style="display:flex; gap:10px; justify-content:center; margin-top:18px; flex-wrap:wrap;">
+          <button class="btn-3d btn-white" id="btn-victory-replay">🔄 Play Again</button>
+          <button class="btn-3d btn-green" id="btn-victory-continue">🗺️ Continue Adventure</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       GOLDEN COUPON / EGG HATCH MODAL
+       ========================================================= -->
+  <div class="modal-backdrop" id="reward-popup-modal">
+    <div class="modal-card" id="reward-popup-content"></div>
+  </div>
+
+  <!-- =========================================================
+       PARENT SETTINGS & FINE-TUNING MODAL
+       ========================================================= -->
+  <div class="modal-backdrop" id="parent-modal">
+    <div class="modal-card" style="max-width:580px; text-align:left;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <h2 style="margin:0; font-weight:900;">⚙️ Parent Settings &amp; Fine-Tuning</h2>
+        <button class="icon-btn" id="btn-close-parent">✕</button>
+      </div>
+
+      <div class="form-group">
+        <label>Child's Name (Displayed in Title &amp; Pet Cheers)</label>
+        <input type="text" class="form-input" id="parent-input-name" value="Jemima" />
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+        <div class="form-group">
+          <label>Default Streak Length (Questions in a Row)</label>
+          <select class="form-input" id="parent-select-streak">
+            <option value="5">5 in a row (Quick)</option>
+            <option value="8">8 in a row</option>
+            <option value="10" selected>10 in a row (Recommended)</option>
+            <option value="12">12 in a row</option>
+            <option value="15">15 in a row (Endurance)</option>
+            <option value="20">20 in a row (Marathon)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Default Timer Speed</label>
+          <select class="form-input" id="parent-select-timer">
+            <option value="3">⚡ 3 Seconds (Blitz)</option>
+            <option value="5">⭐ 5 Seconds (Fast)</option>
+            <option value="8">🌱 8 Seconds (Warmup)</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+        <div class="form-group">
+          <label>Teaching Pause After a Miss</label>
+          <select class="form-input" id="parent-select-pause">
+            <option value="1200">1.2 Seconds (Snappy)</option>
+            <option value="1700" selected>1.7 Seconds (Recommended)</option>
+            <option value="2500">2.5 Seconds (Extra Reading Time)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Award Bonus Gems (Parent Boost)</label>
+          <button class="btn-3d btn-blue" id="btn-parent-grant-gems" style="width:100%; padding:9px;">
+            💎 Grant +50 Gems to Jemima
+          </button>
+        </div>
+      </div>
+
+      <hr style="border:none; border-top:2px solid var(--border-light); margin:16px 0;" />
+
+      <h3 style="margin:0 0 8px; font-weight:900;">🎟️ Add Custom Shop Reward Coupon</h3>
+      <div style="display:grid; grid-template-columns: 70px 1fr 100px; gap:8px; margin-bottom:10px;">
+        <input type="text" class="form-input" id="new-reward-icon" placeholder="🎁" value="🎮" style="text-align:center;" />
+        <input type="text" class="form-input" id="new-reward-title" placeholder="e.g., 15 Mins Extra Screen Time" />
+        <input type="number" class="form-input" id="new-reward-cost" placeholder="Gems" value="100" min="10" step="10" />
+      </div>
+      <button class="btn-3d btn-purple" id="btn-add-custom-reward" style="width:100%; padding:10px; font-size:0.95rem; margin-bottom:14px;">
+        ➕ Add Reward to Jemima's Shop
+      </button>
+
+      <div id="parent-rewards-manage-list" style="max-height:150px; overflow-y:auto; margin-bottom:16px;"></div>
+
+      <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-top:16px;">
+        <button class="btn-3d btn-white" id="btn-export-data" style="font-size:0.85rem; padding:8px 12px;">📋 Export Backup JSON</button>
+        <button class="btn-3d btn-green" id="btn-save-parent" style="flex:1;">💾 Save Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="sound.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
