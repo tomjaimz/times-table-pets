@@ -347,7 +347,7 @@
               ${bestSpeedBadge}
             </div>
           </div>
-          <button class="btn-3d ${isCompleted ? "btn-green" : "btn-blue"}" style="padding:10px 16px; font-size:0.95rem;">
+          <button class="btn-3d ${isCompleted ? "btn-green" : "btn-blue"} node-play-btn" style="padding:10px 16px; font-size:0.95rem;">
             Play ▶
           </button>
         `;
