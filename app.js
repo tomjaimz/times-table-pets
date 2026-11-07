@@ -389,6 +389,7 @@
   let customSelectedTables = new Set([6, 7, 8]);
   let customTimerSec = 3;
   let customStreakLen = 10;
+  let customQuestionStyle = state.settings.questionStyle || "mix";
 
   function renderCustomPractice() {
     const tricky = getTrickyFactsList(6);
@@ -433,6 +434,9 @@
     document.querySelectorAll("#custom-streak-pills .opt-pill").forEach((btn) => {
       btn.classList.toggle("active", Number(btn.dataset.val) === customStreakLen);
     });
+    document.querySelectorAll("#custom-style-pills .opt-pill").forEach((btn) => {
+      btn.classList.toggle("active", btn.dataset.val === customQuestionStyle);
+    });
   }
 
   document.querySelectorAll("#custom-timer-pills .opt-pill").forEach((btn) => {
@@ -447,6 +451,14 @@
     btn.addEventListener("click", () => {
       window.soundFX.tap();
       customStreakLen = Number(btn.dataset.val);
+      renderCustomPractice();
+    });
+  });
+
+  document.querySelectorAll("#custom-style-pills .opt-pill").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      window.soundFX.tap();
+      customQuestionStyle = btn.dataset.val;
       renderCustomPractice();
     });
   });
@@ -477,6 +489,7 @@
       nodeId: null,
       title: `Custom Practice (×${tables.join(", ×")})`,
       tables,
+      questionStyle: customQuestionStyle,
       timerSeconds: customTimerSec,
       streakLength: customStreakLen,
       baseGems: Math.round(customStreakLen * 3),
@@ -934,10 +947,116 @@
   }
 
   // =========================================================
+  // PEDAGOGICAL ENGINE: DERIVED FACTS, RHYMES & VISUAL ARRAYS
+  // =========================================================
+  function getPedagogicalStrategy(a, b) {
+    const ans = a * b;
+    const minF = Math.min(a, b);
+    const maxF = Math.max(a, b);
+    const pairKey = `${minF}x${maxF}`;
+
+    // 1. Famous Memory Rhymes for the classic toughest facts
+    const famousRhymes = {
+      "7x8": `🎵 Count in order: 5, 6, 7, 8! → 56 = 7 × 8!`,
+      "6x8": `🎵 Six and eight went on a date → 48! (Plus: half of 8 is 4, then 8 → 48!)`,
+      "6x7": `💡 Anchor from 5s: (5 × 7 = 35) + one more 7 = 42!`,
+      "6x6": `🎵 Six times six is a magic trick → 36!`,
+      "7x7": `🎵 Seven times seven is mighty fine → 49! (5×7=35 + 2×7=14)`,
+      "8x8": `🎵 I ate and I ate until I was 64! (8 × 8 = 64)`
+    };
+    if (famousRhymes[pairKey]) {
+      return famousRhymes[pairKey];
+    }
+
+    // 2. Derived Fact Strategies by factor
+    if (minF === 1) {
+      return `💡 1 × anything stays the same number → ${ans}!`;
+    }
+    if (minF === 2) {
+      return `💡 Double it! ${maxF} + ${maxF} = ${ans}!`;
+    }
+    if (minF === 10 || maxF === 10) {
+      const other = a === 10 ? b : a;
+      return `💡 Place value shift: ${other} tens = ${ans} (put a 0 on the end of ${other})!`;
+    }
+    if (minF === 5 || maxF === 5) {
+      const other = a === 5 ? b : a;
+      return `💡 5s Trick: Half of (10 × ${other} = ${other * 10}) is ${ans}!`;
+    }
+    if (minF === 9 || maxF === 9) {
+      const other = a === 9 ? b : a;
+      const tensMinusOne = other * 10;
+      const d1 = Math.floor(ans / 10);
+      const d2 = ans % 10;
+      return `💡 9s Trick: (10 × ${other} = ${tensMinusOne}) − ${other} = ${ans}! (Digits ${d1}+${d2}=${d1 + d2})`;
+    }
+    if (minF === 4) {
+      return `💡 Double-Double! Double ${maxF} is ${maxF * 2}, double ${maxF * 2} is ${ans}!`;
+    }
+    if (minF === 3) {
+      return `💡 Double + 1 group: (2 × ${maxF} = ${maxF * 2}) + ${maxF} = ${ans}!`;
+    }
+    if (minF === 6) {
+      return `💡 Anchor from 5s: (5 × ${maxF} = ${maxF * 5}) + ${maxF} = ${ans}!`;
+    }
+    if (maxF === 11 && minF <= 9) {
+      return `💡 11s Twin Digits! ${minF} × 11 repeats the digit → ${ans}!`;
+    }
+    if (maxF === 11 || minF === 11) {
+      const other = a === 11 ? b : a;
+      return `💡 11s Split: (10 × ${other} = ${other * 10}) + ${other} = ${ans}!`;
+    }
+    if (maxF === 12 || minF === 12) {
+      const other = a === 12 ? b : a;
+      return `💡 Dozen Split (10 + 2): (10 × ${other} = ${other * 10}) + (2 × ${other} = ${other * 2}) = ${ans}!`;
+    }
+    // General anchor split from 5
+    return `💡 Split ${minF} into 5 + ${minF - 5}: (5×${maxF}=${5 * maxF}) + (${minF - 5}×${maxF}=${(minF - 5) * maxF}) = ${ans}!`;
+  }
+
+  function renderVisualDotArray(a, b, container) {
+    if (!state.settings.showVisualArrayOnMiss) {
+      container.style.display = "none";
+      return;
+    }
+    // Use smaller factor as rows (up to 12) and larger as columns so it stays compact horizontally
+    const rows = Math.min(a, b);
+    const cols = Math.max(a, b);
+
+    // Choose pedagogical anchor split row count (e.g., 10 for 11/12, 5 for 6..9, 2 for 3/4)
+    let anchorRows = rows;
+    if (rows > 10) anchorRows = 10;
+    else if (rows > 5) anchorRows = 5;
+    else if (rows === 4 || rows === 3) anchorRows = 2;
+
+    const extraRows = rows - anchorRows;
+
+    let dotsHtml = `<div class="array-dots-container">`;
+    for (let r = 0; r < rows; r++) {
+      const isAnchor = r < anchorRows;
+      dotsHtml += `<div class="array-dot-row">`;
+      for (let c = 0; c < cols; c++) {
+        dotsHtml += `<span class="array-dot ${isAnchor ? "dot-anchor" : "dot-extra"}"></span>`;
+      }
+      dotsHtml += `</div>`;
+    }
+    dotsHtml += `</div>`;
+
+    const splitLegend =
+      extraRows > 0
+        ? `🔵 ${anchorRows}×${cols} (${anchorRows * cols}) ➕ 🟠 ${extraRows}×${cols} (${extraRows * cols}) = <strong>${a * b}</strong>`
+        : `🔵 ${rows} rows of ${cols} = <strong>${a * b}</strong>`;
+
+    container.innerHTML = `${dotsHtml}<div class="array-legend-text">${splitLegend}</div>`;
+    container.style.display = "flex";
+  }
+
+  // =========================================================
   // CORE STREAK GAMEPLAY ENGINE (3-Second Timer + Reset to 0)
   // =========================================================
   let currentSession = null;
   let timerAnimId = null;
+  let autoResetTimeoutId = null;
 
   function generateSmartChoices(a, b) {
     const correct = a * b;
@@ -963,7 +1082,6 @@
     candidates.delete(correct);
     const pool = Array.from(candidates);
 
-    // Shuffle pool and take 3 distractors
     for (let i = pool.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [pool[i], pool[j]] = [pool[j], pool[i]];
@@ -985,23 +1103,116 @@
     return choices;
   }
 
+  // Smart choices for Mystery Factor questions (7 × ❓ = 56 -> choices like 6, 7, 8, 9)
+  function generateSmartFactorChoices(correctFactor) {
+    const candidates = new Set();
+    [correctFactor - 2, correctFactor - 1, correctFactor + 1, correctFactor + 2, correctFactor + 3, correctFactor - 3].forEach(
+      (val) => {
+        if (val >= 1 && val <= 12 && val !== correctFactor) {
+          candidates.add(val);
+        }
+      }
+    );
+    const pool = Array.from(candidates);
+    for (let i = pool.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [pool[i], pool[j]] = [pool[j], pool[i]];
+    }
+    const distractors = pool.slice(0, 3);
+    while (distractors.length < 3) {
+      const rand = Math.floor(Math.random() * 12) + 1;
+      if (rand !== correctFactor && !distractors.includes(rand)) {
+        distractors.push(rand);
+      }
+    }
+    const choices = [correctFactor, ...distractors];
+    for (let i = choices.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [choices[i], choices[j]] = [choices[j], choices[i]];
+    }
+    return choices;
+  }
+
+  function applyQuestionStyle(rawQ, session) {
+    const style = session.questionStyle || state.settings.questionStyle || "mix";
+    let qType = "standard";
+    if (style === "mystery") {
+      qType = Math.random() < 0.5 ? "mystery_b" : "mystery_a";
+    } else if (style === "mix" && session.currentStreak >= 1 && Math.random() < 0.25) {
+      qType = Math.random() < 0.65 ? "mystery_b" : "mystery_a";
+    }
+    return {
+      ...rawQ,
+      questionType: qType
+    };
+  }
+
   function pickNextQuestion(session) {
-    // 1. Check if any missed fact in retryQueue is ready to be tested again
-    if (session.retryQueue.length > 0 && session.questionsSinceLastRetry >= 1) {
-      const nextRetry = session.retryQueue.shift();
-      session.questionsSinceLastRetry = 0;
-      return nextRetry;
+    const step = session.currentStreak;
+    const midStep = Math.max(3, Math.floor(session.streakLength / 2));
+    const finalStep = session.streakLength - 1;
+
+    // 1. EXPANDING SPACED RETRIEVAL SCHEDULE (Step 2 -> Midpoint Twin -> Final Boss Question!)
+    if (session.redemptionFact) {
+      const rf = session.redemptionFact;
+      if (step === 2 && !session.redemptionStage1Done) {
+        session.redemptionStage1Done = true;
+        return applyQuestionStyle(
+          { a: rf.a, b: rf.b, badge: "🔄 Spaced Review (1/3)", badgeClass: "" },
+          session
+        );
+      }
+      if (step === midStep && session.streakLength >= 6 && !session.redemptionStage2Done) {
+        session.redemptionStage2Done = true;
+        // Commutative Twin (b × a)
+        return applyQuestionStyle(
+          { a: rf.b, b: rf.a, badge: `🪞 Commutative Twin (${rf.b}×${rf.a} = ${rf.a}×${rf.b})`, badgeClass: "" },
+          session
+        );
+      }
+      if (step === finalStep && !session.redemptionStage3Done) {
+        session.redemptionStage3Done = true;
+        return applyQuestionStyle(
+          { a: rf.a, b: rf.b, badge: "👑 Final Redemption Boss Fact!", badgeClass: "badge-boss" },
+          session
+        );
+      }
     }
 
-    // 2. Build candidate pool from session tables or customFactPairs
+    // 2. Secondary retry queue if multiple facts were missed
+    if (session.retryQueue.length > 0 && session.questionsSinceLastRetry >= 2) {
+      const nextRetry = session.retryQueue.shift();
+      session.questionsSinceLastRetry = 0;
+      return applyQuestionStyle(
+        { a: nextRetry.a, b: nextRetry.b, badge: "🔄 Tricky Fact Review", badgeClass: "" },
+        session
+      );
+    }
+
+    // 3. 18% Interleaved Anchor Review when practicing single tables (prevents rote +N counting)
+    if (session.tables.length === 1 && step >= 2 && Math.random() < 0.18) {
+      const anchors = [2, 5, 10].filter((t) => !session.tables.includes(t));
+      const anchorT = anchors[Math.floor(Math.random() * anchors.length)];
+      const targetT = session.tables[0];
+      return applyQuestionStyle(
+        {
+          a: anchorT,
+          b: targetT,
+          badge: "⚓ Anchor Fact Link",
+          badgeClass: ""
+        },
+        session
+      );
+    }
+
+    // 4. Build candidate pool from session tables or customFactPairs
     const pool = [];
     if (session.customFactPairs && session.customFactPairs.length > 0) {
       session.customFactPairs.forEach((pair) => pool.push({ a: pair.a, b: pair.b }));
     }
     session.tables.forEach((t) => {
       for (let b = 1; b <= 12; b++) {
-        // Randomly present as t × b or b × t so she recognizes both orders
-        if (Math.random() < 0.75) {
+        if (Math.random() < 0.72) {
           pool.push({ a: t, b });
         } else {
           pool.push({ a: b, b: t });
@@ -1009,24 +1220,32 @@
       }
     });
 
-    // Filter out the exact last question so it doesn't repeat back-to-back
     const filtered = pool.filter(
       (q) => !session.lastQuestion || !(q.a === session.lastQuestion.a && q.b === session.lastQuestion.b)
     );
     const source = filtered.length > 0 ? filtered : pool;
     const chosen = source[Math.floor(Math.random() * source.length)];
     session.questionsSinceLastRetry += 1;
-    return chosen;
+    return applyQuestionStyle(chosen, session);
   }
 
   function startGameSession(config) {
     checkDailyStreak();
     renderHUD();
+    if (autoResetTimeoutId) {
+      clearTimeout(autoResetTimeoutId);
+      autoResetTimeoutId = null;
+    }
 
     currentSession = {
       ...config,
+      questionStyle: config.questionStyle || state.settings.questionStyle || "mix",
       currentStreak: 0,
       resets: 0,
+      redemptionFact: null,
+      redemptionStage1Done: false,
+      redemptionStage2Done: false,
+      redemptionStage3Done: false,
       retryQueue: [],
       questionsSinceLastRetry: 0,
       lastQuestion: null,
@@ -1034,6 +1253,7 @@
       questionStartTime: 0,
       streakResponseTimesMs: [],
       isLocked: false,
+      waitingForMissTap: false,
       lowTimeTickPlayed: false
     };
 
@@ -1081,23 +1301,63 @@
   function dealNextQuestion() {
     if (!currentSession) return;
     stopTimerLoop();
+    if (autoResetTimeoutId) {
+      clearTimeout(autoResetTimeoutId);
+      autoResetTimeoutId = null;
+    }
 
     const q = pickNextQuestion(currentSession);
     currentSession.currentQuestion = q;
     currentSession.lastQuestion = q;
     currentSession.isLocked = false;
+    currentSession.waitingForMissTap = false;
     currentSession.lowTimeTickPlayed = false;
 
     const card = document.getElementById("game-problem-card");
     card.className = "problem-card";
 
-    document.getElementById("game-equation").textContent = `${q.a} × ${q.b} = ?`;
-    document.getElementById("game-sub-hint").textContent =
-      currentSession.currentStreak === 0
-        ? "Tap the matching answer!"
-        : `🔥 ${currentSession.currentStreak} in a row! Keep going!`;
+    // Hide miss coaching elements during active question
+    const strategyBox = document.getElementById("game-strategy-box");
+    const visualArray = document.getElementById("game-visual-array");
+    strategyBox.style.display = "none";
+    visualArray.style.display = "none";
 
-    const choices = generateSmartChoices(q.a, q.b);
+    // Render badge if Spaced Review, Commutative Twin, Boss Fact, or Mystery Factor
+    const badgeEl = document.getElementById("game-question-badge");
+    if (q.badge) {
+      badgeEl.textContent = q.badge;
+      badgeEl.className = `question-badge ${q.badgeClass || ""}`;
+      badgeEl.style.display = "inline-flex";
+    } else if (q.questionType === "mystery_a" || q.questionType === "mystery_b") {
+      badgeEl.textContent = "🧩 Mystery Factor (Fact Family)";
+      badgeEl.className = "question-badge badge-mystery";
+      badgeEl.style.display = "inline-flex";
+    } else {
+      badgeEl.style.display = "none";
+    }
+
+    // Format equation & generate choices based on questionType
+    let choices = [];
+    if (q.questionType === "mystery_b") {
+      document.getElementById("game-equation").textContent = `${q.a} × ❓ = ${q.a * q.b}`;
+      document.getElementById("game-sub-hint").textContent = `Which number times ${q.a} makes ${q.a * q.b}?`;
+      currentSession.expectedAnswer = q.b;
+      choices = generateSmartFactorChoices(q.b);
+    } else if (q.questionType === "mystery_a") {
+      document.getElementById("game-equation").textContent = `❓ × ${q.b} = ${q.a * q.b}`;
+      document.getElementById("game-sub-hint").textContent = `Which number times ${q.b} makes ${q.a * q.b}?`;
+      currentSession.expectedAnswer = q.a;
+      choices = generateSmartFactorChoices(q.a);
+    } else {
+      document.getElementById("game-equation").textContent = `${q.a} × ${q.b} = ?`;
+      document.getElementById("game-sub-hint").textContent =
+        currentSession.currentStreak === 0
+          ? "Tap the matching answer!"
+          : `🔥 ${currentSession.currentStreak} in a row! Keep going!`;
+      currentSession.expectedAnswer = q.a * q.b;
+      choices = generateSmartChoices(q.a, q.b);
+    }
+
     currentSession.currentChoices = choices;
 
     const buttons = document.querySelectorAll("#game-choices-grid .choice-btn");
@@ -1145,41 +1405,61 @@
     timerAnimId = requestAnimationFrame(tickTimer);
   }
 
+  function acknowledgeMissAndRestart() {
+    if (!currentSession || !currentSession.waitingForMissTap) return;
+    currentSession.waitingForMissTap = false;
+    window.soundFX.tap();
+    const bubble = document.getElementById("stage-speech-bubble");
+    bubble.className = "speech-bubble";
+    bubble.textContent = `Fresh start, ${state.settings.playerName}! Let's get all ${currentSession.streakLength}!`;
+    dealNextQuestion();
+  }
+
   function handleAnswerSelection(choiceIdx, isTimeout = false) {
-    if (!currentSession || currentSession.isLocked) return;
+    if (!currentSession) return;
+
+    // If waiting for Active Error Encoding tap on the highlighted green button:
+    if (currentSession.waitingForMissTap) {
+      const tappedVal = choiceIdx >= 0 ? currentSession.currentChoices[choiceIdx] : null;
+      if (tappedVal === currentSession.expectedAnswer) {
+        acknowledgeMissAndRestart();
+      }
+      return;
+    }
+
+    if (currentSession.isLocked) return;
     currentSession.isLocked = true;
     stopTimerLoop();
 
     const elapsedMs = performance.now() - currentSession.questionStartTime;
     const { a, b } = currentSession.currentQuestion;
-    const correctAns = a * b;
+    const expectedAns = currentSession.expectedAnswer;
+    const fullProduct = a * b;
     const selectedVal = choiceIdx >= 0 ? currentSession.currentChoices[choiceIdx] : null;
-    const isCorrect = !isTimeout && selectedVal === correctAns;
+    const isCorrect = !isTimeout && selectedVal === expectedAns;
 
     // Record metrics for this fact
     recordFactOutcome(a, b, isCorrect, isTimeout, elapsedMs);
-
-    const buttons = document.querySelectorAll("#game-choices-grid .choice-btn");
-    buttons.forEach((btn, idx) => {
-      btn.disabled = true;
-      if (currentSession.currentChoices[idx] === correctAns) {
-        btn.classList.add("choice-correct");
-      } else if (idx === choiceIdx && !isCorrect) {
-        btn.classList.add("choice-wrong");
-      }
-    });
 
     const card = document.getElementById("game-problem-card");
     const bubble = document.getElementById("stage-speech-bubble");
     const pet = getActivePet();
 
     if (isCorrect) {
+      const buttons = document.querySelectorAll("#game-choices-grid .choice-btn");
+      buttons.forEach((btn, idx) => {
+        btn.disabled = true;
+        if (currentSession.currentChoices[idx] === expectedAns) {
+          btn.classList.add("choice-correct");
+        }
+      });
+
       currentSession.currentStreak += 1;
       currentSession.streakResponseTimesMs.push(elapsedMs);
       window.soundFX.correct(currentSession.currentStreak);
 
       card.classList.add("correct-flash");
-      document.getElementById("game-equation").textContent = `${a} × ${b} = ${correctAns}`;
+      document.getElementById("game-equation").textContent = `${a} × ${b} = ${fullProduct}`;
       document.getElementById("game-sub-hint").textContent =
         `⚡ ${(elapsedMs / 1000).toFixed(2)}s! Great job!`;
 
@@ -1189,7 +1469,6 @@
 
       updateStreakBarUI(false);
 
-      // Did Jemima reach the end of the streak?
       if (currentSession.currentStreak >= currentSession.streakLength) {
         setTimeout(() => {
           triggerStreakVictory();
@@ -1200,37 +1479,85 @@
         }, 340);
       }
     } else {
-      // WRONG OR TIME OUT -> Show right answer & reset back to the beginning (0)!
+      // WRONG OR TIME OUT -> Active Error Encoding + Strategy Coach + Visual Dot Array + Spaced Schedule!
       window.soundFX.reset();
       currentSession.resets += 1;
       currentSession.currentStreak = 0;
       currentSession.streakResponseTimesMs = [];
 
-      // Queue this missed fact so she conquers it in the fresh run
-      const alreadyQueued = currentSession.retryQueue.some((q) => q.a === a && q.b === b);
-      if (!alreadyQueued) {
-        currentSession.retryQueue.push({ a, b });
+      // Set Expanding Spaced Retrieval schedule (Step 2 -> Midpoint Twin -> Final Boss #10)
+      if (currentSession.redemptionFact) {
+        const prevRf = currentSession.redemptionFact;
+        const alreadyQueued = currentSession.retryQueue.some((q) => q.a === prevRf.a && q.b === prevRf.b);
+        if (!alreadyQueued) currentSession.retryQueue.push(prevRf);
       }
+      currentSession.redemptionFact = { a, b };
+      currentSession.redemptionStage1Done = false;
+      currentSession.redemptionStage2Done = false;
+      currentSession.redemptionStage3Done = false;
 
       card.classList.add("wrong-shake");
-      document.getElementById("game-equation").textContent = `${a} × ${b} = ${correctAns}`;
-      document.getElementById("game-sub-hint").textContent = isTimeout
-        ? `⏰ Time's up! Remember: ${a} × ${b} = ${correctAns}`
-        : `💡 Remember: ${a} × ${b} = ${correctAns}`;
+      document.getElementById("game-equation").textContent = `${a} × ${b} = ${fullProduct}`;
 
-      bubble.className = "speech-bubble reset-bubble";
-      bubble.textContent = isTimeout
-        ? `Time ran out, ${state.settings.playerName}! ${a} × ${b} = ${correctAns} — Back to 0, let's go again!`
-        : `Almost, ${state.settings.playerName}! ${a} × ${b} = ${correctAns} — Back to the start, you've got this!`;
+      // Show Derived Fact Strategy / Rhyme
+      const strategyBox = document.getElementById("game-strategy-box");
+      strategyBox.textContent = getPedagogicalStrategy(a, b);
+      strategyBox.style.display = "block";
+
+      // Show CRA Visual Anchor Dot Array
+      const visualArray = document.getElementById("game-visual-array");
+      renderVisualDotArray(a, b, visualArray);
 
       updateStreakBarUI(true);
 
-      setTimeout(() => {
-        if (!currentSession) return;
-        bubble.className = "speech-bubble";
-        bubble.textContent = `Fresh start, ${state.settings.playerName}! Let's get all ${currentSession.streakLength}!`;
-        dealNextQuestion();
-      }, Number(state.settings.teachingPauseMs) || 1700);
+      const useTapToContinue = state.settings.requireTapOnMiss !== false;
+      const buttons = document.querySelectorAll("#game-choices-grid .choice-btn");
+
+      if (useTapToContinue) {
+        currentSession.waitingForMissTap = true;
+        buttons.forEach((btn, idx) => {
+          if (currentSession.currentChoices[idx] === expectedAns) {
+            btn.disabled = false;
+            btn.classList.add("choice-correct", "tap-to-continue");
+          } else {
+            btn.disabled = true;
+            if (idx === choiceIdx) btn.classList.add("choice-wrong");
+          }
+        });
+
+        document.getElementById("game-sub-hint").textContent =
+          `👆 Tap the green ${expectedAns} button below to start your fresh run!`;
+
+        bubble.className = "speech-bubble reset-bubble";
+        bubble.textContent = isTimeout
+          ? `Time's up, ${state.settings.playerName}! Look at the trick below, then tap ${expectedAns} to go again!`
+          : `Almost, ${state.settings.playerName}! ${a} × ${b} = ${fullProduct} — Tap the green ${expectedAns} when you're ready!`;
+      } else {
+        buttons.forEach((btn, idx) => {
+          btn.disabled = true;
+          if (currentSession.currentChoices[idx] === expectedAns) {
+            btn.classList.add("choice-correct");
+          } else if (idx === choiceIdx) {
+            btn.classList.add("choice-wrong");
+          }
+        });
+
+        document.getElementById("game-sub-hint").textContent = isTimeout
+          ? `⏰ Time's up! Remember: ${a} × ${b} = ${fullProduct}`
+          : `💡 Remember: ${a} × ${b} = ${fullProduct}`;
+
+        bubble.className = "speech-bubble reset-bubble";
+        bubble.textContent = isTimeout
+          ? `Time ran out, ${state.settings.playerName}! ${a} × ${b} = ${fullProduct} — Back to 0, let's go again!`
+          : `Almost, ${state.settings.playerName}! ${a} × ${b} = ${fullProduct} — Back to the start, you've got this!`;
+
+        autoResetTimeoutId = setTimeout(() => {
+          if (!currentSession) return;
+          bubble.className = "speech-bubble";
+          bubble.textContent = `Fresh start, ${state.settings.playerName}! Let's get all ${currentSession.streakLength}!`;
+          dealNextQuestion();
+        }, Number(state.settings.teachingPauseMs) || 1700);
+      }
     }
   }
 
@@ -1242,9 +1569,14 @@
     });
   });
 
-  // Keyboard shortcuts (1, 2, 3, 4) for desktop testing
+  // Keyboard shortcuts (1, 2, 3, 4, Enter, Space) for desktop testing
   window.addEventListener("keydown", (e) => {
-    if (!currentSession || currentSession.isLocked) return;
+    if (!currentSession) return;
+    if (currentSession.waitingForMissTap && (e.key === "Enter" || e.key === " ")) {
+      e.preventDefault();
+      acknowledgeMissAndRestart();
+      return;
+    }
     if (["1", "2", "3", "4"].includes(e.key)) {
       handleAnswerSelection(Number(e.key) - 1, false);
     }
@@ -1253,6 +1585,10 @@
   document.getElementById("btn-quit-game").addEventListener("click", () => {
     window.soundFX.tap();
     stopTimerLoop();
+    if (autoResetTimeoutId) {
+      clearTimeout(autoResetTimeoutId);
+      autoResetTimeoutId = null;
+    }
     currentSession = null;
     document.getElementById("game-overlay").classList.remove("active");
     renderHUD();
@@ -1384,6 +1720,7 @@
         nodeId: currentSession.nodeId,
         title: currentSession.title,
         tables: currentSession.tables,
+        questionStyle: currentSession.questionStyle,
         customFactPairs: currentSession.customFactPairs,
         timerSeconds: currentSession.timerSeconds,
         streakLength: currentSession.streakLength,
@@ -1411,6 +1748,9 @@
     document.getElementById("parent-select-streak").value = String(state.settings.defaultStreakLength);
     document.getElementById("parent-select-timer").value = String(state.settings.defaultTimerSeconds);
     document.getElementById("parent-select-pause").value = String(state.settings.teachingPauseMs || 1700);
+    document.getElementById("parent-select-recovery").value =
+      state.settings.requireTapOnMiss === false ? "timer" : "tap";
+    document.getElementById("parent-select-style").value = state.settings.questionStyle || "mix";
     renderParentRewardsList();
     document.getElementById("parent-modal").classList.add("active");
   }
@@ -1480,8 +1820,11 @@
     state.settings.defaultStreakLength = Number(document.getElementById("parent-select-streak").value) || 10;
     state.settings.defaultTimerSeconds = Number(document.getElementById("parent-select-timer").value) || 3;
     state.settings.teachingPauseMs = Number(document.getElementById("parent-select-pause").value) || 1700;
+    state.settings.requireTapOnMiss = document.getElementById("parent-select-recovery").value === "tap";
+    state.settings.questionStyle = document.getElementById("parent-select-style").value || "mix";
     customStreakLen = state.settings.defaultStreakLength;
     customTimerSec = state.settings.defaultTimerSeconds;
+    customQuestionStyle = state.settings.questionStyle;
     saveState();
     renderHUD();
     renderAdventureMap();

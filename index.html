@@ -115,6 +115,15 @@
               <button class="opt-pill" data-val="20">20</button>
             </div>
           </div>
+
+          <div class="config-box" style="flex-basis:100%;">
+            <label>🧩 Question Style (Fact-Family Flexibility)</label>
+            <div class="option-pills" id="custom-style-pills">
+              <button class="opt-pill" data-val="standard">Standard (7 × 8 = ?)</button>
+              <button class="opt-pill active" data-val="mix">✨ Smart Mix (Includes 7 × ❓ = 56)</button>
+              <button class="opt-pill" data-val="mystery">🧩 Mystery Factor Only (7 × ❓ = 56)</button>
+            </div>
+          </div>
         </div>
 
         <button class="btn-3d btn-green" id="btn-start-custom" style="width:100%; font-size:1.25rem; padding:16px;">
@@ -287,8 +296,11 @@
     <!-- Middle Zone: Hero Multiplication Problem Card -->
     <div class="game-middle-stage">
       <div class="problem-card" id="game-problem-card">
+        <div class="question-badge" id="game-question-badge" style="display:none;"></div>
         <h2 class="problem-equation" id="game-equation">7 × 8 = ?</h2>
         <div class="problem-sub-hint" id="game-sub-hint">Tap the right answer below!</div>
+        <div class="strategy-coach-box" id="game-strategy-box" style="display:none;"></div>
+        <div class="visual-array-wrap" id="game-visual-array" style="display:none;"></div>
       </div>
     </div>
 
@@ -392,7 +404,26 @@
 
       <div class="parent-two-col">
         <div class="form-group">
-          <label>Teaching Pause After a Miss</label>
+          <label>After a Miss (Error Recovery Mode)</label>
+          <select class="form-input" id="parent-select-recovery">
+            <option value="tap" selected>👆 Tap Correct Answer to Continue (Recommended)</option>
+            <option value="timer">⏱️ Auto-Continue After 1.7s Pause</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Question Style (Adventure Mode)</label>
+          <select class="form-input" id="parent-select-style">
+            <option value="mix" selected>✨ Smart Mix (Includes 7 × ❓ = 56)</option>
+            <option value="standard">Standard Only (7 × 8 = ?)</option>
+            <option value="mystery">🧩 Mystery Factor Only (7 × ❓ = 56)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="parent-two-col">
+        <div class="form-group">
+          <label>Auto-Pause Speed (if Auto-Continue used)</label>
           <select class="form-input" id="parent-select-pause">
             <option value="1200">1.2 Seconds (Snappy)</option>
             <option value="1700" selected>1.7 Seconds (Recommended)</option>

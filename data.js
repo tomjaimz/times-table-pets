@@ -7,7 +7,10 @@ window.GAME_DATA = {
     defaultTimerSeconds: 3,
     soundEnabled: true,
     teachingPauseMs: 1700,
-    parentPin: "1212" // Optional simple gate or 1-tap confirm
+    requireTapOnMiss: true,
+    showVisualArrayOnMiss: true,
+    questionStyle: "mix", // "standard" | "mix" (20% mystery factor) | "mystery"
+    parentPin: "1212"
   },
 
   timerModes: [
