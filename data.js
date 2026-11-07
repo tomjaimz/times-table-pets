@@ -3,6 +3,7 @@
 window.GAME_DATA = {
   defaultSettings: {
     playerName: "Jemima",
+    language: "en",
     defaultStreakLength: 10,
     defaultTimerSeconds: 3,
     soundEnabled: true,

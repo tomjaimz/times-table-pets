@@ -277,12 +277,21 @@
   // =========================================================
   // TOP HUD & NAVIGATION RENDERING
   // =========================================================
+  function t(key, vars = {}) {
+    return window.I18N ? window.I18N.t(key, vars) : key;
+  }
+
   function renderHUD() {
+    window.CURRENT_LANG = state.settings.language || "en";
+    if (window.I18N) {
+      window.I18N.applyStaticTranslations(state.settings.playerName, state.settings.defaultStreakLength);
+    }
     const pet = getActivePet();
     document.getElementById("hud-pet-emoji").textContent = pet.emoji;
     document.getElementById("hud-pet-name").textContent = pet.name;
-    document.getElementById("hud-academy-title").textContent =
-      `${state.settings.playerName}'s Magical Pet Academy`;
+    document.getElementById("hud-academy-title").textContent = t("academyTitle", {
+      name: state.settings.playerName
+    });
     document.getElementById("hud-daily-streak").textContent = state.dailyStreak.count;
     document.getElementById("hud-gems").textContent = state.gems;
     document.getElementById("hud-sound-btn").textContent = state.settings.soundEnabled ? "🔊" : "🔇";
@@ -335,6 +344,18 @@
     renderHUD();
   });
 
+  const hudLangBtn = document.getElementById("hud-lang-btn");
+  if (hudLangBtn) {
+    hudLangBtn.addEventListener("click", () => {
+      window.soundFX.tap();
+      state.settings.language = state.settings.language === "sv" ? "en" : "sv";
+      window.CURRENT_LANG = state.settings.language;
+      saveState();
+      renderHUD();
+      refreshActiveTabUI();
+    });
+  }
+
   // =========================================================
   // TAB 1: INTERACTIVE PET LOBBY & ADVENTURE PATH RENDERER
   // =========================================================
@@ -376,10 +397,15 @@
     const unlockedCount = (state.unlockedStickers || []).length;
 
     const titleEl = document.getElementById("lobby-room-title");
-    if (titleEl) titleEl.textContent = `🏡 ${state.settings.playerName}'s Pet Lobby`;
+    if (titleEl) titleEl.textContent = t("lobbyTitle", { name: state.settings.playerName });
 
     const badgeEl = document.getElementById("lobby-sticker-count-badge");
-    if (badgeEl) badgeEl.textContent = `✨ ${unlockedCount} / ${totalStickers} Stickers`;
+    if (badgeEl) badgeEl.textContent = t("lobbyStickersBadge", { unlocked: unlockedCount, total: totalStickers });
+
+    const decorateBtn = document.getElementById("btn-toggle-sticker-drawer");
+    if (decorateBtn) {
+      decorateBtn.textContent = stickerDrawerOpen ? t("btnDoneDecorating") : t("btnDecorate");
+    }
 
     const petEmojiEl = document.getElementById("lobby-pet-emoji");
     const petTagEl = document.getElementById("lobby-pet-tag");
@@ -480,7 +506,8 @@
     toolbar.style.display = "flex";
     const label = document.getElementById("toolbar-selected-label");
     if (label && meta) {
-      label.textContent = `Selected: ${meta.emoji} ${meta.name}`;
+      const stkName = window.I18N ? window.I18N.getStickerName(meta) : meta.name;
+      label.textContent = t("toolbarSelected", { emoji: meta.emoji, name: stkName });
     }
   }
 
@@ -495,7 +522,7 @@
     (window.GAME_DATA.lobbyBackgrounds || []).forEach((bg) => {
       const btn = document.createElement("button");
       btn.className = `bg-choice-pill ${(state.lobbyBg || "bg_meadow") === bg.id ? "active" : ""}`;
-      btn.textContent = bg.name;
+      btn.textContent = window.I18N ? window.I18N.getBackdropName(bg) : bg.name;
       btn.addEventListener("click", () => {
         window.soundFX.tap();
         state.lobbyBg = bg.id;
@@ -511,19 +538,20 @@
       ).length;
       mysteryBtn.disabled = state.gems < 25 || lockedLeft === 0;
       mysteryBtn.textContent =
-        lockedLeft === 0 ? "🌟 All 24 Unlocked!" : `🎁 Mystery Sticker (💎 25)`;
+        lockedLeft === 0 ? t("btnAllStickersUnlocked") : t("btnMysterySticker");
     }
 
     // 2. Render Sticker Tray (Unlocked -> Tap to Place, Locked -> Tap to Buy with Gems)
     trayGrid.innerHTML = "";
     (window.GAME_DATA.stickers || []).forEach((stk) => {
       const isUnlocked = (state.unlockedStickers || []).includes(stk.id);
+      const stkName = window.I18N ? window.I18N.getStickerName(stk) : stk.name;
       const btn = document.createElement("button");
       btn.className = `sticker-tray-btn ${isUnlocked ? "unlocked" : "locked"}`;
       btn.innerHTML = `
         <span class="stk-btn-emoji">${stk.emoji}</span>
-        <span class="stk-btn-label">${stk.name}</span>
-        <span class="stk-btn-action">${isUnlocked ? "➕ Place" : `💎 ${stk.cost}`}</span>
+        <span class="stk-btn-label">${stkName}</span>
+        <span class="stk-btn-action">${isUnlocked ? t("stkPlace") : `💎 ${stk.cost}`}</span>
       `;
 
       btn.addEventListener("click", () => {
@@ -641,11 +669,12 @@
       section.className = "world-section";
       section.style.background = world.bgGradient;
 
+      const wTxt = window.I18N ? window.I18N.getWorldText(world) : { name: world.name, subtitle: world.subtitle };
       const header = document.createElement("div");
       header.className = "world-header";
       header.innerHTML = `
-        <h2>${world.name}</h2>
-        <p>${world.subtitle}</p>
+        <h2>${wTxt.name}</h2>
+        <p>${wTxt.subtitle}</p>
       `;
       section.appendChild(header);
 
@@ -657,13 +686,16 @@
         const isCompleted = prog.completions > 0;
         const pet = getPetById(node.unlockPetId);
         const petUnlocked = state.unlockedPets.includes(node.unlockPetId);
+        const nTxt = window.I18N
+          ? window.I18N.getNodeText(node)
+          : { title: node.title, description: node.description };
 
         const starsHtml = [1, 2, 3]
           .map((s) => (s <= prog.stars ? "⭐" : "☆"))
           .join("");
 
         const bestSpeedBadge = prog.bestAvgMs
-          ? `<span style="font-size:0.78rem; font-weight:800; color:#475569;">⚡ Best: ${(prog.bestAvgMs / 1000).toFixed(1)}s</span>`
+          ? `<span style="font-size:0.78rem; font-weight:800; color:#475569;">${t("bestSpeed", { sec: (prog.bestAvgMs / 1000).toFixed(1) })}</span>`
           : "";
 
         const card = document.createElement("div");
@@ -672,19 +704,19 @@
           <div class="node-icon-circle">${node.icon}</div>
           <div class="node-info">
             <div class="node-title-row">
-              <h3 class="node-title">${node.title}</h3>
+              <h3 class="node-title">${nTxt.title}</h3>
             </div>
-            <p class="node-desc">${node.description}</p>
+            <p class="node-desc">${nTxt.description}</p>
             <div class="node-meta-row">
               <span class="node-stars" title="1★=8s, 2★=5s, 3★=3s Blitz">${starsHtml}</span>
               <span class="pet-reward-tag ${petUnlocked ? "unlocked" : ""}">
-                ${petUnlocked ? `✓ ${pet.emoji} ${pet.name}` : `🥚 Unlocks ${pet.emoji} ${pet.name}`}
+                ${petUnlocked ? t("unlockedPetTag", { emoji: pet.emoji, name: pet.name }) : t("unlocksPet", { emoji: pet.emoji, name: pet.name })}
               </span>
               ${bestSpeedBadge}
             </div>
           </div>
           <button class="btn-3d ${isCompleted ? "btn-green" : "btn-blue"} node-play-btn" style="padding:10px 16px; font-size:0.95rem;">
-            Play ▶
+            ${t("btnPlay")}
           </button>
         `;
 
@@ -693,7 +725,7 @@
           startGameSession({
             mode: "adventure",
             nodeId: node.id,
-            title: node.title,
+            title: nTxt.title,
             tables: node.tables,
             timerSeconds: Number(state.settings.defaultTimerSeconds),
             streakLength: Number(state.settings.defaultStreakLength),
@@ -1315,6 +1347,10 @@
   // PEDAGOGICAL ENGINE: DERIVED FACTS, RHYMES & VISUAL ARRAYS
   // =========================================================
   function getPedagogicalStrategy(a, b) {
+    if (window.I18N) {
+      const svStrat = window.I18N.getPedagogicalStrategyLocalized(a, b);
+      if (svStrat) return svStrat;
+    }
     const ans = a * b;
     const minF = Math.min(a, b);
     const maxF = Math.max(a, b);
@@ -1407,10 +1443,12 @@
     }
     dotsHtml += `</div>`;
 
+    const isSv = state.settings.language === "sv";
+    const rowWord = isSv ? (rows === 1 ? "rad med" : "rader med") : (rows === 1 ? "row of" : "rows of");
     const splitLegend =
       extraRows > 0
         ? `🔵 ${anchorRows}×${cols} (${anchorRows * cols}) ➕ 🟠 ${extraRows}×${cols} (${extraRows * cols}) = <strong>${a * b}</strong>`
-        : `🔵 ${rows} ${rows === 1 ? "row" : "rows"} of ${cols} = <strong>${a * b}</strong>`;
+        : `🔵 ${rows} ${rowWord} ${cols} = <strong>${a * b}</strong>`;
 
     container.innerHTML = `${dotsHtml}<div class="array-legend-text">${splitLegend}</div>`;
     container.style.display = "flex";
@@ -1652,7 +1690,10 @@
 
     const bubble = document.getElementById("stage-speech-bubble");
     bubble.className = "speech-bubble";
-    bubble.textContent = `Let's go, ${state.settings.playerName}! Get ${currentSession.streakLength} in a row to open the Treasure Chest!`;
+    bubble.textContent = t("gameInitialSpeech", {
+      name: state.settings.playerName,
+      streak: currentSession.streakLength
+    });
 
     document.getElementById("game-mode-footer").textContent =
       `${currentSession.title} • ⏱️ ${currentSession.timerSeconds}s Timer • Goal: ${currentSession.streakLength} in a row`;
@@ -1719,7 +1760,7 @@
       badgeEl.className = `question-badge ${q.badgeClass || ""}`;
       badgeEl.style.display = "inline-flex";
     } else if (q.questionType === "mystery_a" || q.questionType === "mystery_b") {
-      badgeEl.textContent = "🧩 Mystery Factor (Fact Family)";
+      badgeEl.textContent = t("badgeMystery");
       badgeEl.className = "question-badge badge-mystery";
       badgeEl.style.display = "inline-flex";
     } else {
@@ -1730,20 +1771,26 @@
     let choices = [];
     if (q.questionType === "mystery_b") {
       document.getElementById("game-equation").textContent = `${q.a} × ❓ = ${q.a * q.b}`;
-      document.getElementById("game-sub-hint").textContent = `Which number times ${q.a} makes ${q.a * q.b}?`;
+      document.getElementById("game-sub-hint").textContent = t("gameSubHintMystery", {
+        factor: q.a,
+        prod: q.a * q.b
+      });
       currentSession.expectedAnswer = q.b;
       choices = generateSmartFactorChoices(q.b);
     } else if (q.questionType === "mystery_a") {
       document.getElementById("game-equation").textContent = `❓ × ${q.b} = ${q.a * q.b}`;
-      document.getElementById("game-sub-hint").textContent = `Which number times ${q.b} makes ${q.a * q.b}?`;
+      document.getElementById("game-sub-hint").textContent = t("gameSubHintMystery", {
+        factor: q.b,
+        prod: q.a * q.b
+      });
       currentSession.expectedAnswer = q.a;
       choices = generateSmartFactorChoices(q.a);
     } else {
       document.getElementById("game-equation").textContent = `${q.a} × ${q.b} = ?`;
       document.getElementById("game-sub-hint").textContent =
         currentSession.currentStreak === 0
-          ? "Tap the matching answer!"
-          : `🔥 ${currentSession.currentStreak} in a row! Keep going!`;
+          ? t("gameSubHintStart")
+          : t("gameSubHintStreak", { streak: currentSession.currentStreak });
       currentSession.expectedAnswer = q.a * q.b;
       choices = generateSmartChoices(q.a, q.b);
     }
@@ -1802,7 +1849,10 @@
     window.soundFX.tap();
     const bubble = document.getElementById("stage-speech-bubble");
     bubble.className = "speech-bubble";
-    bubble.textContent = `Fresh start, ${state.settings.playerName}! Let's get all ${currentSession.streakLength}!`;
+    bubble.textContent = t("gameFreshStartBubble", {
+      name: state.settings.playerName,
+      streak: currentSession.streakLength
+    });
     dealNextQuestion();
   }
 
@@ -1851,10 +1901,13 @@
 
       card.classList.add("correct-flash");
       document.getElementById("game-equation").textContent = formatSolvedEquation(currentSession.currentQuestion);
-      document.getElementById("game-sub-hint").textContent =
-        `⚡ ${(elapsedMs / 1000).toFixed(2)}s! Great job!`;
+      document.getElementById("game-sub-hint").textContent = t("gameCorrectSpeed", {
+        sec: (elapsedMs / 1000).toFixed(2)
+      });
 
-      const quote = pet.cheerQuotes[currentSession.currentStreak % pet.cheerQuotes.length];
+      const quote = window.I18N
+        ? window.I18N.getCheerQuote(pet, currentSession.currentStreak)
+        : pet.cheerQuotes[currentSession.currentStreak % pet.cheerQuotes.length];
       bubble.className = "speech-bubble";
       bubble.textContent = quote;
 
@@ -1917,13 +1970,12 @@
           }
         });
 
-        document.getElementById("game-sub-hint").textContent =
-          `👆 Tap the green ${expectedAns} button below to start your fresh run!`;
+        document.getElementById("game-sub-hint").textContent = t("gameTapGreenHint", { ans: expectedAns });
 
         bubble.className = "speech-bubble reset-bubble";
         bubble.textContent = isTimeout
-          ? `Time's up, ${state.settings.playerName}! ${solvedEq} — Tap the green ${expectedAns} to go again!`
-          : `Almost, ${state.settings.playerName}! ${solvedEq} — Tap the green ${expectedAns} when you're ready!`;
+          ? t("gameTimeoutBubbleTap", { name: state.settings.playerName, eq: solvedEq, ans: expectedAns })
+          : t("gameWrongBubbleTap", { name: state.settings.playerName, eq: solvedEq, ans: expectedAns });
       } else {
         buttons.forEach((btn, idx) => {
           btn.disabled = true;
@@ -1935,18 +1987,21 @@
         });
 
         document.getElementById("game-sub-hint").textContent = isTimeout
-          ? `⏰ Time's up! Remember: ${solvedEq}`
-          : `💡 Remember: ${solvedEq}`;
+          ? t("gameTimeoutSubAuto", { eq: solvedEq })
+          : t("gameWrongSubAuto", { eq: solvedEq });
 
         bubble.className = "speech-bubble reset-bubble";
         bubble.textContent = isTimeout
-          ? `Time ran out, ${state.settings.playerName}! ${solvedEq} — Back to 0, let's go again!`
-          : `Almost, ${state.settings.playerName}! ${solvedEq} — Back to the start, you've got this!`;
+          ? t("gameTimeoutBubbleAuto", { name: state.settings.playerName, eq: solvedEq })
+          : t("gameWrongBubbleAuto", { name: state.settings.playerName, eq: solvedEq });
 
         autoResetTimeoutId = setTimeout(() => {
           if (!currentSession) return;
           bubble.className = "speech-bubble";
-          bubble.textContent = `Fresh start, ${state.settings.playerName}! Let's get all ${currentSession.streakLength}!`;
+          bubble.textContent = t("gameFreshStartBubble", {
+            name: state.settings.playerName,
+            streak: currentSession.streakLength
+          });
           dealNextQuestion();
         }, Number(state.settings.teachingPauseMs) || 1700);
       }
@@ -2166,6 +2221,8 @@
   function openParentModal() {
     window.soundFX.tap();
     document.getElementById("parent-input-name").value = state.settings.playerName;
+    const langSel = document.getElementById("parent-select-lang");
+    if (langSel) langSel.value = state.settings.language || "en";
     document.getElementById("parent-select-streak").value = String(state.settings.defaultStreakLength);
     document.getElementById("parent-select-timer").value = String(state.settings.defaultTimerSeconds);
     document.getElementById("parent-select-pause").value = String(state.settings.teachingPauseMs || 1700);
@@ -2238,6 +2295,11 @@
   document.getElementById("btn-save-parent").addEventListener("click", () => {
     window.soundFX.correct(3);
     state.settings.playerName = document.getElementById("parent-input-name").value.trim() || "Jemima";
+    const langSel = document.getElementById("parent-select-lang");
+    if (langSel) {
+      state.settings.language = langSel.value || "en";
+      window.CURRENT_LANG = state.settings.language;
+    }
     state.settings.defaultStreakLength = Number(document.getElementById("parent-select-streak").value) || 10;
     state.settings.defaultTimerSeconds = Number(document.getElementById("parent-select-timer").value) || 3;
     state.settings.teachingPauseMs = Number(document.getElementById("parent-select-pause").value) || 1700;
@@ -2380,10 +2442,21 @@
   const onboardingNamePreview = document.getElementById("onboarding-name-preview");
   const onboardingTimerSelect = document.getElementById("onboarding-select-timer");
 
+  document.querySelectorAll(".onboarding-lang-pill").forEach((pill) => {
+    pill.addEventListener("click", () => {
+      window.soundFX.tap();
+      state.settings.language = pill.dataset.lang || "en";
+      window.CURRENT_LANG = state.settings.language;
+      saveState();
+      renderHUD();
+      refreshActiveTabUI();
+    });
+  });
+
   if (onboardingNameInput && onboardingNamePreview) {
     onboardingNameInput.addEventListener("input", () => {
       const name = onboardingNameInput.value.trim() || "Jemima";
-      onboardingNamePreview.innerHTML = `🦉 Pippin the Owl will cheer for <strong>${name}</strong>!`;
+      onboardingNamePreview.innerHTML = t("welcomeNamePreview", { name });
     });
   }
 

@@ -2295,3 +2295,44 @@ html, body {
   background: #e0f2fe;
   color: #0369a1;
 }
+
+/* =========================================================
+   BILINGUAL TOGGLE (ENGLISH / SVENSKA) STYLES
+   ========================================================= */
+.lang-toggle-btn {
+  width: auto !important;
+  padding: 0 9px;
+  font-size: 0.78rem !important;
+  font-weight: 900;
+  gap: 4px;
+}
+
+.onboarding-lang-pills {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.onboarding-lang-pill {
+  background: var(--bg-main);
+  border: 2px solid var(--border-light);
+  border-bottom-width: 4px;
+  border-radius: 14px;
+  padding: 10px 12px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 900;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: transform 0.1s, border-color 0.15s, background 0.15s;
+}
+
+.onboarding-lang-pill.active {
+  background: #e0f2fe;
+  border-color: var(--duo-blue);
+  color: #0369a1;
+}
+
+.lang-sv .choice-btn.tap-to-continue::after {
+  content: "👆 Tryck för att fortsätta";
+}

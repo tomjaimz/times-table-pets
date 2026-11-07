@@ -35,6 +35,7 @@
         <span>💎</span>
         <span id="hud-gems">50</span>
       </div>
+      <button class="icon-btn lang-toggle-btn" id="hud-lang-btn" title="Switch Language (English / Svenska)">🇬🇧 EN</button>
       <button class="icon-btn" id="hud-cloud-btn" title="Cloud Sync &amp; Parent Magic Link">☁️</button>
       <button class="icon-btn" id="hud-sound-btn" title="Toggle Sound">🔊</button>
       <button class="icon-btn" id="hud-parent-btn" title="Parent Settings &amp; Fine-Tuning">⚙️</button>
@@ -84,13 +85,13 @@
         <!-- Collapsible Sticker Drawer & Shop -->
         <div class="lobby-sticker-drawer" id="lobby-sticker-drawer" style="display:none;">
           <div class="drawer-section-row">
-            <span class="drawer-label">🖼️ Scene Backdrop:</span>
+            <span class="drawer-label" id="drawer-backdrop-label">🖼️ Scene Backdrop:</span>
             <div class="lobby-bg-pills" id="lobby-bg-pills"></div>
           </div>
 
           <div class="drawer-section-row" style="margin-top:8px;">
             <div style="display:flex; justify-content:space-between; align-items:center; width:100%; flex-wrap:wrap; gap:6px;">
-              <span class="drawer-label">✨ Tap an Unlocked Sticker to Add to Lobby (or Buy New Ones with 💎):</span>
+              <span class="drawer-label" id="drawer-sticker-label">✨ Tap an Unlocked Sticker to Add to Lobby (or Buy New Ones with 💎):</span>
               <button class="btn-3d btn-orange" id="btn-buy-mystery-sticker" style="padding:5px 11px; font-size:0.76rem;">
                 🎁 Mystery Sticker (💎 25)
               </button>
@@ -128,7 +129,7 @@
       <div class="section-card" style="background: linear-gradient(135deg, #fff5f5 0%, #fff0f6 100%); border-color: #fda4af;">
         <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
           <div>
-            <h2 style="color:#9f1239;">⚡ Tricky Facts Booster</h2>
+            <h2 style="color:#9f1239;" id="practice-booster-heading">⚡ Tricky Facts Booster</h2>
             <p class="sub" style="margin-bottom:0; color:#be123c;" id="practice-tricky-summary">
               Focuses automatically on the exact times table facts Jemima has missed or answered slowly!
             </p>
@@ -138,8 +139,8 @@
       </div>
 
       <div class="section-card">
-        <h2>🎛️ Build Your Custom Run</h2>
-        <p class="sub">Pick which times tables (up to 12) to include in your streak challenge:</p>
+        <h2 id="practice-custom-heading">🎛️ Build Your Custom Run</h2>
+        <p class="sub" id="practice-custom-sub">Pick which times tables (up to 12) to include in your streak challenge:</p>
 
         <div style="display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap;">
           <button class="btn-3d btn-white" id="btn-select-all-tables" style="padding:7px 14px; font-size:0.88rem;">Select All (1–12)</button>
@@ -192,11 +193,11 @@
       <div class="section-card">
         <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
           <div>
-            <h2>🐾 Magical Pet Sanctuary</h2>
-            <p class="sub" style="margin-bottom:0;">Beat Adventure levels or hatch Mystery Eggs in the Shop to collect all 24 pets!</p>
+            <h2 id="pets-heading">🐾 Magical Pet Sanctuary</h2>
+            <p class="sub" id="pets-sub" style="margin-bottom:0;">Beat Adventure levels or hatch Mystery Eggs in the Shop to collect all 24 pets!</p>
           </div>
           <div class="stat-pill" style="font-size:1rem;">
-            <span>Unlocked:</span>
+            <span id="pets-unlocked-label">Unlocked:</span>
             <span id="pets-unlocked-count">1 / 24</span>
           </div>
         </div>
@@ -210,8 +211,8 @@
       <div class="section-card">
         <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
           <div>
-            <h2>🎁 Magical Gem Shop</h2>
-            <p class="sub" style="margin-bottom:0;">Trade the Gems you earn from completing streaks for Mystery Eggs or Golden Coupons!</p>
+            <h2 id="shop-heading">🎁 Magical Gem Shop</h2>
+            <p class="sub" id="shop-sub" style="margin-bottom:0;">Trade the Gems you earn from completing streaks for Mystery Eggs or Golden Coupons!</p>
           </div>
           <button class="btn-3d btn-white" id="btn-open-parent-from-shop" style="font-size:0.88rem; padding:8px 14px;">
             ⚙️ Edit Rewards (Parent)
@@ -222,8 +223,8 @@
       </div>
 
       <div class="section-card">
-        <h2>🎟️ Jemima's Golden Coupons</h2>
-        <p class="sub">Show an active Golden Coupon to Mum or Dad to redeem your reward!</p>
+        <h2 id="coupons-heading">🎟️ Jemima's Golden Coupons</h2>
+        <p class="sub" id="coupons-sub">Show an active Golden Coupon to Mum or Dad to redeem your reward!</p>
         <div class="coupon-list" id="coupons-history-list"></div>
       </div>
     </section>
@@ -236,8 +237,8 @@
       <div class="section-card">
         <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:12px;">
           <div>
-            <h2>🎯 Top Tricky Facts to Conquer</h2>
-            <p class="sub" style="margin-bottom:0;">Automatically ranked by misses, timeouts, and response speed:</p>
+            <h2 id="stats-tricky-heading">🎯 Top Tricky Facts to Conquer</h2>
+            <p class="sub" id="stats-tricky-sub" style="margin-bottom:0;">Automatically ranked by misses, timeouts, and response speed:</p>
           </div>
           <button class="btn-3d btn-orange" id="btn-stats-practice-tricky">⚡ Drill Tricky Facts</button>
         </div>
@@ -246,8 +247,8 @@
 
       <!-- Interactive 12x12 Mastery Heatmap -->
       <div class="section-card">
-        <h2>🗺️ 12×12 Times Table Mastery Heatmap</h2>
-        <p class="sub">Tap any square to inspect Jemima's exact accuracy and average speed (in seconds) for that fact:</p>
+        <h2 id="heatmap-heading">🗺️ 12×12 Times Table Mastery Heatmap</h2>
+        <p class="sub" id="heatmap-sub">Tap any square to inspect Jemima's exact accuracy and average speed (in seconds) for that fact:</p>
 
         <div class="heatmap-legend">
           <div class="legend-item"><span class="legend-swatch mastery-gold"></span> 👑 Mastered (≥90% &amp; &lt;2.2s)</div>
@@ -268,15 +269,15 @@
 
       <!-- Per-Table Mastery Breakdown -->
       <div class="section-card">
-        <h2>📈 Mastery by Times Table (×1 to ×12)</h2>
-        <p class="sub">Percentage of facts practiced &amp; mastered in each table, plus average answer speed:</p>
+        <h2 id="per-table-heading">📈 Mastery by Times Table (×1 to ×12)</h2>
+        <p class="sub" id="per-table-sub">Percentage of facts practiced &amp; mastered in each table, plus average answer speed:</p>
         <div class="table-progress-list" id="per-table-progress-list"></div>
       </div>
 
       <!-- Recent Streak Runs History -->
       <div class="section-card">
-        <h2>📜 Recent Streak Runs Log</h2>
-        <p class="sub">Tracks completed runs, timer speeds, average response times, and how many resets were overcome:</p>
+        <h2 id="recent-runs-heading">📜 Recent Streak Runs Log</h2>
+        <p class="sub" id="recent-runs-sub">Tracks completed runs, timer speeds, average response times, and how many resets were overcome:</p>
         <div id="recent-runs-list"></div>
       </div>
     </section>
@@ -386,7 +387,7 @@
       <!-- Step 1: Tap to Open Chest -->
       <div id="chest-unopened-view">
         <button class="chest-big-btn" id="btn-open-chest" title="Tap to Open Treasure Chest!">🎁</button>
-        <p style="font-weight:900; color:var(--duo-orange-dark);">👆 Tap the Treasure Chest to claim your reward!</p>
+        <p id="victory-tap-chest-hint" style="font-weight:900; color:var(--duo-orange-dark);">👆 Tap the Treasure Chest to claim your reward!</p>
       </div>
 
       <!-- Step 2: Opened Rewards & Hatched Pet -->
@@ -430,9 +431,19 @@
         <button class="icon-btn" id="btn-close-parent">✕</button>
       </div>
 
-      <div class="form-group">
-        <label>Child's Name (Displayed in Title &amp; Pet Cheers)</label>
-        <input type="text" class="form-input" id="parent-input-name" value="Jemima" />
+      <div class="parent-two-col">
+        <div class="form-group">
+          <label>Child's Name (Displayed in Title &amp; Pet Cheers)</label>
+          <input type="text" class="form-input" id="parent-input-name" value="Jemima" />
+        </div>
+
+        <div class="form-group">
+          <label>🌍 Language / Språk</label>
+          <select class="form-input" id="parent-select-lang">
+            <option value="en" selected>🇬🇧 English (Default)</option>
+            <option value="sv">🇸🇪 Svenska (Swedish)</option>
+          </select>
+        </div>
       </div>
 
       <div class="parent-two-col">
@@ -649,17 +660,30 @@
        ========================================================= -->
   <div class="modal-backdrop" id="onboarding-modal">
     <div class="modal-card" style="max-width:520px; text-align:left;">
-      <div style="text-align:center; margin-bottom:14px;">
-        <div style="font-size:3.2rem; line-height:1; margin-bottom:6px;">🦉✨</div>
-        <h2 style="margin:0; font-size:1.55rem; font-weight:900;">Welcome to Magical Pet Academy!</h2>
-        <p style="margin:4px 0 0; font-size:0.9rem; font-weight:700; color:var(--text-muted);">
+      <div style="text-align:center; margin-bottom:12px;">
+        <div style="font-size:3rem; line-height:1; margin-bottom:6px;">🦉✨</div>
+        <h2 id="onboarding-title-text" style="margin:0; font-size:1.5rem; font-weight:900;">Welcome to Magical Pet Academy!</h2>
+        <p id="onboarding-sub-text" style="margin:4px 0 0; font-size:0.88rem; font-weight:700; color:var(--text-muted);">
           Quick 10-second setup before the times table adventure begins:
         </p>
       </div>
 
+      <!-- Step 0: Language Choice at Startup (English Default / Swedish) -->
+      <div class="form-group">
+        <label id="onboarding-lang-label" style="font-size:0.88rem;">🌍 Choose Language / Välj språk</label>
+        <div class="onboarding-lang-pills">
+          <button type="button" class="onboarding-lang-pill active" data-lang="en">
+            🇬🇧 English <span style="font-size:0.74rem; opacity:0.8;">(Default)</span>
+          </button>
+          <button type="button" class="onboarding-lang-pill" data-lang="sv">
+            🇸🇪 Svenska
+          </button>
+        </div>
+      </div>
+
       <!-- Step 1: Child's Name -->
       <div class="form-group">
-        <label style="font-size:0.9rem;">1️⃣ What is the player's name?</label>
+        <label id="onboarding-name-label" style="font-size:0.9rem;">1️⃣ What is the player's name?</label>
         <input
           type="text"
           class="form-input"
@@ -675,7 +699,7 @@
 
       <!-- Step 2: Starting Speed -->
       <div class="form-group">
-        <label style="font-size:0.9rem;">2️⃣ Default Countdown Speed</label>
+        <label id="onboarding-speed-label" style="font-size:0.9rem;">2️⃣ Default Countdown Speed</label>
         <select class="form-input" id="onboarding-select-timer" style="font-weight:800;">
           <option value="3" selected>⚡ 3 Seconds — Blitz Mode (2× Gems)</option>
           <option value="5">⭐ 5 Seconds — Fast Mode (1.5× Gems)</option>
@@ -687,11 +711,11 @@
       <button class="btn-3d btn-green" id="btn-onboarding-start-local" style="width:100%; padding:14px; font-size:1.12rem; margin-top:6px;">
         🚀 Start Playing Now (No Login Needed)
       </button>
-      <div style="text-align:center; font-size:0.76rem; font-weight:800; color:var(--text-muted); margin-top:5px;">
+      <div id="onboarding-start-sub" style="text-align:center; font-size:0.76rem; font-weight:800; color:var(--text-muted); margin-top:5px;">
         Progress saves automatically on this device. You can always link an email later!
       </div>
 
-      <hr style="border:none; border-top:2px solid var(--border-light); margin:14px 0;" />
+      <hr style="border:none; border-top:2px solid var(--border-light); margin:12px 0;" />
 
       <!-- Step 3: Optional Parent Cloud Login -->
       <div class="onboarding-cloud-box">
@@ -719,6 +743,7 @@
   <script src="firebase-config.js"></script>
   <script src="cloud.js"></script>
   <script src="data.js"></script>
+  <script src="i18n.js"></script>
   <script src="sound.js"></script>
   <script src="app.js"></script>
 </body>
