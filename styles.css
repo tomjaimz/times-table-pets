@@ -1262,6 +1262,11 @@ html, body {
   padding-bottom: 18px;
 }
 
+.choice-btn.tap-to-continue:active {
+  animation-play-state: paused;
+  transform: translateY(4px);
+}
+
 .choice-btn.tap-to-continue::after {
   content: "👆 Tap to Continue";
   position: absolute;
@@ -1276,8 +1281,8 @@ html, body {
 }
 
 @keyframes pulseCorrectBtn {
-  from { transform: scale(1); box-shadow: 0 0 0 0 rgba(88, 204, 2, 0.45); }
-  to { transform: scale(1.03); box-shadow: 0 0 0 8px rgba(88, 204, 2, 0); }
+  from { box-shadow: 0 0 0 0 rgba(88, 204, 2, 0.55); }
+  to { box-shadow: 0 0 0 9px rgba(88, 204, 2, 0); }
 }
 
 /* Bottom Thumb Zone */

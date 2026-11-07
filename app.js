@@ -204,6 +204,27 @@
     return { status: "red", className: "mastery-red", accuracy, avgMs, attempts: st.attempts };
   }
 
+  // Combines stats for (t, b) and (b, t) for per-table progress bars
+  function getCombinedPairStats(t, b) {
+    const s1 = state.factStats[getFactKey(t, b)];
+    const s2 = t !== b ? state.factStats[getFactKey(b, t)] : null;
+    const attempts = (s1 ? s1.attempts : 0) + (s2 ? s2.attempts : 0);
+    const correct = (s1 ? s1.correct : 0) + (s2 ? s2.correct : 0);
+    const totalTimeMs = (s1 ? s1.totalTimeMs : 0) + (s2 ? s2.totalTimeMs : 0);
+    return { attempts, correct, totalTimeMs };
+  }
+
+  function evaluateTablePairMastery(t, b) {
+    const comb = getCombinedPairStats(t, b);
+    if (comb.attempts === 0) return "none";
+    const acc = (comb.correct / comb.attempts) * 100;
+    const avgMs = comb.totalTimeMs / comb.attempts;
+    if (comb.attempts >= 2 && acc >= 90 && avgMs <= 2200) return "gold";
+    if (acc >= 80 && avgMs <= 3500) return "green";
+    if (acc >= 50) return "yellow";
+    return "red";
+  }
+
   // Returns ranked tricky facts [{ a, b, score, accuracy, avgMs, misses }]
   function getTrickyFactsList(limit = 8) {
     const list = [];
@@ -258,6 +279,12 @@
     if (tabId === "pets") renderPetsSanctuary();
     if (tabId === "shop") renderShop();
     if (tabId === "stats") renderStatsDashboard();
+  }
+
+  function refreshActiveTabUI() {
+    const activeBtn = document.querySelector(".nav-tab.active");
+    const tabId = activeBtn ? activeBtn.dataset.tab : "adventure";
+    switchTab(tabId);
   }
 
   document.querySelectorAll(".nav-tab").forEach((btn) => {
@@ -404,11 +431,11 @@
     const grid = document.getElementById("custom-tables-grid");
     grid.innerHTML = "";
     for (let t = 1; t <= 12; t++) {
-      // Calculate quick mastery % for table t
+      // Calculate quick mastery % for table t (combining t×b and b×t)
       let masteredCount = 0;
       for (let b = 1; b <= 12; b++) {
-        const m = evaluateFactMastery(t, b);
-        if (m.status === "gold" || m.status === "green") masteredCount++;
+        const stStatus = evaluateTablePairMastery(t, b);
+        if (stStatus === "gold" || stStatus === "green") masteredCount++;
       }
       const btn = document.createElement("button");
       btn.className = `table-toggle-btn ${customSelectedTables.has(t) ? "selected" : ""}`;
@@ -844,13 +871,13 @@
       let tableCorrect = 0;
 
       for (let b = 1; b <= 12; b++) {
-        const m = evaluateFactMastery(t, b);
-        if (m.status === "gold" || m.status === "green") strongOrGold++;
-        const st = state.factStats[getFactKey(t, b)];
-        if (st && st.attempts > 0) {
-          tableAttempts += st.attempts;
-          tableTimeMs += st.totalTimeMs;
-          tableCorrect += st.correct;
+        const stStatus = evaluateTablePairMastery(t, b);
+        if (stStatus === "gold" || stStatus === "green") strongOrGold++;
+        const comb = getCombinedPairStats(t, b);
+        if (comb.attempts > 0) {
+          tableAttempts += comb.attempts;
+          tableTimeMs += comb.totalTimeMs;
+          tableCorrect += comb.correct;
         }
       }
 
@@ -901,13 +928,14 @@
   function showFactDetail(a, b) {
     const banner = document.getElementById("heatmap-fact-detail");
     const st = state.factStats[getFactKey(a, b)];
+    const btnLabel = a === b ? `Practice ×${a} Table` : `Practice ×${a} &amp; ×${b}`;
     if (!st || st.attempts === 0) {
       banner.innerHTML = `
         <div>
           <strong>${a} × ${b} = ${a * b}</strong> — Not practiced yet!
         </div>
         <button class="btn-3d btn-blue" style="padding:7px 14px; font-size:0.85rem;" id="btn-drill-this-fact">
-          Practice ×${a} Table Now
+          ${btnLabel}
         </button>
       `;
     } else {
@@ -922,7 +950,7 @@
           Avg Speed: <strong>${avgSec}s</strong> (Fastest: ${bestSec})
         </div>
         <button class="btn-3d btn-blue" style="padding:7px 14px; font-size:0.85rem;" id="btn-drill-this-fact">
-          Practice ×${a} &amp; ×${b}
+          ${btnLabel}
         </button>
       `;
     }
@@ -1045,7 +1073,7 @@
     const splitLegend =
       extraRows > 0
         ? `🔵 ${anchorRows}×${cols} (${anchorRows * cols}) ➕ 🟠 ${extraRows}×${cols} (${extraRows * cols}) = <strong>${a * b}</strong>`
-        : `🔵 ${rows} rows of ${cols} = <strong>${a * b}</strong>`;
+        : `🔵 ${rows} ${rows === 1 ? "row" : "rows"} of ${cols} = <strong>${a * b}</strong>`;
 
     container.innerHTML = `${dotsHtml}<div class="array-legend-text">${splitLegend}</div>`;
     container.style.display = "flex";
@@ -1057,6 +1085,18 @@
   let currentSession = null;
   let timerAnimId = null;
   let autoResetTimeoutId = null;
+  let nextQuestionTimeoutId = null;
+
+  function clearPendingTimeouts() {
+    if (autoResetTimeoutId) {
+      clearTimeout(autoResetTimeoutId);
+      autoResetTimeoutId = null;
+    }
+    if (nextQuestionTimeoutId) {
+      clearTimeout(nextQuestionTimeoutId);
+      nextQuestionTimeoutId = null;
+    }
+  }
 
   function generateSmartChoices(a, b) {
     const correct = a * b;
@@ -1205,20 +1245,30 @@
       );
     }
 
-    // 4. Build candidate pool from session tables or customFactPairs
+    // 4. Build candidate pool from session customFactPairs (if Tricky Booster) or session tables
     const pool = [];
-    if (session.customFactPairs && session.customFactPairs.length > 0) {
-      session.customFactPairs.forEach((pair) => pool.push({ a: pair.a, b: pair.b }));
-    }
-    session.tables.forEach((t) => {
-      for (let b = 1; b <= 12; b++) {
-        if (Math.random() < 0.72) {
-          pool.push({ a: t, b });
-        } else {
-          pool.push({ a: b, b: t });
+    const hasCustomPairs = session.customFactPairs && session.customFactPairs.length > 0;
+    if (hasCustomPairs && (session.customFactPairs.length >= 2 || Math.random() < 0.78)) {
+      session.customFactPairs.forEach((pair) => {
+        pool.push({ a: pair.a, b: pair.b });
+        if (pair.a !== pair.b && Math.random() < 0.35) {
+          pool.push({ a: pair.b, b: pair.a });
         }
+      });
+    } else {
+      if (hasCustomPairs) {
+        session.customFactPairs.forEach((pair) => pool.push({ a: pair.a, b: pair.b }));
       }
-    });
+      session.tables.forEach((t) => {
+        for (let b = 1; b <= 12; b++) {
+          if (Math.random() < 0.72) {
+            pool.push({ a: t, b });
+          } else {
+            pool.push({ a: b, b: t });
+          }
+        }
+      });
+    }
 
     const filtered = pool.filter(
       (q) => !session.lastQuestion || !(q.a === session.lastQuestion.a && q.b === session.lastQuestion.b)
@@ -1232,10 +1282,8 @@
   function startGameSession(config) {
     checkDailyStreak();
     renderHUD();
-    if (autoResetTimeoutId) {
-      clearTimeout(autoResetTimeoutId);
-      autoResetTimeoutId = null;
-    }
+    stopTimerLoop();
+    clearPendingTimeouts();
 
     currentSession = {
       ...config,
@@ -1298,13 +1346,18 @@
     }
   }
 
+  function formatSolvedEquation(q) {
+    if (!q) return "";
+    const prod = q.a * q.b;
+    if (q.questionType === "mystery_b") return `${q.a} × [${q.b}] = ${prod}`;
+    if (q.questionType === "mystery_a") return `[${q.a}] × ${q.b} = ${prod}`;
+    return `${q.a} × ${q.b} = ${prod}`;
+  }
+
   function dealNextQuestion() {
     if (!currentSession) return;
     stopTimerLoop();
-    if (autoResetTimeoutId) {
-      clearTimeout(autoResetTimeoutId);
-      autoResetTimeoutId = null;
-    }
+    clearPendingTimeouts();
 
     const q = pickNextQuestion(currentSession);
     currentSession.currentQuestion = q;
@@ -1365,6 +1418,7 @@
       btn.className = "choice-btn";
       btn.disabled = false;
       btn.textContent = choices[idx];
+      btn.blur();
     });
 
     // Start precision timer
@@ -1459,7 +1513,7 @@
       window.soundFX.correct(currentSession.currentStreak);
 
       card.classList.add("correct-flash");
-      document.getElementById("game-equation").textContent = `${a} × ${b} = ${fullProduct}`;
+      document.getElementById("game-equation").textContent = formatSolvedEquation(currentSession.currentQuestion);
       document.getElementById("game-sub-hint").textContent =
         `⚡ ${(elapsedMs / 1000).toFixed(2)}s! Great job!`;
 
@@ -1470,11 +1524,11 @@
       updateStreakBarUI(false);
 
       if (currentSession.currentStreak >= currentSession.streakLength) {
-        setTimeout(() => {
+        nextQuestionTimeoutId = setTimeout(() => {
           triggerStreakVictory();
         }, 380);
       } else {
-        setTimeout(() => {
+        nextQuestionTimeoutId = setTimeout(() => {
           dealNextQuestion();
         }, 340);
       }
@@ -1496,8 +1550,9 @@
       currentSession.redemptionStage2Done = false;
       currentSession.redemptionStage3Done = false;
 
+      const solvedEq = formatSolvedEquation(currentSession.currentQuestion);
       card.classList.add("wrong-shake");
-      document.getElementById("game-equation").textContent = `${a} × ${b} = ${fullProduct}`;
+      document.getElementById("game-equation").textContent = solvedEq;
 
       // Show Derived Fact Strategy / Rhyme
       const strategyBox = document.getElementById("game-strategy-box");
@@ -1530,8 +1585,8 @@
 
         bubble.className = "speech-bubble reset-bubble";
         bubble.textContent = isTimeout
-          ? `Time's up, ${state.settings.playerName}! Look at the trick below, then tap ${expectedAns} to go again!`
-          : `Almost, ${state.settings.playerName}! ${a} × ${b} = ${fullProduct} — Tap the green ${expectedAns} when you're ready!`;
+          ? `Time's up, ${state.settings.playerName}! ${solvedEq} — Tap the green ${expectedAns} to go again!`
+          : `Almost, ${state.settings.playerName}! ${solvedEq} — Tap the green ${expectedAns} when you're ready!`;
       } else {
         buttons.forEach((btn, idx) => {
           btn.disabled = true;
@@ -1543,13 +1598,13 @@
         });
 
         document.getElementById("game-sub-hint").textContent = isTimeout
-          ? `⏰ Time's up! Remember: ${a} × ${b} = ${fullProduct}`
-          : `💡 Remember: ${a} × ${b} = ${fullProduct}`;
+          ? `⏰ Time's up! Remember: ${solvedEq}`
+          : `💡 Remember: ${solvedEq}`;
 
         bubble.className = "speech-bubble reset-bubble";
         bubble.textContent = isTimeout
-          ? `Time ran out, ${state.settings.playerName}! ${a} × ${b} = ${fullProduct} — Back to 0, let's go again!`
-          : `Almost, ${state.settings.playerName}! ${a} × ${b} = ${fullProduct} — Back to the start, you've got this!`;
+          ? `Time ran out, ${state.settings.playerName}! ${solvedEq} — Back to 0, let's go again!`
+          : `Almost, ${state.settings.playerName}! ${solvedEq} — Back to the start, you've got this!`;
 
         autoResetTimeoutId = setTimeout(() => {
           if (!currentSession) return;
@@ -1572,12 +1627,14 @@
   // Keyboard shortcuts (1, 2, 3, 4, Enter, Space) for desktop testing
   window.addEventListener("keydown", (e) => {
     if (!currentSession) return;
+    if (document.querySelector(".modal-backdrop.active")) return;
     if (currentSession.waitingForMissTap && (e.key === "Enter" || e.key === " ")) {
       e.preventDefault();
       acknowledgeMissAndRestart();
       return;
     }
     if (["1", "2", "3", "4"].includes(e.key)) {
+      e.preventDefault();
       handleAnswerSelection(Number(e.key) - 1, false);
     }
   });
@@ -1585,14 +1642,11 @@
   document.getElementById("btn-quit-game").addEventListener("click", () => {
     window.soundFX.tap();
     stopTimerLoop();
-    if (autoResetTimeoutId) {
-      clearTimeout(autoResetTimeoutId);
-      autoResetTimeoutId = null;
-    }
+    clearPendingTimeouts();
     currentSession = null;
     document.getElementById("game-overlay").classList.remove("active");
     renderHUD();
-    renderAdventureMap();
+    refreshActiveTabUI();
   });
 
   // =========================================================
@@ -1618,6 +1672,7 @@
     const zeroResetBonus = currentSession.resets === 0 ? 10 : 0;
     const totalGemsEarned = Math.round(currentSession.baseGems * timerMode.gemMultiplier) + zeroResetBonus;
 
+    currentSession.chestOpened = false;
     currentSession.computedReward = {
       avgMs,
       totalGemsEarned,
@@ -1637,7 +1692,8 @@
   }
 
   document.getElementById("btn-open-chest").addEventListener("click", () => {
-    if (!currentSession || !currentSession.computedReward) return;
+    if (!currentSession || !currentSession.computedReward || currentSession.chestOpened) return;
+    currentSession.chestOpened = true;
     window.soundFX.chestOpen();
     burstConfetti(110);
 
@@ -1736,7 +1792,7 @@
     document.getElementById("game-overlay").classList.remove("active");
     currentSession = null;
     renderHUD();
-    renderAdventureMap();
+    refreshActiveTabUI();
   });
 
   // =========================================================
@@ -1827,7 +1883,7 @@
     customQuestionStyle = state.settings.questionStyle;
     saveState();
     renderHUD();
-    renderAdventureMap();
+    refreshActiveTabUI();
     document.getElementById("parent-modal").classList.remove("active");
   });
 
