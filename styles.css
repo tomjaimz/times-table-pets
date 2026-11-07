@@ -1991,3 +1991,10 @@ html, body {
   text-decoration: underline;
   padding: 4px;
 }
+
+.onboarding-cloud-box {
+  background: var(--bg-main);
+  border: 2px solid var(--border-light);
+  border-radius: 14px;
+  padding: 10px 12px;
+}

@@ -2013,23 +2013,87 @@
   });
 
   // =========================================================
+  // FIRST-TIME WELCOME & SETUP WIZARD (Login 100% Optional)
+  // =========================================================
+  const onboardingNameInput = document.getElementById("onboarding-input-name");
+  const onboardingNamePreview = document.getElementById("onboarding-name-preview");
+  const onboardingTimerSelect = document.getElementById("onboarding-select-timer");
+
+  if (onboardingNameInput && onboardingNamePreview) {
+    onboardingNameInput.addEventListener("input", () => {
+      const name = onboardingNameInput.value.trim() || "Jemima";
+      onboardingNamePreview.innerHTML = `🦉 Pippin the Owl will cheer for <strong>${name}</strong>!`;
+    });
+  }
+
+  function applyOnboardingInputs() {
+    const chosenName = (onboardingNameInput && onboardingNameInput.value.trim()) || "Jemima";
+    const chosenTimer = Number(onboardingTimerSelect && onboardingTimerSelect.value) || 3;
+    state.settings.playerName = chosenName;
+    state.settings.defaultTimerSeconds = chosenTimer;
+    mapTimerSeconds = chosenTimer;
+    customTimerSec = chosenTimer;
+    state.onboardingCompleted = true;
+    saveState();
+    renderHUD();
+    refreshActiveTabUI();
+  }
+
+  document.getElementById("btn-onboarding-start-local").addEventListener("click", () => {
+    window.soundFX.correct(2);
+    applyOnboardingInputs();
+    document.getElementById("onboarding-modal").classList.remove("active");
+  });
+
+  document.getElementById("btn-onboarding-open-cloud").addEventListener("click", () => {
+    window.soundFX.tap();
+    applyOnboardingInputs();
+    document.getElementById("onboarding-modal").classList.remove("active");
+    openCloudModal();
+  });
+
+  function checkFirstTimeOnboarding() {
+    const hasHistory =
+      Object.keys(state.factStats || {}).length > 0 || (state.recentRuns && state.recentRuns.length > 0);
+    const isMagicLinkCallback =
+      window.location.search.includes("magic_email=") || window.location.search.includes("oobCode=");
+
+    if (hasHistory || isMagicLinkCallback) {
+      if (!state.onboardingCompleted) {
+        state.onboardingCompleted = true;
+        saveState(true);
+      }
+      return;
+    }
+
+    if (!state.onboardingCompleted) {
+      if (onboardingNameInput) onboardingNameInput.value = state.settings.playerName || "Jemima";
+      if (onboardingTimerSelect) onboardingTimerSelect.value = String(state.settings.defaultTimerSeconds || 3);
+      document.getElementById("onboarding-modal").classList.add("active");
+    }
+  }
+
+  // =========================================================
   // INITIALIZE APP ON LOAD
   // =========================================================
   checkDailyStreak();
   renderHUD();
   renderAdventureMap();
+  checkFirstTimeOnboarding();
 
   if (window.CLOUD_SYNC) {
     window.CLOUD_SYNC.init({
       getLocalState: () => state,
       onRemoteStateMerge: (mergedState) => {
         state = mergedState;
+        state.onboardingCompleted = true;
         customStreakLen = state.settings.defaultStreakLength || 10;
         customTimerSec = state.settings.defaultTimerSeconds || 3;
         customQuestionStyle = state.settings.questionStyle || "mix";
         saveState(true);
         renderHUD();
         refreshActiveTabUI();
+        document.getElementById("onboarding-modal").classList.remove("active");
       }
     });
   }

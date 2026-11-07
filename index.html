@@ -589,6 +589,74 @@
     </div>
   </div>
 
+  <!-- =========================================================
+       FIRST-TIME WELCOME & SETUP WIZARD MODAL (Login 100% Optional)
+       ========================================================= -->
+  <div class="modal-backdrop" id="onboarding-modal">
+    <div class="modal-card" style="max-width:520px; text-align:left;">
+      <div style="text-align:center; margin-bottom:14px;">
+        <div style="font-size:3.2rem; line-height:1; margin-bottom:6px;">🦉✨</div>
+        <h2 style="margin:0; font-size:1.55rem; font-weight:900;">Welcome to Magical Pet Academy!</h2>
+        <p style="margin:4px 0 0; font-size:0.9rem; font-weight:700; color:var(--text-muted);">
+          Quick 10-second setup before the times table adventure begins:
+        </p>
+      </div>
+
+      <!-- Step 1: Child's Name -->
+      <div class="form-group">
+        <label style="font-size:0.9rem;">1️⃣ What is the player's name?</label>
+        <input
+          type="text"
+          class="form-input"
+          id="onboarding-input-name"
+          value="Jemima"
+          placeholder="Enter child's first name..."
+          style="font-size:1.1rem; font-weight:900;"
+        />
+        <div style="font-size:0.8rem; font-weight:800; color:var(--duo-purple); margin-top:4px;" id="onboarding-name-preview">
+          🦉 Pippin the Owl will cheer for <strong>Jemima</strong>!
+        </div>
+      </div>
+
+      <!-- Step 2: Starting Speed -->
+      <div class="form-group">
+        <label style="font-size:0.9rem;">2️⃣ Default Countdown Speed</label>
+        <select class="form-input" id="onboarding-select-timer" style="font-weight:800;">
+          <option value="3" selected>⚡ 3 Seconds — Blitz Mode (2× Gems)</option>
+          <option value="5">⭐ 5 Seconds — Fast Mode (1.5× Gems)</option>
+          <option value="8">🌱 8 Seconds — Warmup Mode (1× Gems)</option>
+        </select>
+      </div>
+
+      <!-- Primary CTA: Play Immediately Without Login -->
+      <button class="btn-3d btn-green" id="btn-onboarding-start-local" style="width:100%; padding:14px; font-size:1.12rem; margin-top:6px;">
+        🚀 Start Playing Now (No Login Needed)
+      </button>
+      <div style="text-align:center; font-size:0.76rem; font-weight:800; color:var(--text-muted); margin-top:5px;">
+        Progress saves automatically on this device. You can always link an email later!
+      </div>
+
+      <hr style="border:none; border-top:2px solid var(--border-light); margin:14px 0;" />
+
+      <!-- Step 3: Optional Parent Cloud Login -->
+      <div class="onboarding-cloud-box">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+          <div>
+            <div style="font-size:0.86rem; font-weight:900; color:var(--text-main);">
+              ☁️ Want to Sync Across Devices? <span style="color:var(--text-muted); font-weight:800;">(Optional)</span>
+            </div>
+            <div style="font-size:0.76rem; font-weight:700; color:var(--text-muted);">
+              Parents can sign in with a free Magic Email Link to sync progress between iPad &amp; phone.
+            </div>
+          </div>
+          <button class="btn-3d btn-white" id="btn-onboarding-open-cloud" style="padding:7px 12px; font-size:0.8rem; white-space:nowrap;">
+            ✉️ Parent Login
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Firebase Official SDK (Compat for Static Zero-Build Hosting) -->
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
