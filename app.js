@@ -42,9 +42,13 @@
     }
   }
 
-  function saveState() {
+  function saveState(skipCloud = false) {
     try {
+      state.updatedAt = Date.now();
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      if (!skipCloud && window.CLOUD_SYNC) {
+        window.CLOUD_SYNC.pushState(state);
+      }
     } catch (e) {
       console.warn("Could not save state to localStorage:", e);
     }
@@ -1898,9 +1902,135 @@
   });
 
   // =========================================================
+  // CLOUD SYNC & PASSWORDLESS MAGIC LINK MODAL HANDLERS
+  // =========================================================
+  function openCloudModal() {
+    window.soundFX.tap();
+    if (window.CLOUD_SYNC) {
+      window.CLOUD_SYNC.updateUI();
+    }
+    document.getElementById("cloud-modal").classList.add("active");
+  }
+
+  document.getElementById("hud-cloud-btn").addEventListener("click", openCloudModal);
+
+  const openCloudFromParentBtn = document.getElementById("btn-open-cloud-from-parent");
+  if (openCloudFromParentBtn) {
+    openCloudFromParentBtn.addEventListener("click", () => {
+      document.getElementById("parent-modal").classList.remove("active");
+      openCloudModal();
+    });
+  }
+
+  document.getElementById("btn-close-cloud").addEventListener("click", () => {
+    window.soundFX.tap();
+    document.getElementById("cloud-modal").classList.remove("active");
+  });
+
+  document.getElementById("btn-toggle-firebase-setup").addEventListener("click", () => {
+    const panel = document.getElementById("cloud-firebase-setup-panel");
+    panel.style.display = panel.style.display === "none" ? "block" : "none";
+  });
+
+  document.getElementById("btn-save-firebase-config").addEventListener("click", () => {
+    const raw = document.getElementById("cloud-input-firebase-config").value;
+    const errEl = document.getElementById("cloud-config-error");
+    try {
+      errEl.style.display = "none";
+      window.CLOUD_SYNC.saveCustomFirebaseConfig(raw);
+    } catch (err) {
+      errEl.textContent = err.message;
+      errEl.style.display = "block";
+    }
+  });
+
+  document.getElementById("btn-send-magic-link").addEventListener("click", async () => {
+    const emailInput = document.getElementById("cloud-input-email");
+    const feedbackEl = document.getElementById("cloud-magic-feedback");
+    const btn = document.getElementById("btn-send-magic-link");
+    const email = emailInput.value.trim();
+
+    feedbackEl.style.display = "block";
+    feedbackEl.textContent = "⏳ Sending free Magic Login Link...";
+    btn.disabled = true;
+
+    try {
+      await window.CLOUD_SYNC.sendMagicLink(email);
+      window.soundFX.correct(2);
+      feedbackEl.innerHTML =
+        `✅ <strong>Magic Link sent to ${email}!</strong><br/>` +
+        `Open the email on this device (or forward/AirDrop the link to Jemima's iPad) and tap it to permanently link the device.`;
+    } catch (err) {
+      feedbackEl.textContent = `⚠️ ${err.message}`;
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  document.getElementById("btn-google-signin").addEventListener("click", async () => {
+    const feedbackEl = document.getElementById("cloud-magic-feedback");
+    try {
+      feedbackEl.style.display = "none";
+      await window.CLOUD_SYNC.signInWithGoogle();
+      window.soundFX.chestOpen();
+    } catch (err) {
+      feedbackEl.style.display = "block";
+      feedbackEl.textContent = `⚠️ Google Sign-In error: ${err.message}`;
+    }
+  });
+
+  document.getElementById("btn-cloud-force-sync").addEventListener("click", () => {
+    window.soundFX.tap();
+    if (window.CLOUD_SYNC) {
+      window.CLOUD_SYNC.pushState(state);
+    }
+    const fb = document.getElementById("cloud-signedin-feedback");
+    fb.style.display = "block";
+    fb.textContent = "✅ Synced latest progress to your cloud account!";
+  });
+
+  document.getElementById("btn-copy-device-setup-link").addEventListener("click", async () => {
+    const user = window.CLOUD_SYNC ? window.CLOUD_SYNC.getCurrentUser() : null;
+    const fb = document.getElementById("cloud-signedin-feedback");
+    fb.style.display = "block";
+    if (user && user.email) {
+      try {
+        await window.CLOUD_SYNC.sendMagicLink(user.email);
+        fb.innerHTML =
+          `✉️ <strong>Sent a fresh Magic Link to ${user.email}!</strong><br/>` +
+          `Open your email on the other device (or AirDrop the link from your email to Jemima's iPad) to link it permanently!`;
+      } catch (err) {
+        fb.textContent = `⚠️ ${err.message}`;
+      }
+    }
+  });
+
+  document.getElementById("btn-cloud-signout").addEventListener("click", async () => {
+    window.soundFX.tap();
+    if (window.CLOUD_SYNC) {
+      await window.CLOUD_SYNC.signOut();
+    }
+  });
+
+  // =========================================================
   // INITIALIZE APP ON LOAD
   // =========================================================
   checkDailyStreak();
   renderHUD();
   renderAdventureMap();
+
+  if (window.CLOUD_SYNC) {
+    window.CLOUD_SYNC.init({
+      getLocalState: () => state,
+      onRemoteStateMerge: (mergedState) => {
+        state = mergedState;
+        customStreakLen = state.settings.defaultStreakLength || 10;
+        customTimerSec = state.settings.defaultTimerSeconds || 3;
+        customQuestionStyle = state.settings.questionStyle || "mix";
+        saveState(true);
+        renderHUD();
+        refreshActiveTabUI();
+      }
+    });
+  }
 })();

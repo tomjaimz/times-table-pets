@@ -35,8 +35,9 @@
         <span>💎</span>
         <span id="hud-gems">50</span>
       </div>
+      <button class="icon-btn" id="hud-cloud-btn" title="Cloud Sync &amp; Parent Magic Link">☁️</button>
       <button class="icon-btn" id="hud-sound-btn" title="Toggle Sound">🔊</button>
-      <button class="icon-btn" id="hud-parent-btn" title="Parent Settings & Fine-Tuning">⚙️</button>
+      <button class="icon-btn" id="hud-parent-btn" title="Parent Settings &amp; Fine-Tuning">⚙️</button>
     </div>
   </header>
 
@@ -454,12 +455,146 @@
       <div id="parent-rewards-manage-list" style="max-height:150px; overflow-y:auto; margin-bottom:16px;"></div>
 
       <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-top:16px;">
+        <button class="btn-3d btn-white" id="btn-open-cloud-from-parent" style="font-size:0.85rem; padding:8px 12px;">☁️ Multi-Device Cloud Login</button>
         <button class="btn-3d btn-white" id="btn-export-data" style="font-size:0.85rem; padding:8px 12px;">📋 Export Backup JSON</button>
         <button class="btn-3d btn-green" id="btn-save-parent" style="flex:1;">💾 Save Settings</button>
       </div>
     </div>
   </div>
 
+  <!-- =========================================================
+       CLOUD SYNC & PASSWORDLESS MAGIC LINK MODAL
+       ========================================================= -->
+  <div class="modal-backdrop" id="cloud-modal">
+    <div class="modal-card" style="max-width:560px; text-align:left;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <h2 style="margin:0; font-weight:900;">☁️ Parent Account &amp; Cloud Sync</h2>
+        <button class="icon-btn" id="btn-close-cloud">✕</button>
+      </div>
+
+      <p style="margin:0 0 12px; font-size:0.9rem; font-weight:700; color:var(--text-muted);">
+        Link your parent email via a free <strong>Magic Login Link</strong> so Jemima's Gems, Pets, Coupons, and 12×12 Mastery sync automatically across iPad, phone, and laptop. Once linked, this device stays signed in permanently.
+      </p>
+
+      <!-- Live Sync Status & Persistent Device ID -->
+      <div class="cloud-status-box">
+        <div class="cloud-status-pill status-local" id="cloud-modal-status-badge">
+          <span id="cloud-modal-status-text">Saved on this device (Offline Mode)</span>
+        </div>
+        <div style="font-size:0.78rem; font-weight:800; color:var(--text-muted); margin-top:6px;">
+          Persistent Device ID: <code id="cloud-device-id-display">dev_...</code>
+        </div>
+      </div>
+
+      <!-- PANEL A: Signed Out -> Send Magic Link or Google 1-Tap -->
+      <div id="cloud-signed-out-panel" style="display:none; margin-top:14px;">
+        <div class="form-group">
+          <label>Parent Email Address (for Free Magic Login Link)</label>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <input
+              type="email"
+              class="form-input"
+              id="cloud-input-email"
+              placeholder="parent@example.com"
+              style="flex:1; min-width:200px;"
+            />
+            <button class="btn-3d btn-blue" id="btn-send-magic-link" style="padding:10px 16px; font-size:0.92rem;">
+              ✉️ Send Magic Link
+            </button>
+          </div>
+        </div>
+
+        <div id="cloud-magic-feedback" class="cloud-feedback-banner" style="display:none;"></div>
+
+        <div style="text-align:center; margin:12px 0 8px; font-size:0.8rem; font-weight:900; color:var(--text-muted); text-transform:uppercase;">
+          — or instant 1-tap sign in —
+        </div>
+
+        <button class="btn-3d btn-white" id="btn-google-signin" style="width:100%; padding:10px; font-size:0.95rem;">
+          🔑 Sign in with Google Account
+        </button>
+
+        <div style="margin-top:12px; text-align:right;">
+          <button class="btn-link-subtle" id="btn-toggle-firebase-setup">⚙️ Edit Firebase Project Config</button>
+        </div>
+      </div>
+
+      <!-- PANEL B: Signed In -> Linked Account Details & Actions -->
+      <div id="cloud-signed-in-panel" style="display:none; margin-top:14px;">
+        <div class="cloud-account-card">
+          <div style="font-size:0.78rem; font-weight:900; color:#15803d; text-transform:uppercase;">
+            ✅ Permanently Linked Parent Account
+          </div>
+          <div style="font-size:1.15rem; font-weight:900; margin:4px 0;" id="cloud-user-email">parent@example.com</div>
+          <div style="font-size:0.82rem; font-weight:700; color:var(--text-muted);">
+            🔒 Protected by per-account Firebase Security Rules (<code>auth.uid</code>). Only devices logged into your email can read or update Jemima's data.
+          </div>
+        </div>
+
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;">
+          <button class="btn-3d btn-green" id="btn-cloud-force-sync" style="flex:1; padding:10px; font-size:0.9rem;">
+            🔄 Sync Now
+          </button>
+          <button class="btn-3d btn-blue" id="btn-copy-device-setup-link" style="flex:1; padding:10px; font-size:0.9rem;">
+            📱 Send Magic Link to Another Device
+          </button>
+          <button class="btn-3d btn-white" id="btn-cloud-signout" style="padding:10px 14px; font-size:0.88rem;">
+            Sign Out
+          </button>
+        </div>
+        <div id="cloud-signedin-feedback" class="cloud-feedback-banner" style="display:none; margin-top:10px;"></div>
+      </div>
+
+      <!-- PANEL C: 1-Minute Firebase Project Config Setup -->
+      <div id="cloud-firebase-setup-panel" style="margin-top:14px;">
+        <div class="cloud-setup-instructions">
+          <div style="font-weight:900; font-size:0.95rem; margin-bottom:6px; color:#1e40af;">
+            🛠️ 1-Time Free Firebase Setup (Takes 2 Minutes)
+          </div>
+          <ol style="margin:0; padding-left:18px; font-size:0.82rem; font-weight:700; line-height:1.45; color:var(--text-main);">
+            <li>In <a href="https://console.firebase.google.com/" target="_blank" rel="noopener">Firebase Console</a>, create a project &amp; add a <strong>Web App (<code>&lt;/&gt;</code>)</strong>.</li>
+            <li>Enable <strong>Authentication → Sign-in method → Email/Password + Email link (passwordless)</strong> (and optionally <strong>Google</strong>), and add <code>tomjaimz.github.io</code> under <strong>Authentication → Settings → Authorized domains</strong>.</li>
+            <li>Create a <strong>Realtime Database</strong> and set its <strong>Rules</strong> to lock each account to its own email UID:
+              <pre class="cloud-rules-pre">{
+  "rules": {
+    "users": {
+      "$uid": {
+        ".read": "auth != null &amp;&amp; auth.uid === $uid",
+        ".write": "auth != null &amp;&amp; auth.uid === $uid"
+      }
+    }
+  }
+}</pre>
+            </li>
+          </ol>
+
+          <label style="display:block; font-size:0.82rem; font-weight:900; margin:8px 0 4px;">
+            Paste your <code>firebaseConfig</code> snippet below:
+          </label>
+          <textarea
+            id="cloud-input-firebase-config"
+            class="form-input"
+            rows="4"
+            placeholder='const firebaseConfig = { apiKey: "AIza...", authDomain: "...", databaseURL: "https://...", projectId: "..." };'
+            style="font-family:monospace; font-size:0.78rem;"
+          ></textarea>
+          <div id="cloud-config-error" style="color:var(--duo-red); font-size:0.8rem; font-weight:800; margin-top:4px; display:none;"></div>
+          <div style="display:flex; gap:8px; margin-top:8px;">
+            <button class="btn-3d btn-green" id="btn-save-firebase-config" style="flex:1; padding:9px; font-size:0.9rem;">
+              💾 Connect Firebase Cloud
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase Official SDK (Compat for Static Zero-Build Hosting) -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="cloud.js"></script>
   <script src="data.js"></script>
   <script src="sound.js"></script>
   <script src="app.js"></script>
