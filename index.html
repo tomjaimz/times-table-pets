@@ -50,9 +50,18 @@
           <span>⏱️ Timer Speed & Streak Goal (<span id="map-streak-label">10</span> in a row):</span>
         </div>
         <div class="speed-pills" id="map-speed-pills">
-          <button class="speed-pill active" data-seconds="3">⚡ 3s Blitz (2× 💎)</button>
-          <button class="speed-pill" data-seconds="5">⭐ 5s Fast (1.5× 💎)</button>
-          <button class="speed-pill" data-seconds="8">🌱 8s Warmup (1× 💎)</button>
+          <button class="speed-pill active" data-seconds="3">
+            <span class="sp-main">⚡ 3s Blitz</span>
+            <span class="sp-sub">2× 💎</span>
+          </button>
+          <button class="speed-pill" data-seconds="5">
+            <span class="sp-main">⭐ 5s Fast</span>
+            <span class="sp-sub">1.5× 💎</span>
+          </button>
+          <button class="speed-pill" data-seconds="8">
+            <span class="sp-main">🌱 8s Chill</span>
+            <span class="sp-sub">1× 💎</span>
+          </button>
         </div>
       </div>
 
@@ -238,24 +247,34 @@
        FULL-SCREEN GAME OVERLAY (The 3-Second Streak Challenge)
        ========================================================= -->
   <div class="game-overlay" id="game-overlay">
-    <div class="game-top-bar">
-      <button class="icon-btn" id="btn-quit-game" title="Exit to Map">✕</button>
+    <!-- Top Zone: Progress Bar, Timer Bar & Companion Cheer -->
+    <div class="game-header-zone">
+      <div class="game-top-bar">
+        <button class="icon-btn" id="btn-quit-game" title="Exit to Map">✕</button>
 
-      <div class="streak-track-wrap">
-        <div class="streak-bar-outer">
-          <div class="streak-bar-fill" id="game-streak-fill"></div>
+        <div class="streak-track-wrap">
+          <div class="streak-bar-outer">
+            <div class="streak-bar-fill" id="game-streak-fill"></div>
+          </div>
+          <div class="streak-counter-badge" id="game-streak-text">0 / 10</div>
+          <div class="chest-goal-icon" id="game-chest-icon">🧰</div>
         </div>
-        <div class="streak-counter-badge" id="game-streak-text">0 / 10</div>
-        <div class="chest-goal-icon" id="game-chest-icon">🧰</div>
+
+        <div class="stat-pill" id="game-resets-pill" title="Resets this run">
+          <span>🔄</span>
+          <span id="game-resets-count">0</span>
+        </div>
       </div>
 
-      <div class="stat-pill" id="game-resets-pill" title="Resets this run">
-        <span>🔄</span>
-        <span id="game-resets-count">0</span>
+      <!-- Precision Countdown Timer Bar -->
+      <div class="timer-bar-container">
+        <span style="font-size:1.1rem; line-height:1;">⏱️</span>
+        <div class="timer-track">
+          <div class="timer-fill" id="game-timer-fill"></div>
+        </div>
+        <div class="timer-text" id="game-timer-text">3.0s</div>
       </div>
-    </div>
 
-    <div class="game-stage">
       <!-- Active Pet Companion & Dynamic Cheer / Reset Teaching Bubble -->
       <div class="companion-cheer-row">
         <div class="stage-pet-avatar" id="stage-pet-avatar">🦉</div>
@@ -263,33 +282,27 @@
           Ready, Jemima? Answer before the bar runs out!
         </div>
       </div>
+    </div>
 
-      <!-- Precision Countdown Timer Bar -->
-      <div class="timer-bar-container">
-        <span style="font-size:1.2rem;">⏱️</span>
-        <div class="timer-track">
-          <div class="timer-fill" id="game-timer-fill"></div>
-        </div>
-        <div class="timer-text" id="game-timer-text">3.0s</div>
-      </div>
-
-      <!-- Multiplication Problem Card -->
+    <!-- Middle Zone: Hero Multiplication Problem Card -->
+    <div class="game-middle-stage">
       <div class="problem-card" id="game-problem-card">
         <h2 class="problem-equation" id="game-equation">7 × 8 = ?</h2>
         <div class="problem-sub-hint" id="game-sub-hint">Tap the right answer below!</div>
       </div>
+    </div>
 
-      <!-- 4 Multiple Choice Buttons -->
+    <!-- Bottom Thumb Zone: 4 Multiple Choice Buttons -->
+    <div class="game-bottom-zone">
       <div class="choices-grid" id="game-choices-grid">
         <button class="choice-btn" data-idx="0">48</button>
         <button class="choice-btn" data-idx="1">54</button>
         <button class="choice-btn" data-idx="2">56</button>
         <button class="choice-btn" data-idx="3">64</button>
       </div>
-    </div>
-
-    <div style="text-align:center; font-size:0.82rem; font-weight:800; color:var(--text-muted);">
-      <span id="game-mode-footer">Level: 1× &amp; 2× Sprout Path • ⚡ 3s Blitz Mode</span>
+      <div class="game-footer-label">
+        <span id="game-mode-footer">Level: 1× &amp; 2× Sprout Path • ⚡ 3s Blitz Mode</span>
+      </div>
     </div>
   </div>
 

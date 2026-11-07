@@ -345,6 +345,23 @@ html, body {
   color: var(--text-main);
   cursor: pointer;
   transition: all 0.12s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.speed-pill .sp-main {
+  font-weight: 900;
+}
+
+.speed-pill .sp-sub {
+  font-size: 0.78rem;
+  font-weight: 800;
+  opacity: 0.85;
+  background: rgba(0, 0, 0, 0.05);
+  padding: 2px 6px;
+  border-radius: 99px;
 }
 
 .speed-pill.active[data-seconds="3"] {
@@ -932,25 +949,32 @@ html, body {
   display: flex;
 }
 
-.game-top-bar {
-  max-width: 820px;
+.game-header-zone {
+  max-width: 760px;
   width: 100%;
   margin: 0 auto;
   display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.game-top-bar {
+  width: 100%;
+  display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 10px;
 }
 
 .streak-track-wrap {
   flex: 1;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .streak-bar-outer {
   flex: 1;
-  height: 24px;
+  height: 22px;
   background: #e2e8f0;
   border-radius: 999px;
   position: relative;
@@ -985,14 +1009,15 @@ html, body {
 
 .streak-counter-badge {
   font-weight: 900;
-  font-size: 1.05rem;
-  min-width: 58px;
+  font-size: 0.98rem;
+  min-width: 50px;
   text-align: right;
   color: var(--text-main);
+  font-variant-numeric: tabular-nums;
 }
 
 .chest-goal-icon {
-  font-size: 1.9rem;
+  font-size: 1.75rem;
   line-height: 1;
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.12));
   transition: transform 0.2s;
@@ -1007,71 +1032,20 @@ html, body {
   to { transform: scale(1.18) rotate(6deg); }
 }
 
-/* Game Center Stage */
-.game-stage {
-  max-width: 760px;
-  width: 100%;
-  margin: 0 auto;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 16px;
-}
-
-.companion-cheer-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-height: 64px;
-}
-
-.stage-pet-avatar {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2.2rem;
-  border: 3px solid rgba(0,0,0,0.08);
-  flex-shrink: 0;
-  background: #fff;
-}
-
-.speech-bubble {
-  background: #ffffff;
-  border: 2px solid var(--border-light);
-  border-bottom-width: 4px;
-  border-radius: 18px;
-  padding: 10px 16px;
-  font-weight: 800;
-  font-size: 1rem;
-  color: var(--text-main);
-  position: relative;
-  flex: 1;
-}
-
-.speech-bubble.reset-bubble {
-  background: var(--duo-red-bg);
-  border-color: var(--duo-red);
-  color: #991b1b;
-}
-
 /* Precision Countdown Bar */
 .timer-bar-container {
   background: #fff;
   border: 2px solid var(--border-light);
-  border-radius: 16px;
-  padding: 8px 12px;
+  border-radius: 14px;
+  padding: 6px 12px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .timer-track {
   flex: 1;
-  height: 16px;
+  height: 14px;
   background: #e2e8f0;
   border-radius: 99px;
   overflow: hidden;
@@ -1087,19 +1061,71 @@ html, body {
 
 .timer-text {
   font-weight: 900;
-  font-size: 1.05rem;
-  min-width: 52px;
+  font-size: 0.98rem;
+  min-width: 46px;
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
+.companion-cheer-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 62px;
+}
+
+.stage-pet-avatar {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  border: 3px solid rgba(0,0,0,0.08);
+  flex-shrink: 0;
+  background: #fff;
+}
+
+.speech-bubble {
+  background: #ffffff;
+  border: 2px solid var(--border-light);
+  border-bottom-width: 4px;
+  border-radius: 16px;
+  padding: 9px 14px;
+  font-weight: 800;
+  font-size: 0.96rem;
+  color: var(--text-main);
+  position: relative;
+  flex: 1;
+}
+
+.speech-bubble.reset-bubble {
+  background: var(--duo-red-bg);
+  border-color: var(--duo-red);
+  color: #991b1b;
+}
+
+/* Middle Zone: Hero Multiplication Card */
+.game-middle-stage {
+  max-width: 760px;
+  width: 100%;
+  margin: 0 auto;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 0;
+}
+
 /* Problem Card */
 .problem-card {
+  width: 100%;
   background: #ffffff;
   border: 3px solid var(--border-light);
   border-bottom-width: 7px;
   border-radius: 28px;
-  padding: 28px 20px;
+  padding: 32px 20px;
   text-align: center;
   position: relative;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
@@ -1126,7 +1152,7 @@ html, body {
 }
 
 .problem-equation {
-  font-size: clamp(2.8rem, 7vw, 4.5rem);
+  font-size: clamp(2.8rem, 8vw, 4.5rem);
   font-weight: 900;
   letter-spacing: 1px;
   color: var(--text-main);
@@ -1140,6 +1166,23 @@ html, body {
   font-weight: 800;
   color: var(--text-muted);
   min-height: 22px;
+}
+
+/* Bottom Thumb Zone */
+.game-bottom-zone {
+  max-width: 760px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.game-footer-label {
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--text-muted);
 }
 
 /* 4 Multiple Choice Buttons (2x2 Grid for Fast Thumb Reach) */
@@ -1367,11 +1410,18 @@ html, body {
   }
 
   .speed-pill {
-    padding: 8px 4px;
-    font-size: 0.76rem;
+    padding: 7px 4px;
+    font-size: 0.78rem;
     text-align: center;
-    border-radius: 11px;
+    border-radius: 12px;
     border-bottom-width: 3px;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .speed-pill .sp-sub {
+    font-size: 0.68rem;
+    padding: 1px 5px;
   }
 
   /* Adventure Worlds & Stepping Stone Cards */
@@ -1601,8 +1651,12 @@ html, body {
     padding: 10px 12px calc(12px + env(safe-area-inset-bottom, 0px));
   }
 
-  .game-top-bar {
+  .game-header-zone {
     gap: 8px;
+  }
+
+  .game-top-bar {
+    gap: 6px;
   }
 
   .streak-bar-outer {
@@ -1610,64 +1664,68 @@ html, body {
   }
 
   .streak-counter-badge {
-    font-size: 0.9rem;
-    min-width: 44px;
+    font-size: 0.85rem;
+    min-width: 40px;
   }
 
   .chest-goal-icon {
-    font-size: 1.5rem;
-  }
-
-  .game-stage {
-    gap: 10px;
-  }
-
-  .companion-cheer-row {
-    min-height: 48px;
-    gap: 8px;
-  }
-
-  .stage-pet-avatar {
-    width: 46px;
-    height: 46px;
-    font-size: 1.7rem;
-  }
-
-  .speech-bubble {
-    padding: 8px 12px;
-    font-size: 0.86rem;
-    border-radius: 14px;
-    line-height: 1.25;
+    font-size: 1.45rem;
   }
 
   .timer-bar-container {
-    padding: 6px 10px;
-    border-radius: 13px;
+    padding: 5px 10px;
+    border-radius: 12px;
     gap: 8px;
   }
 
   .timer-track {
-    height: 12px;
+    height: 11px;
   }
 
   .timer-text {
-    font-size: 0.92rem;
-    min-width: 42px;
+    font-size: 0.88rem;
+    min-width: 38px;
+  }
+
+  .companion-cheer-row {
+    min-height: 50px;
+    gap: 8px;
+  }
+
+  .stage-pet-avatar {
+    width: 44px;
+    height: 44px;
+    font-size: 1.65rem;
+  }
+
+  .speech-bubble {
+    padding: 7px 11px;
+    font-size: 0.84rem;
+    border-radius: 13px;
+    line-height: 1.25;
+  }
+
+  .game-middle-stage {
+    padding: 6px 0;
   }
 
   .problem-card {
-    padding: 18px 12px;
+    padding: 22px 14px;
     border-radius: 22px;
     border-bottom-width: 5px;
   }
 
   .problem-equation {
-    font-size: clamp(2.2rem, 9.5vw, 3.1rem);
+    font-size: clamp(2.3rem, 10vw, 3.2rem);
   }
 
   .problem-sub-hint {
     font-size: 0.84rem;
-    margin-top: 4px;
+    margin-top: 6px;
+  }
+
+  .game-bottom-zone {
+    gap: 8px;
   }
 
   .choices-grid {
@@ -1675,10 +1733,14 @@ html, body {
   }
 
   .choice-btn {
-    min-height: 74px;
+    min-height: 76px;
     font-size: clamp(1.75rem, 6.5vw, 2.2rem);
     border-radius: 18px;
     border-bottom-width: 5px;
+  }
+
+  .game-footer-label {
+    font-size: 0.72rem;
   }
 
   /* Modals on Phone */
