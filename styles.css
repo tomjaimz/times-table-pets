@@ -1266,7 +1266,7 @@ html, body {
 }
 
 .choice-btn.tap-to-continue::after {
-  content: "👆 Tap to Continue";
+  content: "👆 Tap!";
   position: absolute;
   bottom: 4px;
   font-size: 0.68rem;
@@ -2332,5 +2332,76 @@ html, body {
 }
 
 .lang-sv .choice-btn.tap-to-continue::after {
-  content: "👆 Tryck för att fortsätta";
+  content: "👆 Tryck!";
+}
+
+/* =========================================================
+   EXPANDABLE "FOR PARENTS" INFO BOXES (MINIMAL KID READING)
+   ========================================================= */
+.parent-info-box {
+  margin-top: 8px;
+  border-radius: 12px;
+  background: rgba(241, 245, 249, 0.85);
+  border: 1.5px solid #cbd5e1;
+  font-size: 0.8rem;
+  color: #475569;
+  text-align: left;
+  overflow: hidden;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.parent-info-box[open] {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+
+.parent-info-box summary {
+  cursor: pointer;
+  padding: 5px 11px;
+  font-weight: 800;
+  font-size: 0.76rem;
+  color: #64748b;
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  user-select: none;
+}
+
+.parent-info-box summary::-webkit-details-marker {
+  display: none;
+}
+
+.parent-info-box summary::after {
+  content: "▾";
+  font-size: 0.75rem;
+  opacity: 0.75;
+  transition: transform 0.15s;
+}
+
+.parent-info-box[open] summary::after {
+  transform: rotate(180deg);
+}
+
+.parent-info-body {
+  padding: 6px 12px 10px;
+  border-top: 1px dashed #cbd5e1;
+  font-weight: 700;
+  line-height: 1.42;
+  color: #334155;
+  font-size: 0.8rem;
+}
+
+.parent-info-body p {
+  margin: 0 0 5px;
+}
+
+.parent-info-body p:last-child {
+  margin-bottom: 0;
+}
+
+.strategy-kid-line {
+  font-size: 1rem;
+  font-weight: 900;
+  color: #78350f;
 }

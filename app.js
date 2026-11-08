@@ -1399,7 +1399,14 @@
   // =========================================================
   // PEDAGOGICAL ENGINE: DERIVED FACTS, RHYMES & VISUAL ARRAYS
   // =========================================================
+  // Ultra-short, icon-based hint shown to the child on a miss
   function getPedagogicalStrategy(a, b) {
+    if (window.I18N && window.I18N.getKidStrategy) return window.I18N.getKidStrategy(a, b);
+    return getPedagogicalStrategyLong(a, b);
+  }
+
+  // Fuller written explanation, only shown inside the expandable "For Parents" box
+  function getPedagogicalStrategyLong(a, b) {
     if (window.I18N) {
       const svStrat = window.I18N.getPedagogicalStrategyLocalized(a, b);
       if (svStrat) return svStrat;
@@ -1817,10 +1824,27 @@
     return `${q.a} × ${q.b} = ${prod}`;
   }
 
+  // Fills the collapsed "For Parents" box under the problem card after a miss
+  function showParentMissInfo(a, b, kind, missCount) {
+    const box = document.getElementById("game-parent-info-box");
+    const body = document.getElementById("game-parent-info-body");
+    if (!box || !body) return;
+    const name = state.settings.playerName;
+    const noteKey =
+      kind === "bonus" ? "gameParentInfoBonusNote" : kind === "reset" ? "gameParentInfoResetNote" : "gameParentInfoRetryNote";
+    body.innerHTML =
+      `<p>${t(noteKey, { name, missCount: missCount || 1 })}</p>` +
+      `<p>${getPedagogicalStrategyLong(a, b)}</p>`;
+    box.open = false;
+    box.style.display = "block";
+  }
+
   function dealNextQuestion() {
     if (!currentSession) return;
     stopTimerLoop();
     clearPendingTimeouts();
+    const parentBox = document.getElementById("game-parent-info-box");
+    if (parentBox) parentBox.style.display = "none";
 
     const q = pickNextQuestion(currentSession);
     currentSession.currentQuestion = q;
@@ -2053,6 +2077,7 @@
 
       const visualArray = document.getElementById("game-visual-array");
       renderVisualDotArray(a, b, visualArray);
+      showParentMissInfo(a, b, "bonus", 0);
 
       updateStreakBarUI(false);
 
@@ -2127,6 +2152,7 @@
       // Show CRA Visual Anchor Dot Array
       const visualArray = document.getElementById("game-visual-array");
       renderVisualDotArray(a, b, visualArray);
+      showParentMissInfo(a, b, isThirdStrike ? "reset" : "retry", missCount);
 
       if (isThirdStrike) {
         // 3rd failure on the SAME fact fails & resets the run

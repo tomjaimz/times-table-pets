@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=6" />
+  <link rel="stylesheet" href="styles.css?v=7" />
 </head>
 <body>
   <!-- Confetti Canvas -->
@@ -51,12 +51,12 @@
       <div class="lobby-card" id="lobby-card">
         <div class="lobby-header">
           <div class="lobby-title-wrap">
-            <span class="lobby-title" id="lobby-room-title">🏡 Jemima's Pet Lobby</span>
-            <span class="lobby-subtitle" id="lobby-sticker-count-badge">3 / 24 Stickers</span>
+            <span class="lobby-title" id="lobby-room-title">🏡 Jemima</span>
+            <span class="lobby-subtitle" id="lobby-sticker-count-badge">✨ 3 / 24</span>
           </div>
           <div class="lobby-actions">
             <button class="btn-3d btn-purple lobby-btn" id="btn-toggle-sticker-drawer">
-              🎨 Decorate &amp; Stickers
+              🎨 Stickers
             </button>
           </div>
         </div>
@@ -68,32 +68,32 @@
             <div class="lobby-pet-emoji" id="lobby-pet-emoji">🦉</div>
             <div class="lobby-pet-tag" id="lobby-pet-tag">Pippin</div>
           </div>
-          <div class="lobby-drag-hint" id="lobby-drag-hint">👆 Drag any sticker to move it!</div>
+          <div class="lobby-drag-hint" id="lobby-drag-hint">👆 Drag!</div>
         </div>
 
         <!-- Selected Sticker Toolbar (appears when a placed sticker is tapped in Decorate mode) -->
         <div class="lobby-sticker-toolbar" id="lobby-sticker-toolbar" style="display:none;">
-          <span class="toolbar-label" id="toolbar-selected-label">Selected: ⭐</span>
+          <span class="toolbar-label" id="toolbar-selected-label">⭐</span>
           <div class="toolbar-btns">
-            <button class="toolbar-mini-btn" id="btn-stk-bigger" title="Make Bigger">➕ Bigger</button>
-            <button class="toolbar-mini-btn" id="btn-stk-smaller" title="Make Smaller">➖ Smaller</button>
-            <button class="toolbar-mini-btn" id="btn-stk-flip" title="Flip Mirror">↔️ Flip</button>
-            <button class="toolbar-mini-btn toolbar-btn-del" id="btn-stk-remove" title="Put Back in Tray">🗑️ Remove</button>
+            <button class="toolbar-mini-btn" id="btn-stk-bigger" title="Make Bigger">➕</button>
+            <button class="toolbar-mini-btn" id="btn-stk-smaller" title="Make Smaller">➖</button>
+            <button class="toolbar-mini-btn" id="btn-stk-flip" title="Flip Mirror">↔️</button>
+            <button class="toolbar-mini-btn toolbar-btn-del" id="btn-stk-remove" title="Put Back in Tray">🗑️</button>
           </div>
         </div>
 
         <!-- Collapsible Sticker Drawer & Shop -->
         <div class="lobby-sticker-drawer" id="lobby-sticker-drawer" style="display:none;">
           <div class="drawer-section-row">
-            <span class="drawer-label" id="drawer-backdrop-label">🖼️ Scene Backdrop:</span>
+            <span class="drawer-label" id="drawer-backdrop-label">🖼️</span>
             <div class="lobby-bg-pills" id="lobby-bg-pills"></div>
           </div>
 
           <div class="drawer-section-row" style="margin-top:8px;">
             <div style="display:flex; justify-content:space-between; align-items:center; width:100%; flex-wrap:wrap; gap:6px;">
-              <span class="drawer-label" id="drawer-sticker-label">✨ Tap an Unlocked Sticker to Add to Lobby (or Buy New Ones with 💎):</span>
+              <span class="drawer-label" id="drawer-sticker-label">✨ Stickers:</span>
               <button class="btn-3d btn-orange" id="btn-buy-mystery-sticker" style="padding:5px 11px; font-size:0.76rem;">
-                🎁 Mystery Sticker (💎 25)
+                🎁 +1 (💎 25)
               </button>
             </div>
             <div class="sticker-tray-grid" id="sticker-tray-grid"></div>
@@ -103,23 +103,32 @@
 
       <div class="speed-selector-bar">
         <div class="speed-selector-title">
-          <span>⏱️ Timer Speed & Streak Goal (<span id="map-streak-label">10</span> in a row):</span>
+          <span>⏱️ <span id="map-streak-label">10</span> Qs:</span>
         </div>
         <div class="speed-pills" id="map-speed-pills">
           <button class="speed-pill active" data-seconds="3">
-            <span class="sp-main">⚡ 3s Blitz</span>
+            <span class="sp-main">⚡ 3s</span>
             <span class="sp-sub">2× 💎</span>
           </button>
           <button class="speed-pill" data-seconds="5">
-            <span class="sp-main">⭐ 5s Fast</span>
+            <span class="sp-main">⭐ 5s</span>
             <span class="sp-sub">1.5× 💎</span>
           </button>
           <button class="speed-pill" data-seconds="8">
-            <span class="sp-main">🌱 8s Chill</span>
+            <span class="sp-main">🌱 8s</span>
             <span class="sp-sub">1× 💎</span>
           </button>
         </div>
       </div>
+
+      <details class="parent-info-box" id="parent-info-adventure" style="margin-bottom:14px;">
+        <summary id="parent-info-adventure-sum">ℹ️ For Parents: How Levels, Retries &amp; Bonus Questions Work</summary>
+        <div class="parent-info-body" id="parent-info-adventure-body">
+          <p>• <strong>End-of-Run Retry (3-Strikes Rule):</strong> If Jemima misses a standard question, her streak does <em>not</em> reset! It is added to the end of the run to retry. Only 3 misses on the <em>exact same fact</em> resets the run.</p>
+          <p>• <strong>🌟 Bonus Questions (<code>7 × ❓ = 56</code>):</strong> Award <strong>+3 Bonus Gems</strong> if right, and have <strong>zero penalty</strong> if missed.</p>
+          <p>• <strong>Timer Speeds:</strong> 8s = 1★ (1× Gems), 5s = 2★ (1.5× Gems), 3s Blitz = 3★ (2× Gems). First completion of each level hatches a new Pet!</p>
+        </div>
+      </details>
 
       <div id="adventure-worlds-container"></div>
     </section>
@@ -129,43 +138,49 @@
       <div class="section-card" style="background: linear-gradient(135deg, #fff5f5 0%, #fff0f6 100%); border-color: #fda4af;">
         <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
           <div>
-            <h2 style="color:#9f1239;" id="practice-booster-heading">⚡ Tricky Facts Booster</h2>
+            <h2 style="color:#9f1239; margin-bottom:4px;" id="practice-booster-heading">⚡ Tricky Facts</h2>
             <p class="sub" style="margin-bottom:0; color:#be123c;" id="practice-tricky-summary">
-              Focuses automatically on the exact times table facts Jemima has missed or answered slowly!
+              6×, 7×, 8×, 9×, 12×
             </p>
           </div>
-          <button class="btn-3d btn-red" id="btn-start-tricky">🎯 Practice My Tricky Facts</button>
+          <button class="btn-3d btn-red" id="btn-start-tricky">🎯 Play ▶</button>
         </div>
+        <details class="parent-info-box" id="parent-info-tricky">
+          <summary id="parent-info-tricky-sum">ℹ️ For Parents: Tricky Facts Booster</summary>
+          <div class="parent-info-body" id="parent-info-tricky-body">
+            Automatically focuses on the exact multiplication facts your child has missed or answered slowly across previous runs.
+          </div>
+        </details>
       </div>
 
       <div class="section-card">
-        <h2 id="practice-custom-heading">🎛️ Build Your Custom Run</h2>
-        <p class="sub" id="practice-custom-sub">Pick which times tables (up to 12) to include in your streak challenge:</p>
+        <h2 id="practice-custom-heading" style="margin-bottom:10px;">🎛️ Custom Run</h2>
+        <p class="sub" id="practice-custom-sub" style="display:none;"></p>
 
         <div style="display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap;">
-          <button class="btn-3d btn-white" id="btn-select-all-tables" style="padding:7px 14px; font-size:0.88rem;">Select All (1–12)</button>
-          <button class="btn-3d btn-white" id="btn-select-hard-tables" style="padding:7px 14px; font-size:0.88rem;">Tricky Tables (6, 7, 8, 9, 12)</button>
-          <button class="btn-3d btn-white" id="btn-clear-tables" style="padding:7px 14px; font-size:0.88rem;">Clear</button>
+          <button class="btn-3d btn-white" id="btn-select-all-tables" style="padding:7px 14px; font-size:0.88rem;">1–12</button>
+          <button class="btn-3d btn-white" id="btn-select-hard-tables" style="padding:7px 14px; font-size:0.88rem;">🔥 6, 7, 8, 9, 12</button>
+          <button class="btn-3d btn-white" id="btn-clear-tables" style="padding:7px 14px; font-size:0.88rem;">✕</button>
         </div>
 
         <div class="tables-grid" id="custom-tables-grid"></div>
 
         <div class="config-row">
           <div class="config-box">
-            <label>⏱️ Time Limit per Question</label>
+            <label>⏱️ Speed</label>
             <div class="option-pills" id="custom-timer-pills">
-              <button class="opt-pill active" data-val="3">⚡ 3 Seconds (Blitz)</button>
-              <button class="opt-pill" data-val="5">⭐ 5 Seconds (Fast)</button>
-              <button class="opt-pill" data-val="8">🌱 8 Seconds (Chill)</button>
+              <button class="opt-pill active" data-val="3">⚡ 3s</button>
+              <button class="opt-pill" data-val="5">⭐ 5s</button>
+              <button class="opt-pill" data-val="8">🌱 8s</button>
             </div>
           </div>
 
           <div class="config-box">
-            <label>🏁 Streak Length (Questions in a Row to Win)</label>
+            <label>🏁 Goal</label>
             <div class="option-pills" id="custom-streak-pills">
               <button class="opt-pill" data-val="5">5</button>
               <button class="opt-pill" data-val="8">8</button>
-              <button class="opt-pill active" data-val="10">10 (Default)</button>
+              <button class="opt-pill active" data-val="10">10</button>
               <button class="opt-pill" data-val="12">12</button>
               <button class="opt-pill" data-val="15">15</button>
               <button class="opt-pill" data-val="20">20</button>
@@ -173,34 +188,48 @@
           </div>
 
           <div class="config-box" style="flex-basis:100%;">
-            <label>🧩 Question Style (Fact-Family Flexibility)</label>
+            <label>🧩 Style</label>
             <div class="option-pills" id="custom-style-pills">
-              <button class="opt-pill" data-val="standard">Standard (7 × 8 = ?)</button>
-              <button class="opt-pill active" data-val="mix">✨ Smart Mix (Includes 7 × ❓ = 56)</button>
-              <button class="opt-pill" data-val="mystery">🧩 Mystery Factor Only (7 × ❓ = 56)</button>
+              <button class="opt-pill" data-val="standard">7 × 8 = ?</button>
+              <button class="opt-pill active" data-val="mix">✨ Mix</button>
+              <button class="opt-pill" data-val="mystery">7 × ❓ = 56</button>
             </div>
           </div>
         </div>
 
         <button class="btn-3d btn-green" id="btn-start-custom" style="width:100%; font-size:1.25rem; padding:16px;">
-          🚀 Launch Custom Streak Run!
+          🚀 Play ▶
         </button>
+
+        <details class="parent-info-box" id="parent-info-custom">
+          <summary id="parent-info-custom-sum">ℹ️ For Parents: Custom Practice Options</summary>
+          <div class="parent-info-body" id="parent-info-custom-body">
+            Select any combination of times tables (1–12), choose the timer speed per question, and pick whether to include Bonus Mystery Factor questions (<code>7 × ❓ = 56</code>).
+          </div>
+        </details>
       </div>
     </section>
 
     <!-- TAB 3: MAGICAL PET SANCTUARY -->
     <section class="tab-view" id="view-pets">
       <div class="section-card">
-        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
           <div>
-            <h2 id="pets-heading">🐾 Magical Pet Sanctuary</h2>
-            <p class="sub" id="pets-sub" style="margin-bottom:0;">Beat Adventure levels or hatch Mystery Eggs in the Shop to collect all 24 pets!</p>
+            <h2 id="pets-heading" style="margin-bottom:0;">🐾 Pets</h2>
+            <p class="sub" id="pets-sub" style="display:none;"></p>
           </div>
           <div class="stat-pill" style="font-size:1rem;">
-            <span id="pets-unlocked-label">Unlocked:</span>
+            <span id="pets-unlocked-label">🐾</span>
             <span id="pets-unlocked-count">1 / 24</span>
           </div>
         </div>
+
+        <details class="parent-info-box" id="parent-info-pets" style="margin-bottom:14px;">
+          <summary id="parent-info-pets-sum">ℹ️ For Parents: Unlocking &amp; Choosing Pets</summary>
+          <div class="parent-info-body" id="parent-info-pets-body">
+            16 pets unlock by beating each level on the Adventure Map for the first time, and 8 bonus pets hatch from Mystery Eggs in the Gem Shop. Tap any unlocked pet to make it the active cheering companion!
+          </div>
+        </details>
 
         <div class="pets-grid" id="pets-sanctuary-grid"></div>
       </div>
@@ -209,22 +238,29 @@
     <!-- TAB 4: GEM SHOP & REAL-LIFE PARENT COUPONS -->
     <section class="tab-view" id="view-shop">
       <div class="section-card">
-        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
           <div>
-            <h2 id="shop-heading">🎁 Magical Gem Shop</h2>
-            <p class="sub" id="shop-sub" style="margin-bottom:0;">Trade the Gems you earn from completing streaks for Mystery Eggs or Golden Coupons!</p>
+            <h2 id="shop-heading" style="margin-bottom:0;">🎁 Shop</h2>
+            <p class="sub" id="shop-sub" style="display:none;"></p>
           </div>
-          <button class="btn-3d btn-white" id="btn-open-parent-from-shop" style="font-size:0.88rem; padding:8px 14px;">
-            ⚙️ Edit Rewards (Parent)
+          <button class="btn-3d btn-white" id="btn-open-parent-from-shop" style="font-size:0.84rem; padding:7px 12px;">
+            ⚙️ Parent
           </button>
         </div>
+
+        <details class="parent-info-box" id="parent-info-shop" style="margin-bottom:14px;">
+          <summary id="parent-info-shop-sum">ℹ️ For Parents: Gems, Eggs &amp; Golden Reward Coupons</summary>
+          <div class="parent-info-body" id="parent-info-shop-body">
+            Gems earned from completing streak runs can be spent on Lobby Stickers, Mystery Pet Eggs, or real-life Golden Coupons (like extra screen time or choosing a movie). You can customize or add new family rewards anytime using the <strong>⚙️ Parent</strong> button.
+          </div>
+        </details>
 
         <div class="shop-grid" id="shop-items-grid"></div>
       </div>
 
       <div class="section-card">
-        <h2 id="coupons-heading">🎟️ Jemima's Golden Coupons</h2>
-        <p class="sub" id="coupons-sub">Show an active Golden Coupon to Mum or Dad to redeem your reward!</p>
+        <h2 id="coupons-heading" style="margin-bottom:8px;">🎟️ Coupons</h2>
+        <p class="sub" id="coupons-sub" style="display:none;"></p>
         <div class="coupon-list" id="coupons-history-list"></div>
       </div>
     </section>
@@ -237,25 +273,25 @@
       <div class="section-card">
         <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:12px;">
           <div>
-            <h2 id="stats-tricky-heading">🎯 Top Tricky Facts to Conquer</h2>
-            <p class="sub" id="stats-tricky-sub" style="margin-bottom:0;">Automatically ranked by misses, timeouts, and response speed:</p>
+            <h2 id="stats-tricky-heading" style="margin-bottom:0;">🎯 Tricky Facts</h2>
+            <p class="sub" id="stats-tricky-sub" style="display:none;"></p>
           </div>
-          <button class="btn-3d btn-orange" id="btn-stats-practice-tricky">⚡ Drill Tricky Facts</button>
+          <button class="btn-3d btn-orange" id="btn-stats-practice-tricky">⚡ Play ▶</button>
         </div>
         <div id="tricky-facts-pills" style="display:flex; flex-wrap:wrap; gap:10px;"></div>
       </div>
 
       <!-- Interactive 12x12 Mastery Heatmap -->
       <div class="section-card">
-        <h2 id="heatmap-heading">🗺️ 12×12 Times Table Mastery Heatmap</h2>
-        <p class="sub" id="heatmap-sub">Tap any square to inspect Jemima's exact accuracy and average speed (in seconds) for that fact:</p>
+        <h2 id="heatmap-heading" style="margin-bottom:8px;">🗺️ 12×12 Map</h2>
+        <p class="sub" id="heatmap-sub" style="display:none;"></p>
 
         <div class="heatmap-legend">
-          <div class="legend-item"><span class="legend-swatch mastery-gold"></span> 👑 Mastered (≥90% &amp; &lt;2.2s)</div>
-          <div class="legend-item"><span class="legend-swatch mastery-green"></span> 🟢 Strong (≥80% &amp; &lt;3.5s)</div>
-          <div class="legend-item"><span class="legend-swatch mastery-yellow"></span> 🟡 Learning</div>
-          <div class="legend-item"><span class="legend-swatch mastery-red"></span> 🔴 Needs Practice</div>
-          <div class="legend-item"><span class="legend-swatch mastery-none"></span> ⚪ Not Tested Yet</div>
+          <div class="legend-item"><span class="legend-swatch mastery-gold"></span> 👑 &lt;2.2s</div>
+          <div class="legend-item"><span class="legend-swatch mastery-green"></span> 🟢 &lt;3.5s</div>
+          <div class="legend-item"><span class="legend-swatch mastery-yellow"></span> 🟡</div>
+          <div class="legend-item"><span class="legend-swatch mastery-red"></span> 🔴</div>
+          <div class="legend-item"><span class="legend-swatch mastery-none"></span> ⚪</div>
         </div>
 
         <div class="heatmap-wrapper">
@@ -263,21 +299,28 @@
         </div>
 
         <div class="fact-detail-banner" id="heatmap-fact-detail">
-          <span>👆 Tap any cell in the 12×12 grid above to see detailed speed &amp; accuracy metrics!</span>
+          <span>👆 Tap any square!</span>
         </div>
+
+        <details class="parent-info-box" id="parent-info-stats">
+          <summary id="parent-info-stats-sum">ℹ️ For Parents: Reading the 12×12 Mastery Heatmap</summary>
+          <div class="parent-info-body" id="parent-info-stats-body">
+            Tap any cell in the 12×12 grid to inspect exact accuracy, attempts, and response speed. 👑 <strong>Mastered</strong> requires ≥90% accuracy under 2.2s; 🟢 <strong>Strong</strong> requires ≥80% accuracy under 3.5s.
+          </div>
+        </details>
       </div>
 
       <!-- Per-Table Mastery Breakdown -->
       <div class="section-card">
-        <h2 id="per-table-heading">📈 Mastery by Times Table (×1 to ×12)</h2>
-        <p class="sub" id="per-table-sub">Percentage of facts practiced &amp; mastered in each table, plus average answer speed:</p>
+        <h2 id="per-table-heading" style="margin-bottom:10px;">📈 Tables (×1 – ×12)</h2>
+        <p class="sub" id="per-table-sub" style="display:none;"></p>
         <div class="table-progress-list" id="per-table-progress-list"></div>
       </div>
 
       <!-- Recent Streak Runs History -->
       <div class="section-card">
-        <h2 id="recent-runs-heading">📜 Recent Streak Runs Log</h2>
-        <p class="sub" id="recent-runs-sub">Tracks completed runs, timer speeds, average response times, and how many resets were overcome:</p>
+        <h2 id="recent-runs-heading" style="margin-bottom:10px;">📜 History</h2>
+        <p class="sub" id="recent-runs-sub" style="display:none;"></p>
         <div id="recent-runs-list"></div>
       </div>
     </section>
@@ -344,7 +387,7 @@
       <div class="companion-cheer-row">
         <div class="stage-pet-avatar" id="stage-pet-avatar">🦉</div>
         <div class="speech-bubble" id="stage-speech-bubble">
-          Ready, Jemima? Answer before the bar runs out!
+          🚀 Go, Jemima!
         </div>
       </div>
     </div>
@@ -354,9 +397,13 @@
       <div class="problem-card" id="game-problem-card">
         <div class="question-badge" id="game-question-badge" style="display:none;"></div>
         <h2 class="problem-equation" id="game-equation">7 × 8 = ?</h2>
-        <div class="problem-sub-hint" id="game-sub-hint">Tap the right answer below!</div>
+        <div class="problem-sub-hint" id="game-sub-hint"></div>
         <div class="strategy-coach-box" id="game-strategy-box" style="display:none;"></div>
         <div class="visual-array-wrap" id="game-visual-array" style="display:none;"></div>
+        <details class="parent-info-box" id="game-parent-info-box" style="display:none; width:100%;">
+          <summary id="game-parent-info-sum">ℹ️ For Parents: Teaching Tip</summary>
+          <div class="parent-info-body" id="game-parent-info-body"></div>
+        </details>
       </div>
     </div>
 
@@ -740,11 +787,11 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
-  <script src="firebase-config.js?v=6"></script>
-  <script src="cloud.js?v=6"></script>
-  <script src="data.js?v=6"></script>
-  <script src="i18n.js?v=6"></script>
-  <script src="sound.js?v=6"></script>
-  <script src="app.js?v=6"></script>
+  <script src="firebase-config.js?v=7"></script>
+  <script src="cloud.js?v=7"></script>
+  <script src="data.js?v=7"></script>
+  <script src="i18n.js?v=7"></script>
+  <script src="sound.js?v=7"></script>
+  <script src="app.js?v=7"></script>
 </body>
 </html>

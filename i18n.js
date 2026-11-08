@@ -30,178 +30,205 @@
       welcomeCloudSub: "Parents can sign in with a free Magic Email Link to sync progress between iPad & phone.",
       welcomeParentLoginBtn: "✉️ Parent Login",
 
-      // Lobby & Stickers
-      lobbyTitle: "🏡 {name}'s Pet Lobby",
-      lobbyStickersBadge: "✨ {unlocked} / {total} Stickers",
-      btnDecorate: "🎨 Decorate & Stickers",
-      btnDoneDecorating: "✓ Done Decorating",
-      lobbyDragHint: "👆 Drag any sticker to move it!",
-      toolbarSelected: "Selected: {emoji} {name}",
-      btnBigger: "➕ Bigger",
-      btnSmaller: "➖ Smaller",
-      btnFlip: "↔️ Flip",
-      btnRemove: "🗑️ Remove",
-      drawerBackdropLabel: "🖼️ Scene Backdrop:",
-      drawerStickerLabel: "✨ Tap an Unlocked Sticker to Place (or Buy New Ones with 💎):",
-      btnMysterySticker: "🎁 Mystery Sticker (💎 25)",
-      btnAllStickersUnlocked: "🌟 All 24 Unlocked!",
-      stkPlace: "➕ Place",
+      // Lobby & Stickers (Kid-Minimal)
+      lobbyTitle: "🏡 {name}",
+      lobbyStickersBadge: "✨ {unlocked} / {total}",
+      btnDecorate: "🎨 Stickers",
+      btnDoneDecorating: "✓ Done",
+      lobbyDragHint: "👆 Drag!",
+      toolbarSelected: "{emoji} {name}",
+      btnBigger: "➕",
+      btnSmaller: "➖",
+      btnFlip: "↔️",
+      btnRemove: "🗑️",
+      drawerBackdropLabel: "🖼️",
+      drawerStickerLabel: "✨ Stickers:",
+      btnMysterySticker: "🎁 +1 (💎 25)",
+      btnAllStickersUnlocked: "🌟 24 / 24!",
+      stkPlace: "➕",
 
-      // Adventure Map
-      speedSelectorTitle: "⏱️ Timer Speed & Streak Goal ({streak} in a row):",
-      speed3Main: "⚡ 3s Blitz",
-      speed5Main: "⭐ 5s Fast",
-      speed8Main: "🌱 8s Chill",
-      unlocksPet: "🥚 Unlocks {emoji} {name}",
+      // Adventure Map (Kid-Minimal)
+      speedSelectorTitle: "⏱️ {streak} Qs:",
+      speed3Main: "⚡ 3s",
+      speed5Main: "⭐ 5s",
+      speed8Main: "🌱 8s",
+      unlocksPet: "🥚 {emoji} {name}",
       unlockedPetTag: "✓ {emoji} {name}",
-      bestSpeed: "⚡ Best: {sec}s",
+      bestSpeed: "⚡ {sec}s",
       btnPlay: "Play ▶",
 
-      // Practice Tab
-      trickyBoosterTitle: "⚡ Tricky Facts Booster",
-      trickyBoosterEmpty: "No missed facts logged yet! Complete a few runs or click to practice the classic tricky 6s, 7s, 8s, 9s, and 12s.",
-      trickyBoosterFound: "{name}'s current top tricky facts: {list}",
-      btnPracticeTricky: "🎯 Practice My Tricky Facts",
-      customRunTitle: "🎛️ Build Your Custom Run",
-      customRunSub: "Pick which times tables (up to 12) to include in your streak challenge:",
-      btnSelectAll: "Select All (1–12)",
-      btnSelectHard: "Tricky Tables (6, 7, 8, 9, 12)",
-      btnClear: "Clear",
-      tableBtnTitle: "×{t} Table",
-      tableBtnSub: "{count}/12 strong",
-      customTimeLimitLabel: "⏱️ Time Limit per Question",
-      customTime3: "⚡ 3 Seconds (Blitz)",
-      customTime5: "⭐ 5 Seconds (Fast)",
-      customTime8: "🌱 8 Seconds (Chill)",
-      customStreakLabel: "🏁 Streak Length (Questions in a Row to Win)",
-      customStreak10Default: "10 (Default)",
-      customStyleLabel: "🧩 Question Style (Fact-Family Flexibility)",
-      styleStandard: "Standard (7 × 8 = ?)",
-      styleMix: "✨ Smart Mix (Includes 7 × ❓ = 56)",
-      styleMystery: "🧩 Mystery Factor Only (7 × ❓ = 56)",
-      btnLaunchCustom: "🚀 Launch Custom Streak Run!",
-      customPracticeSessionTitle: "Custom Practice (×{tables})",
-      focusedDrillSessionTitle: "Focused Drill (×{tables})",
+      // Practice Tab (Kid-Minimal)
+      trickyBoosterTitle: "⚡ Tricky Facts",
+      trickyBoosterEmpty: "6×, 7×, 8×, 9×, 12×",
+      trickyBoosterFound: "🎯 {list}",
+      btnPracticeTricky: "🎯 Play ▶",
+      customRunTitle: "🎛️ Custom Run",
+      customRunSub: "",
+      btnSelectAll: "1–12",
+      btnSelectHard: "🔥 6, 7, 8, 9, 12",
+      btnClear: "✕",
+      tableBtnTitle: "×{t}",
+      tableBtnSub: "{count}/12 ⭐",
+      customTimeLimitLabel: "⏱️ Speed",
+      customTime3: "⚡ 3s",
+      customTime5: "⭐ 5s",
+      customTime8: "🌱 8s",
+      customStreakLabel: "🏁 Goal",
+      customStreak10Default: "10",
+      customStyleLabel: "🧩 Style",
+      styleStandard: "7 × 8 = ?",
+      styleMix: "✨ Mix",
+      styleMystery: "7 × ❓ = 56",
+      btnLaunchCustom: "🚀 Play ▶",
+      customPracticeSessionTitle: "×{tables}",
+      focusedDrillSessionTitle: "×{tables}",
 
-      // Pets Tab
-      petsTitle: "🐾 Magical Pet Sanctuary",
-      petsSub: "Beat Adventure levels or hatch Mystery Eggs in the Shop to collect all 24 pets!",
-      petsUnlockedLabel: "Unlocked:",
-      petLockedBio: "Beat Adventure levels or open Mystery Eggs in the Shop to hatch this friend!",
-      btnActiveCompanion: "★ Active Companion",
-      btnPickCompanion: "Pick as Companion",
-      btnLocked: "🔒 Locked",
+      // Pets Tab (Kid-Minimal)
+      petsTitle: "🐾 Pets",
+      petsSub: "",
+      petsUnlockedLabel: "🐾",
+      petLockedBio: "🔒",
+      btnActiveCompanion: "★ Active",
+      btnPickCompanion: "Pick",
+      btnLocked: "🔒",
       rarityCommon: "Common",
       rarityRare: "Rare",
       rarityEpic: "Epic",
       rarityMythic: "Mythic",
 
-      // Shop Tab & Reward Popups
-      shopTitle: "🎁 Magical Gem Shop",
-      shopSub: "Trade the Gems you earn from completing streaks for Stickers, Mystery Eggs, or Golden Coupons!",
-      btnEditRewardsParent: "⚙️ Edit Rewards (Parent)",
-      btnRedeemFor: "💎 Redeem for {cost} Gems",
-      couponsTitle: "🎟️ {name}'s Golden Coupons",
-      couponsSub: "Show an active Golden Coupon to Mum or Dad to redeem your reward!",
-      noCouponsYet: "No Golden Coupons redeemed yet! Earn Gems in Streak Runs and redeem them above.",
-      couponRedeemedTag: "(✓ Redeemed)",
-      couponActiveTag: "(✨ Active Ticket)",
-      couponClaimedBy: "Claimed by {name} on {date}",
-      btnCompleted: "Completed ✓",
-      btnMarkUsed: "Mark Used (Parent)",
-      popupStickerOpenedTitle: "✨ Sticker Pack Opened!",
-      popupStickerOpenedSub: "Added straight to {name}'s Pet Lobby! Drag it anywhere you like!",
-      popupStickerAwesomeBtn: "Awesome! 🎨",
-      popupAllStickersTitle: "🌟 All 24 Stickers Collected!",
-      popupAllStickersSub: "{name} already owns every sticker! Here are your 25 Gems back!",
-      popupEggHatchedTitle: "🥚 Mystery Egg Hatched!",
-      popupEggAwesomeBtn: "Awesome! 🐾",
-      popupAllPetsTitle: "🌟 All 24 Pets Collected!",
-      popupAllPetsSub: "{name} has already unlocked every Magical Pet in the Sanctuary! Here are +25 Starlight Gems back!",
+      // Shop Tab & Reward Popups (Kid-Minimal)
+      shopTitle: "🎁 Shop",
+      shopSub: "",
+      btnEditRewardsParent: "⚙️ Parent",
+      btnRedeemFor: "💎 {cost}",
+      couponsTitle: "🎟️ Coupons",
+      couponsSub: "",
+      noCouponsYet: "🎟️ —",
+      couponRedeemedTag: "✓",
+      couponActiveTag: "✨",
+      couponClaimedBy: "{name} • {date}",
+      btnCompleted: "✓",
+      btnMarkUsed: "Use (Parent)",
+      popupStickerOpenedTitle: "✨ New Sticker!",
+      popupStickerOpenedSub: "🏡 Added to {name}'s room!",
+      popupStickerAwesomeBtn: "Yay! 🎨",
+      popupAllStickersTitle: "🌟 All 24!",
+      popupAllStickersSub: "+25 💎",
+      popupEggHatchedTitle: "🥚 New Pet!",
+      popupEggAwesomeBtn: "Yay! 🐾",
+      popupAllPetsTitle: "🌟 All 24!",
+      popupAllPetsSub: "+25 💎",
       popupYayBtn: "Yay!",
-      popupCouponHeader: "✨ Official Golden Reward Coupon ✨",
-      popupCouponEarnedBy: "Earned by {name} • {date}",
-      popupCouponSub: "Show this Golden Coupon to Mum or Dad! It is saved in your Shop Coupon list.",
-      popupKeepCouponBtn: "🎉 Keep Golden Coupon",
+      popupCouponHeader: "✨ Golden Coupon ✨",
+      popupCouponEarnedBy: "{name} • {date}",
+      popupCouponSub: "🎟️ Show to Mum or Dad!",
+      popupKeepCouponBtn: "🎉 Keep",
 
-      // Stats / Metrics Tab
-      kpiQuestionsAnswered: "Questions Answered",
-      kpiOverallAccuracy: "Overall Accuracy",
-      kpiAvgSpeed: "Avg Response Speed",
-      kpiFactsMastered: "12×12 Facts Strong/Mastered",
-      kpiStreaksConquered: "Streaks Conquered",
-      statsTrickyTitle: "🎯 Top Tricky Facts to Conquer",
-      statsTrickySub: "Automatically ranked by misses, timeouts, and response speed:",
-      btnDrillTricky: "⚡ Drill Tricky Facts",
-      noTrickyYet: "No tricky facts flagged yet—play a few rounds and any missed or slow facts will appear here automatically!",
-      trickyPillStats: "({acc}% acc • {sec}s • {misses} miss)",
-      heatmapTitle: "🗺️ 12×12 Times Table Mastery Heatmap",
-      heatmapSub: "Tap any square to inspect {name}'s exact accuracy and average speed (in seconds) for that fact:",
-      legendGold: "👑 Mastered (≥90% & <2.2s)",
-      legendGreen: "🟢 Strong (≥80% & <3.5s)",
-      legendYellow: "🟡 Learning",
-      legendRed: "🔴 Needs Practice",
-      legendNone: "⚪ Not Tested Yet",
-      heatmapTapHint: "👆 Tap any cell in the 12×12 grid above to see detailed speed & accuracy metrics!",
-      factNotPracticedYet: "Not practiced yet!",
-      factDetailStats: "Seen <strong>{attempts}</strong> times • Accuracy: <strong>{acc}%</strong> ({correct}✓, {wrong}✗, {timeouts}⏱️) • Avg Speed: <strong>{avgSec}s</strong> (Fastest: {bestSec})",
-      btnPracticeSingleTable: "Practice ×{a} Table",
-      btnPracticeTwoTables: "Practice ×{a} & ×{b}",
-      perTableTitle: "📈 Mastery by Times Table (×1 to ×12)",
-      perTableSub: "Percentage of facts practiced & mastered in each table, plus average answer speed:",
-      perTableRowTitle: "×{t} Times Table",
-      perTableRowStats: "{strong}/12 mastered • Acc: {acc} • Avg: {avg}",
-      recentRunsTitle: "📜 Recent Streak Runs Log",
-      recentRunsSub: "Tracks completed runs, timer speeds, average response times, and how many resets were overcome:",
-      noRunsYet: "No streak runs completed yet—start an Adventure level to see run logs here!",
-      runRowMeta: "({streak} in a row • {timer}s timer)",
-      runRowAvg: "⚡ Avg: {sec}s",
-      runRowResets: "🔄 Resets: {resets}",
+      // Stats / Metrics Tab (Kid-Minimal)
+      kpiQuestionsAnswered: "Solved",
+      kpiOverallAccuracy: "Accuracy",
+      kpiAvgSpeed: "Speed",
+      kpiFactsMastered: "Mastered",
+      kpiStreaksConquered: "Runs",
+      statsTrickyTitle: "🎯 Tricky Facts",
+      statsTrickySub: "",
+      btnDrillTricky: "⚡ Play ▶",
+      noTrickyYet: "🌟 None yet!",
+      trickyPillStats: "({acc}% • {sec}s)",
+      heatmapTitle: "🗺️ 12×12 Map",
+      heatmapSub: "",
+      legendGold: "👑 <2.2s",
+      legendGreen: "🟢 <3.5s",
+      legendYellow: "🟡",
+      legendRed: "🔴",
+      legendNone: "⚪",
+      heatmapTapHint: "👆 Tap any square!",
+      factNotPracticedYet: "⚪",
+      factDetailStats: "<strong>{attempts}×</strong> • <strong>{acc}%</strong> ({correct}✓ {wrong}✗) • ⚡ <strong>{avgSec}s</strong>",
+      btnPracticeSingleTable: "▶ ×{a}",
+      btnPracticeTwoTables: "▶ ×{a} & ×{b}",
+      perTableTitle: "📈 Tables (×1 – ×12)",
+      perTableSub: "",
+      perTableRowTitle: "×{t}",
+      perTableRowStats: "{strong}/12 ⭐ • {acc} • {avg}",
+      recentRunsTitle: "📜 History",
+      recentRunsSub: "",
+      noRunsYet: "—",
+      runRowMeta: "({streak} Qs • {timer}s)",
+      runRowAvg: "⚡ {sec}s",
+      runRowResets: "🔄 {resets}",
 
-      // Gameplay Stage
-      gameInitialSpeech: "Let's go, {name}! Solve {streak} questions to open the Treasure Chest!",
-      gameModeFooter: "{title} • ⏱️ {timer}s Timer • Goal: {streak} Questions",
-      gameSubHintStart: "Tap the matching answer!",
-      gameSubHintStreak: "🔥 {streak} solved! Keep going!",
-      gameSubHintMystery: "🌟 Bonus! Which number times {factor} makes {prod}?",
-      gameCorrectSpeed: "⚡ {sec}s! Great job!",
-      gameBonusCorrectSpeed: "🌟 Bonus Correct! +3 Extra Gems ({sec}s)!",
-      gameTapGreenHint: "👆 Tap the green {ans} button below to start your fresh run!",
-      gameTimeoutBubbleTap: "3rd miss on {eq}, {name}! Tap the green {ans} to start a fresh run!",
-      gameWrongBubbleTap: "3rd miss on {eq}, {name}! Tap the green {ans} to start a fresh run!",
-      gameTimeoutSubAuto: "⏰ 3rd miss on this fact! Remember: {eq}",
-      gameWrongSubAuto: "💡 3rd miss on this fact! Remember: {eq}",
-      gameTimeoutBubbleAuto: "3rd miss on {eq}, {name}! Back to 0, let's go again!",
-      gameWrongBubbleAuto: "3rd miss on {eq}, {name}! Back to the start, you've got this!",
-      gameRetryLaterBubbleTap: "No worries, {name}! {eq} — Added to the end to retry! ({triesLeft} left before reset). Tap green {ans}!",
-      gameRetryLaterBubbleAuto: "No worries, {name}! {eq} — Added to the end to retry! ({triesLeft} left before reset).",
-      gameRetryLaterSubHint: "🔄 Added to end to retry ({missCount}/3 misses on this fact) • Tap green {ans}!",
-      gameBonusMissBubbleTap: "🌟 Bonus question—no penalty at all, {name}! {eq}. Tap green {ans} to keep going!",
-      gameBonusMissBubbleAuto: "🌟 Bonus question—no penalty at all, {name}! {eq}. Moving right along!",
-      gameBonusMissSubHint: "🌟 Bonus Question (Fails Not Counted!) • Tap green {ans} to continue!",
-      gameKeepGoingBubble: "Keep going, {name}! {current}/{streak} done!",
-      gameFreshStartBubble: "Fresh start, {name}! Let's get all {streak}!",
-      badgeSpaced1: "🔄 Spaced Review (1/3)",
-      badgeTwin: "🪞 Commutative Twin ({b}×{a} = {a}×{b})",
-      badgeBoss: "👑 Final Redemption Boss Fact!",
-      badgeRetry: "🔄 Tricky Fact Review",
-      badgeEndRetry: "🔄 End-of-Run Retry! (Try {tryNum}/3)",
-      badgeAnchor: "⚓ Anchor Fact Link",
-      badgeMystery: "🌟 Bonus Question! (No Penalty if Missed)",
+      // Gameplay Stage (Kid-Minimal: 1–4 words + icons!)
+      gameInitialSpeech: "🚀 Go, {name}!",
+      gameModeFooter: "{title} • ⏱️ {timer}s • 🏁 {streak}",
+      gameSubHintStart: "👆 Tap!",
+      gameSubHintStreak: "🔥 {streak}",
+      gameSubHintMystery: "🌟 Bonus (+3 💎)",
+      gameCorrectSpeed: "⚡ {sec}s!",
+      gameBonusCorrectSpeed: "🌟 +3 💎 ({sec}s)!",
+      gameTapGreenHint: "👆 Tap green {ans}",
+      gameTimeoutBubbleTap: "{eq} 🔄 Fresh start!",
+      gameWrongBubbleTap: "{eq} 🔄 Fresh start!",
+      gameTimeoutSubAuto: "⏰ {eq}",
+      gameWrongSubAuto: "💡 {eq}",
+      gameTimeoutBubbleAuto: "{eq} 🔄 Fresh start!",
+      gameWrongBubbleAuto: "{eq} 🔄 Fresh start!",
+      gameRetryLaterBubbleTap: "{eq} 🔄 Retry at end!",
+      gameRetryLaterBubbleAuto: "{eq} 🔄 Retry at end!",
+      gameRetryLaterSubHint: "🔄 Retry at end ({missCount}/3) • 👆 Tap {ans}",
+      gameBonusMissBubbleTap: "{eq} 🌟 Free bonus!",
+      gameBonusMissBubbleAuto: "{eq} 🌟 Free bonus!",
+      gameBonusMissSubHint: "🌟 No penalty • 👆 Tap {ans}",
+      gameKeepGoingBubble: "🔥 {current} / {streak}!",
+      gameFreshStartBubble: "🚀 Go, {name}!",
+      badgeSpaced1: "🔄 Review",
+      badgeTwin: "🪞 {b} × {a}",
+      badgeBoss: "👑 Boss!",
+      badgeRetry: "🔄 Review",
+      badgeEndRetry: "🔄 Retry ({tryNum}/3)",
+      badgeAnchor: "⚓ Tip",
+      badgeMystery: "🌟 Bonus (+3 💎)",
 
-      // Victory Modal
-      victoryFlawlessTitle: "Flawless Streak, {name}! 🎉",
-      victoryCompleteTitle: "Streak Complete! 🎉",
-      victoryFlawlessSub: "{streak} in a row with ZERO resets!",
-      victoryCompleteSub: "{name} conquered all {streak} in a row!",
-      victoryTapChestHint: "👆 Tap the Treasure Chest to claim your reward!",
-      victoryGemsEarned: "+{gems} Gems",
-      victoryAvgLabel: "⚡ Avg:",
-      victoryNewPetHeader: "🐾 New Magical Pet Unlocked!",
-      victoryNewStickerHeader: "🎨 Bonus Lobby Sticker Won!",
-      victoryPlacedInLobby: "Placed in your Pet Lobby!",
-      btnPlayAgain: "🔄 Play Again",
-      btnContinueAdventure: "🗺️ Continue Adventure",
+      // Expandable "For Parents" Boxes
+      parentInfoAdventureSum: "ℹ️ For Parents: How Levels, Retries & Bonus Questions Work",
+      parentInfoAdventureBody:
+        "<p>• <strong>End-of-Run Retry (3-Strikes Rule):</strong> Missing a standard question does <em>not</em> reset the run! It moves to the end of the run so {name} can retry it. Only 3 misses on the <em>exact same fact</em> resets the run.</p><p>• <strong>🌟 Bonus Questions (<code>7 × ❓ = 56</code>):</strong> Award <strong>+3 Bonus Gems</strong> if right, and have <strong>zero penalty</strong> if missed.</p><p>• <strong>Timer Speeds:</strong> 8s = 1★ (1× Gems), 5s = 2★ (1.5× Gems), 3s = 3★ (2× Gems). Beating a level unlocks its Pet!</p>",
+      parentInfoTrickySum: "ℹ️ For Parents: Tricky Facts Booster",
+      parentInfoTrickyBody:
+        "Automatically selects the multiplication facts {name} has missed or answered slowly so she can conquer them without having to configure anything.",
+      parentInfoCustomSum: "ℹ️ For Parents: Custom Practice Options",
+      parentInfoCustomBody:
+        "Tap any combination of times tables (1–12), choose the countdown timer speed, and pick whether to include Bonus Mystery Factor questions (<code>7 × ❓ = 56</code>).",
+      parentInfoPetsSum: "ℹ️ For Parents: Unlocking & Choosing Pets",
+      parentInfoPetsBody:
+        "16 pets unlock by beating each level on the Adventure Map, and 8 bonus pets hatch from Mystery Eggs in the Shop. Tap any unlocked pet to make it {name}'s active companion.",
+      parentInfoShopSum: "ℹ️ For Parents: Gems, Eggs & Family Reward Coupons",
+      parentInfoShopBody:
+        "Gems earned from completing runs can buy Lobby Stickers, Mystery Pet Eggs, or real-life Golden Coupons (like extra screen time or choosing a movie). Use <strong>⚙️ Parent</strong> to add or edit custom family rewards.",
+      parentInfoStatsSum: "ℹ️ For Parents: Reading the 12×12 Mastery Heatmap",
+      parentInfoStatsBody:
+        "Tap any square in the 12×12 grid to see exact accuracy and speed. 👑 <strong>Mastered</strong> requires ≥90% accuracy under 2.2s; 🟢 <strong>Strong</strong> requires ≥80% accuracy under 3.5s.",
+      gameParentInfoSum: "ℹ️ For Parents: Why This Tip Appeared",
+      gameParentInfoRetryNote:
+        "<strong>End-of-Run Retry ({missCount}/3 misses on this fact):</strong> {name}'s streak is safe! This question was added to the end of the run to try again. Only 3 misses on the same fact resets the run.",
+      gameParentInfoResetNote:
+        "<strong>3rd Miss on Same Fact:</strong> Because this specific fact was missed 3 times in this run, the streak resets to 0 with spaced review.",
+      gameParentInfoBonusNote:
+        "<strong>Bonus Mystery Factor Question:</strong> Missing a bonus question has zero penalty and is not counted as a fail.",
+
+      // Victory Modal (Kid-Minimal)
+      victoryFlawlessTitle: "🎉 You Did It, {name}!",
+      victoryCompleteTitle: "🎉 You Did It!",
+      victoryFlawlessSub: "⭐ {streak} / {streak}!",
+      victoryCompleteSub: "⭐ {streak} / {streak}!",
+      victoryTapChestHint: "👆 Tap the chest!",
+      victoryGemsEarned: "+{gems} 💎",
+      victoryAvgLabel: "⚡",
+      victoryNewPetHeader: "🐾 New Pet!",
+      victoryNewStickerHeader: "🎨 New Sticker!",
+      victoryPlacedInLobby: "🏡 In your room!",
+      btnPlayAgain: "🔄 Again",
+      btnContinueAdventure: "🗺️ Map",
 
       // Parent Modal
       parentModalTitle: "⚙️ Parent Settings & Fine-Tuning",
@@ -265,178 +292,205 @@
       welcomeCloudSub: "Föräldrar kan logga in med en gratis magisk e-postlänk för att synka mellan iPad och mobil.",
       welcomeParentLoginBtn: "✉️ Föräldrainloggning",
 
-      // Lobby & Stickers
-      lobbyTitle: "🏡 {name}s Djurrum",
-      lobbyStickersBadge: "✨ {unlocked} / {total} Klistermärken",
-      btnDecorate: "🎨 Dekorera & Klistermärken",
-      btnDoneDecorating: "✓ Klar med dekorering",
-      lobbyDragHint: "👆 Dra ett klistermärke för att flytta det!",
-      toolbarSelected: "Vald: {emoji} {name}",
-      btnBigger: "➕ Större",
-      btnSmaller: "➖ Mindre",
-      btnFlip: "↔️ Vänd",
-      btnRemove: "🗑️ Ta bort",
-      drawerBackdropLabel: "🖼️ Bakgrund:",
-      drawerStickerLabel: "✨ Tryck på ett upplåst klistermärke för att placera (eller köp nya med 💎):",
-      btnMysterySticker: "🎁 Hemligt klistermärke (💎 25)",
-      btnAllStickersUnlocked: "🌟 Alla 24 upplåsta!",
-      stkPlace: "➕ Placera",
+      // Lobby & Stickers (Kid-Minimal)
+      lobbyTitle: "🏡 {name}",
+      lobbyStickersBadge: "✨ {unlocked} / {total}",
+      btnDecorate: "🎨 Klistermärken",
+      btnDoneDecorating: "✓ Klar",
+      lobbyDragHint: "👆 Dra!",
+      toolbarSelected: "{emoji} {name}",
+      btnBigger: "➕",
+      btnSmaller: "➖",
+      btnFlip: "↔️",
+      btnRemove: "🗑️",
+      drawerBackdropLabel: "🖼️",
+      drawerStickerLabel: "✨ Klistermärken:",
+      btnMysterySticker: "🎁 +1 (💎 25)",
+      btnAllStickersUnlocked: "🌟 24 / 24!",
+      stkPlace: "➕",
 
-      // Adventure Map
-      speedSelectorTitle: "⏱️ Tid & Svitsmål ({streak} i rad):",
-      speed3Main: "⚡ 3s Blixt",
-      speed5Main: "⭐ 5s Snabb",
-      speed8Main: "🌱 8s Lugn",
-      unlocksPet: "🥚 Låser upp {emoji} {name}",
+      // Adventure Map (Kid-Minimal)
+      speedSelectorTitle: "⏱️ {streak} st:",
+      speed3Main: "⚡ 3s",
+      speed5Main: "⭐ 5s",
+      speed8Main: "🌱 8s",
+      unlocksPet: "🥚 {emoji} {name}",
       unlockedPetTag: "✓ {emoji} {name}",
-      bestSpeed: "⚡ Bäst: {sec}s",
+      bestSpeed: "⚡ {sec}s",
       btnPlay: "Spela ▶",
 
-      // Practice Tab
-      trickyBoosterTitle: "⚡ Träna kluriga tal",
-      trickyBoosterEmpty: "Inga missade tal registrerade än! Spela några rundor eller klicka för att öva de kluriga tabellerna 6, 7, 8, 9 och 12.",
-      trickyBoosterFound: "{name}s klurigaste tal just nu: {list}",
-      btnPracticeTricky: "🎯 Öva mina kluriga tal",
-      customRunTitle: "🎛️ Skapa egen runda",
-      customRunSub: "Välj vilka multiplikationstabeller (1–12) som ska ingå i utmaningen:",
-      btnSelectAll: "Välj alla (1–12)",
-      btnSelectHard: "Kluriga tabeller (6, 7, 8, 9, 12)",
-      btnClear: "Rensa",
-      tableBtnTitle: "{t}:ans tabell",
-      tableBtnSub: "{count}/12 starka",
-      customTimeLimitLabel: "⏱️ Tidsgräns per fråga",
-      customTime3: "⚡ 3 sekunder (Blixt)",
-      customTime5: "⭐ 5 sekunder (Snabb)",
-      customTime8: "🌱 8 sekunder (Lugn)",
-      customStreakLabel: "🏁 Svitlängd (Antal rätt i rad för vinst)",
-      customStreak10Default: "10 (Standard)",
-      customStyleLabel: "🧩 Frågestil (Talfamiljer)",
-      styleStandard: "Standard (7 × 8 = ?)",
-      styleMix: "✨ Smart mix (Inkluderar 7 × ❓ = 56)",
-      styleMystery: "🧩 Endast hemlig faktor (7 × ❓ = 56)",
-      btnLaunchCustom: "🚀 Starta egen runda!",
-      customPracticeSessionTitle: "Egen övning (×{tables})",
-      focusedDrillSessionTitle: "Fokuserad träning (×{tables})",
+      // Practice Tab (Kid-Minimal)
+      trickyBoosterTitle: "⚡ Kluriga tal",
+      trickyBoosterEmpty: "6×, 7×, 8×, 9×, 12×",
+      trickyBoosterFound: "🎯 {list}",
+      btnPracticeTricky: "🎯 Spela ▶",
+      customRunTitle: "🎛️ Egen runda",
+      customRunSub: "",
+      btnSelectAll: "1–12",
+      btnSelectHard: "🔥 6, 7, 8, 9, 12",
+      btnClear: "✕",
+      tableBtnTitle: "×{t}",
+      tableBtnSub: "{count}/12 ⭐",
+      customTimeLimitLabel: "⏱️ Tid",
+      customTime3: "⚡ 3s",
+      customTime5: "⭐ 5s",
+      customTime8: "🌱 8s",
+      customStreakLabel: "🏁 Mål",
+      customStreak10Default: "10",
+      customStyleLabel: "🧩 Stil",
+      styleStandard: "7 × 8 = ?",
+      styleMix: "✨ Mix",
+      styleMystery: "7 × ❓ = 56",
+      btnLaunchCustom: "🚀 Spela ▶",
+      customPracticeSessionTitle: "×{tables}",
+      focusedDrillSessionTitle: "×{tables}",
 
-      // Pets Tab
-      petsTitle: "🐾 Magiska Djurfristaden",
-      petsSub: "Klara äventyrsbanor eller kläck mystiska ägg i butiken för att samla alla 24 husdjur!",
-      petsUnlockedLabel: "Upplåsta:",
-      petLockedBio: "Klara äventyrsbanor eller öppna mystiska ägg i butiken för att kläcka den här vännen!",
-      btnActiveCompanion: "★ Aktiv följeslagare",
-      btnPickCompanion: "Välj som följeslagare",
-      btnLocked: "🔒 Låst",
+      // Pets Tab (Kid-Minimal)
+      petsTitle: "🐾 Husdjur",
+      petsSub: "",
+      petsUnlockedLabel: "🐾",
+      petLockedBio: "🔒",
+      btnActiveCompanion: "★ Aktiv",
+      btnPickCompanion: "Välj",
+      btnLocked: "🔒",
       rarityCommon: "Vanlig",
       rarityRare: "Sällsynt",
       rarityEpic: "Episk",
       rarityMythic: "Mytisk",
 
-      // Shop Tab & Reward Popups
-      shopTitle: "🎁 Magiska Ädelstensbutiken",
-      shopSub: "Byt ädelstenarna du tjänar mot klistermärken, mystiska ägg eller guldkuponger!",
-      btnEditRewardsParent: "⚙️ Ändra belöningar (Förälder)",
-      btnRedeemFor: "💎 Lös in för {cost} ädelstenar",
-      couponsTitle: "🎟️ {name}s Guldkuponger",
-      couponsSub: "Visa en aktiv guldkupong för mamma eller pappa för att få din belöning!",
-      noCouponsYet: "Inga guldkuponger inlösta än! Tjäna ädelstenar och lös in dem ovan.",
-      couponRedeemedTag: "(✓ Använd)",
-      couponActiveTag: "(✨ Aktiv kupong)",
-      couponClaimedBy: "Hämtad av {name} • {date}",
-      btnCompleted: "Använd ✓",
-      btnMarkUsed: "Markera använd (Förälder)",
-      popupStickerOpenedTitle: "✨ Klistermärkespaket öppnat!",
-      popupStickerOpenedSub: "Tillagt direkt i {name}s djurrum! Dra det precis dit du vill!",
-      popupStickerAwesomeBtn: "Toppen! 🎨",
-      popupAllStickersTitle: "🌟 Alla 24 klistermärken samlade!",
-      popupAllStickersSub: "{name} har redan alla klistermärken! Här får du dina 25 ädelstenar tillbaka!",
-      popupEggHatchedTitle: "🥚 Mystiskt ägg kläckt!",
-      popupEggAwesomeBtn: "Toppen! 🐾",
-      popupAllPetsTitle: "🌟 Alla 24 husdjur samlade!",
-      popupAllPetsSub: "{name} har redan låst upp alla magiska husdjur! Här får du +25 ädelstenar tillbaka!",
+      // Shop Tab & Reward Popups (Kid-Minimal)
+      shopTitle: "🎁 Butik",
+      shopSub: "",
+      btnEditRewardsParent: "⚙️ Förälder",
+      btnRedeemFor: "💎 {cost}",
+      couponsTitle: "🎟️ Kuponger",
+      couponsSub: "",
+      noCouponsYet: "🎟️ —",
+      couponRedeemedTag: "✓",
+      couponActiveTag: "✨",
+      couponClaimedBy: "{name} • {date}",
+      btnCompleted: "✓",
+      btnMarkUsed: "Använd (Förälder)",
+      popupStickerOpenedTitle: "✨ Nytt klistermärke!",
+      popupStickerOpenedSub: "🏡 I {name}s rum!",
+      popupStickerAwesomeBtn: "Jippie! 🎨",
+      popupAllStickersTitle: "🌟 Alla 24!",
+      popupAllStickersSub: "+25 💎",
+      popupEggHatchedTitle: "🥚 Nytt husdjur!",
+      popupEggAwesomeBtn: "Jippie! 🐾",
+      popupAllPetsTitle: "🌟 Alla 24!",
+      popupAllPetsSub: "+25 💎",
       popupYayBtn: "Jippie!",
-      popupCouponHeader: "✨ Officiell Guldkupong ✨",
-      popupCouponEarnedBy: "Intjänad av {name} • {date}",
-      popupCouponSub: "Visa den här guldkupongen för mamma eller pappa! Den finns sparad i din kuponglista.",
-      popupKeepCouponBtn: "🎉 Spara guldkupong",
+      popupCouponHeader: "✨ Guldkupong ✨",
+      popupCouponEarnedBy: "{name} • {date}",
+      popupCouponSub: "🎟️ Visa för mamma eller pappa!",
+      popupKeepCouponBtn: "🎉 Spara",
 
-      // Stats / Metrics Tab
-      kpiQuestionsAnswered: "Besvarade frågor",
-      kpiOverallAccuracy: "Träffsäkerhet",
-      kpiAvgSpeed: "Snitthastighet",
-      kpiFactsMastered: "12×12 Starka / Bemästrade",
-      kpiStreaksConquered: "Avklarade sviter",
-      statsTrickyTitle: "🎯 Klurigaste talen att bemästra",
-      statsTrickySub: "Rankade automatiskt efter missar, tidsgränser och svarstid:",
-      btnDrillTricky: "⚡ Träna kluriga tal",
-      noTrickyYet: "Inga kluriga tal registrerade än — spela några rundor så dyker eventuella missade eller långsamma tal upp här automatiskt!",
-      trickyPillStats: "({acc}% rätt • {sec}s • {misses} miss)",
-      heatmapTitle: "🗺️ 12×12 Multiplikationskarta",
-      heatmapSub: "Tryck på valfri ruta för att se {name}s exakta träffsäkerhet och svarstid (i sekunder):",
-      legendGold: "👑 Bemästrad (≥90% & <2.2s)",
-      legendGreen: "🟢 Stark (≥80% & <3.5s)",
-      legendYellow: "🟡 Lär sig",
-      legendRed: "🔴 Behöver övas",
-      legendNone: "⚪ Ej testad än",
-      heatmapTapHint: "👆 Tryck på en ruta i 12×12-rutnätet ovan för att se detaljerad statistik!",
-      factNotPracticedYet: "Inte övad än!",
-      factDetailStats: "Visad <strong>{attempts}</strong> ggr • Träffsäkerhet: <strong>{acc}%</strong> ({correct}✓, {wrong}✗, {timeouts}⏱️) • Snittid: <strong>{avgSec}s</strong> (Snabbast: {bestSec})",
-      btnPracticeSingleTable: "Öva {a}:ans tabell",
-      btnPracticeTwoTables: "Öva ×{a} & ×{b}",
-      perTableTitle: "📈 Framsteg per tabell (×1 till ×12)",
-      perTableSub: "Andel övade och bemästrade tal i varje tabell samt genomsnittlig svarstid:",
-      perTableRowTitle: "{t}:ans tabell (×{t})",
-      perTableRowStats: "{strong}/12 bemästrade • Rätt: {acc} • Snitt: {avg}",
-      recentRunsTitle: "📜 Senaste rundor",
-      recentRunsSub: "Visar avklarade sviter, tider, snitthastighet och antal omstarter:",
-      noRunsYet: "Inga avklarade sviter än — spela en bana på äventyrskartan för att se din historik här!",
-      runRowMeta: "({streak} i rad • {timer}s tid)",
-      runRowAvg: "⚡ Snitt: {sec}s",
-      runRowResets: "🔄 Omstarter: {resets}",
+      // Stats / Metrics Tab (Kid-Minimal)
+      kpiQuestionsAnswered: "Svar",
+      kpiOverallAccuracy: "Rätt %",
+      kpiAvgSpeed: "Snittid",
+      kpiFactsMastered: "Starka",
+      kpiStreaksConquered: "Rundor",
+      statsTrickyTitle: "🎯 Kluriga tal",
+      statsTrickySub: "",
+      btnDrillTricky: "⚡ Spela ▶",
+      noTrickyYet: "🌟 Inga än!",
+      trickyPillStats: "({acc}% • {sec}s)",
+      heatmapTitle: "🗺️ 12×12 Karta",
+      heatmapSub: "",
+      legendGold: "👑 <2.2s",
+      legendGreen: "🟢 <3.5s",
+      legendYellow: "🟡",
+      legendRed: "🔴",
+      legendNone: "⚪",
+      heatmapTapHint: "👆 Tryck på en ruta!",
+      factNotPracticedYet: "⚪",
+      factDetailStats: "<strong>{attempts}×</strong> • <strong>{acc}%</strong> ({correct}✓ {wrong}✗) • ⚡ <strong>{avgSec}s</strong>",
+      btnPracticeSingleTable: "▶ ×{a}",
+      btnPracticeTwoTables: "▶ ×{a} & ×{b}",
+      perTableTitle: "📈 Tabeller (×1 – ×12)",
+      perTableSub: "",
+      perTableRowTitle: "×{t}",
+      perTableRowStats: "{strong}/12 ⭐ • {acc} • {avg}",
+      recentRunsTitle: "📜 Historik",
+      recentRunsSub: "",
+      noRunsYet: "—",
+      runRowMeta: "({streak} st • {timer}s)",
+      runRowAvg: "⚡ {sec}s",
+      runRowResets: "🔄 {resets}",
 
-      // Gameplay Stage
-      gameInitialSpeech: "Nu kör vi, {name}! Klara {streak} frågor för att öppna skattkistan!",
-      gameModeFooter: "{title} • ⏱️ {timer}s tid • Mål: {streak} frågor",
-      gameSubHintStart: "Tryck på rätt svar!",
-      gameSubHintStreak: "🔥 {streak} klara! Fortsätt så!",
-      gameSubHintMystery: "🌟 Bonus! Vilket tal gånger {factor} blir {prod}?",
-      gameCorrectSpeed: "⚡ {sec}s! Snyggt jobbat!",
-      gameBonusCorrectSpeed: "🌟 Bonus rätt! +3 bonus-ädelstenar ({sec}s)!",
-      gameTapGreenHint: "👆 Tryck på den gröna knappen ({ans}) nedan för att börja om!",
-      gameTimeoutBubbleTap: "3:e missen på {eq}, {name}! Tryck på gröna {ans} för att börja om rundan!",
-      gameWrongBubbleTap: "3:e missen på {eq}, {name}! Tryck på gröna {ans} för att börja om rundan!",
-      gameTimeoutSubAuto: "⏰ 3:e missen på detta tal! Kom ihåg: {eq}",
-      gameWrongSubAuto: "💡 3:e missen på detta tal! Kom ihåg: {eq}",
-      gameTimeoutBubbleAuto: "3:e missen på {eq}, {name}! Vi börjar om från 0, nu tar vi det!",
-      gameWrongBubbleAuto: "3:e missen på {eq}, {name}! Vi börjar om från start, du fixar det här!",
-      gameRetryLaterBubbleTap: "Ingen fara, {name}! {eq} — Vi sparar den till slutet! ({triesLeft} försök kvar). Tryck på gröna {ans}!",
-      gameRetryLaterBubbleAuto: "Ingen fara, {name}! {eq} — Vi sparar den till slutet! ({triesLeft} försök kvar).",
-      gameRetryLaterSubHint: "🔄 Sparad till slutet ({missCount}/3 missar på detta tal) • Tryck på gröna {ans}!",
-      gameBonusMissBubbleTap: "🌟 Bonusfråga — ingen fara alls, {name}! {eq}. Tryck på gröna {ans} för att fortsätta!",
-      gameBonusMissBubbleAuto: "🌟 Bonusfråga — ingen fara alls, {name}! {eq}. Vi kör vidare!",
-      gameBonusMissSubHint: "🌟 Bonusfråga (Missar räknas inte!) • Tryck på gröna {ans}!",
-      gameKeepGoingBubble: "Fortsätt så, {name}! {current}/{streak} klara!",
-      gameFreshStartBubble: "Ny start, {name}! Nu tar vi alla {streak}!",
-      badgeSpaced1: "🔄 Repetition (1/3)",
-      badgeTwin: "🪞 Tvillingtal ({b}×{a} = {a}×{b})",
-      badgeBoss: "👑 Sista Boss-frågan!",
-      badgeRetry: "🔄 Klurigt tal i repris",
-      badgeEndRetry: "🔄 Försök igen på slutet! (Försök {tryNum}/3)",
-      badgeAnchor: "⚓ Ankartal",
-      badgeMystery: "🌟 Bonusfråga! (Ingen förlust vid miss)",
+      // Gameplay Stage (Kid-Minimal: 1–4 words + icons!)
+      gameInitialSpeech: "🚀 Kör, {name}!",
+      gameModeFooter: "{title} • ⏱️ {timer}s • 🏁 {streak}",
+      gameSubHintStart: "👆 Tryck!",
+      gameSubHintStreak: "🔥 {streak}",
+      gameSubHintMystery: "🌟 Bonus (+3 💎)",
+      gameCorrectSpeed: "⚡ {sec}s!",
+      gameBonusCorrectSpeed: "🌟 +3 💎 ({sec}s)!",
+      gameTapGreenHint: "👆 Tryck grön {ans}",
+      gameTimeoutBubbleTap: "{eq} 🔄 Ny start!",
+      gameWrongBubbleTap: "{eq} 🔄 Ny start!",
+      gameTimeoutSubAuto: "⏰ {eq}",
+      gameWrongSubAuto: "💡 {eq}",
+      gameTimeoutBubbleAuto: "{eq} 🔄 Ny start!",
+      gameWrongBubbleAuto: "{eq} 🔄 Ny start!",
+      gameRetryLaterBubbleTap: "{eq} 🔄 Igen på slutet!",
+      gameRetryLaterBubbleAuto: "{eq} 🔄 Igen på slutet!",
+      gameRetryLaterSubHint: "🔄 Igen på slutet ({missCount}/3) • 👆 Tryck {ans}",
+      gameBonusMissBubbleTap: "{eq} 🌟 Gratis bonus!",
+      gameBonusMissBubbleAuto: "{eq} 🌟 Gratis bonus!",
+      gameBonusMissSubHint: "🌟 Ingen förlust • 👆 Tryck {ans}",
+      gameKeepGoingBubble: "🔥 {current} / {streak}!",
+      gameFreshStartBubble: "🚀 Kör, {name}!",
+      badgeSpaced1: "🔄 Repris",
+      badgeTwin: "🪞 {b} × {a}",
+      badgeBoss: "👑 Boss!",
+      badgeRetry: "🔄 Repris",
+      badgeEndRetry: "🔄 Försök {tryNum}/3",
+      badgeAnchor: "⚓ Tips",
+      badgeMystery: "🌟 Bonus (+3 💎)",
 
-      // Victory Modal
-      victoryFlawlessTitle: "Perfekt svit, {name}! 🎉",
-      victoryCompleteTitle: "Sviten klar! 🎉",
-      victoryFlawlessSub: "{streak} i rad med NOLL omstarter!",
-      victoryCompleteSub: "{name} klarade alla {streak} i rad!",
-      victoryTapChestHint: "👆 Tryck på skattkistan för att hämta din belöning!",
-      victoryGemsEarned: "+{gems} Ädelstenar",
-      victoryAvgLabel: "⚡ Snitt:",
-      victoryNewPetHeader: "🐾 Nytt magiskt husdjur upplåst!",
-      victoryNewStickerHeader: "🎨 Bonus-klistermärke vunnet!",
-      victoryPlacedInLobby: "Placerat i ditt djurrum!",
-      btnPlayAgain: "🔄 Spela igen",
-      btnContinueAdventure: "🗺️ Fortsätt äventyret",
+      // Expandable "For Parents" Boxes (Swedish)
+      parentInfoAdventureSum: "ℹ️ För föräldrar: Så fungerar banor, försök & bonusfrågor",
+      parentInfoAdventureBody:
+        "<p>• <strong>Försök igen på slutet (3-missregeln):</strong> Om {name} missar en vanlig fråga nollställs <em>inte</em> sviten! Frågan läggs sist i rundan så hon får prova igen. Bara 3 missar på <em>exakt samma tal</em> startar om rundan.</p><p>• <strong>🌟 Bonusfrågor (<code>7 × ❓ = 56</code>):</strong> Ger <strong>+3 bonus-ädelstenar</strong> vid rätt svar och <strong>inget avdrag alls</strong> vid miss.</p><p>• <strong>Tidsgränser:</strong> 8s = 1★ (1× ädelstenar), 5s = 2★ (1.5× ädelstenar), 3s = 3★ (2× ädelstenar). Första vinsten på en bana låser upp dess husdjur!</p>",
+      parentInfoTrickySum: "ℹ️ För föräldrar: Träna kluriga tal",
+      parentInfoTrickyBody:
+        "Väljer automatiskt ut de multiplikationer som {name} har missat eller svarat långsamt på i tidigare rundor.",
+      parentInfoCustomSum: "ℹ️ För föräldrar: Skapa egen runda",
+      parentInfoCustomBody:
+        "Välj valfria tabeller (1–12), tidsgräns per fråga och om bonusfrågor med hemlig faktor (<code>7 × ❓ = 56</code>) ska ingå.",
+      parentInfoPetsSum: "ℹ️ För föräldrar: Låsa upp & välja husdjur",
+      parentInfoPetsBody:
+        "16 husdjur låses upp genom att klara banorna på äventyrskartan och 8 kläcks ur mystiska ägg i butiken. Tryck på ett upplåst djur för att välja det som sällskap.",
+      parentInfoShopSum: "ℹ️ För föräldrar: Ädelstenar, ägg & guldkuponger",
+      parentInfoShopBody:
+        "Ädelstenar från avklarade rundor kan bytas mot klistermärken, mystiska djurägg eller guldkuponger (t.ex. extra skärmtid eller välja familjefilm). Klicka på <strong>⚙️ Förälder</strong> för att ändra eller lägga till egna belöningar.",
+      parentInfoStatsSum: "ℹ️ För föräldrar: Så läser du 12×12-kartan",
+      parentInfoStatsBody:
+        "Tryck på valfri ruta i 12×12-nätet för att se träffsäkerhet och snittid. 👑 <strong>Bemästrad</strong> kräver ≥90% rätt under 2.2s; 🟢 <strong>Stark</strong> kräver ≥80% rätt under 3.5s.",
+      gameParentInfoSum: "ℹ️ För föräldrar: Förklaring & räknestrategi",
+      gameParentInfoRetryNote:
+        "<strong>Sparad till slutet ({missCount}/3 missar på detta tal):</strong> Sviten är kvar! Frågan lades sist i rundan för ett nytt försök. Bara 3 missar på samma tal startar om rundan.",
+      gameParentInfoResetNote:
+        "<strong>3:e missen på samma tal:</strong> Eftersom just detta tal missades 3 gånger i samma runda börjar sviten om från 0.",
+      gameParentInfoBonusNote:
+        "<strong>Bonusfråga (Hemlig faktor):</strong> Missar på bonusfrågor räknas inte som fel och påverkar inte sviten.",
+
+      // Victory Modal (Kid-Minimal)
+      victoryFlawlessTitle: "🎉 Du klarade det, {name}!",
+      victoryCompleteTitle: "🎉 Du klarade det!",
+      victoryFlawlessSub: "⭐ {streak} / {streak}!",
+      victoryCompleteSub: "⭐ {streak} / {streak}!",
+      victoryTapChestHint: "👆 Tryck på kistan!",
+      victoryGemsEarned: "+{gems} 💎",
+      victoryAvgLabel: "⚡",
+      victoryNewPetHeader: "🐾 Nytt husdjur!",
+      victoryNewStickerHeader: "🎨 Nytt klistermärke!",
+      victoryPlacedInLobby: "🏡 I ditt rum!",
+      btnPlayAgain: "🔄 Igen",
+      btnContinueAdventure: "🗺️ Karta",
 
       // Parent Modal
       parentModalTitle: "⚙️ Föräldrainställningar",
@@ -477,40 +531,66 @@
   // Swedish translations for Worlds & Nodes (matching exact IDs in data.js)
   const SV_WORLDS = {
     woods: {
-      name: "🌱 Värld 1: Viskande Skogen",
-      subtitle: "Bygg en oslagbar rytm med 1:ans, 2:ans, 5:ans och 10:ans tabell!"
+      name: "🌱 Värld 1: Skogen",
+      subtitle: "×1, ×2, ×5, ×10"
     },
     caves: {
-      name: "💎 Värld 2: Kristallgrottorna",
-      subtitle: "Lys upp de glittrande grottorna med 3:ans, 4:ans och 6:ans tabell!"
+      name: "💎 Värld 2: Grottan",
+      subtitle: "×3, ×4, ×6"
     },
     clouds: {
-      name: "☁️ Värld 3: Molnriket",
-      subtitle: "Sväva högt bland molnen med de kluriga 7:ans, 8:ans och 9:ans tabeller!"
+      name: "☁️ Värld 3: Molnen",
+      subtitle: "×7, ×8, ×9"
     },
     summit: {
-      name: "🏔️ Värld 4: Stjärntoppen",
-      subtitle: "Nå bergstoppen med 11:ans och 12:ans tabell & Stora Mästarkronan!"
+      name: "🏔️ Värld 4: Toppen",
+      subtitle: "×11, ×12 & 12×12"
     }
   };
 
   const SV_NODES = {
-    lvl_1: { title: "1× & 2× Groddstigen", desc: "Dubbla upp! Värm upp fingrarna med 1:or och 2:or." },
-    lvl_2: { title: "5× High-Five-Ängen", desc: "Räkna med 5:or hela vägen upp till 60!" },
-    lvl_3: { title: "10× Stjärnbäcken", desc: "Supersnabba tiotal! Lägg till en nolla med stil." },
-    lvl_4: { title: "Skogens Boss: 1, 2, 5, 10", desc: "Blanda alla fyra skogstabellerna i en svit!" },
-    lvl_5: { title: "3× Magiska Trianglar", desc: "Bemästra rytmen i 3:ans tabell upp till 3 × 12!" },
-    lvl_6: { title: "4× Kvartsgrottan", desc: "Dubbel-dubbel! Erövra 4:ans multiplikationstabell." },
-    lvl_7: { title: "6× Safirbron", desc: "Kliv över de lysande kristallerna med 6:ans tabell!" },
-    lvl_8: { title: "Grottans Boss: 3, 4 & 6 Mix", desc: "Kan du besegra Kristallgrottans väktare i rad?" },
-    lvl_9: { title: "9× Fingerkneps-himlen", desc: "Siffrorna blir alltid 9 tillsammans! Flyg genom 9:orna." },
-    lvl_10: { title: "7× Regnbågscitadellet", desc: "Tämj den berömda 7:ans multiplikationstabell!" },
-    lvl_11: { title: "8× Åskmolnet", desc: "Kraftfull fart från 8 × 1 hela vägen till 8 × 12!" },
-    lvl_12: { title: "Molnens Boss: 7, 8 & 9 Mix", desc: "Erövra Molnrikets klurigaste trio!" },
-    lvl_13: { title: "11× Tvillingstjärnans Topp", desc: "Tvillingsiffror upp till 99, plus 110, 121 och 132!" },
-    lvl_14: { title: "12× Drakryggen", desc: "Bemästra de mäktiga 12:orna upp till 12 × 12 = 144!" },
-    lvl_15: { title: "Kluriga Höjdmixen (6–12)", desc: "Alla de stora tabellerna tillsammans i en episk klättring!" },
-    lvl_16: { title: "Stora 12×12 Mästarkronan", desc: "Alla tabeller från 1 till 12! Visa att du är Stormästare!" }
+    lvl_1: { title: "1× & 2×", desc: "" },
+    lvl_2: { title: "5×", desc: "" },
+    lvl_3: { title: "10×", desc: "" },
+    lvl_4: { title: "Boss: 1, 2, 5, 10", desc: "" },
+    lvl_5: { title: "3×", desc: "" },
+    lvl_6: { title: "4×", desc: "" },
+    lvl_7: { title: "6×", desc: "" },
+    lvl_8: { title: "Boss: 3, 4 & 6", desc: "" },
+    lvl_9: { title: "9×", desc: "" },
+    lvl_10: { title: "7×", desc: "" },
+    lvl_11: { title: "8×", desc: "" },
+    lvl_12: { title: "Boss: 7, 8 & 9", desc: "" },
+    lvl_13: { title: "11×", desc: "" },
+    lvl_14: { title: "12×", desc: "" },
+    lvl_15: { title: "Mix: 6–12", desc: "" },
+    lvl_16: { title: "12×12 Kronan", desc: "" }
+  };
+
+  const EN_WORLDS_SHORT = {
+    woods: { name: "🌱 World 1: Woods", subtitle: "×1, ×2, ×5, ×10" },
+    caves: { name: "💎 World 2: Caves", subtitle: "×3, ×4, ×6" },
+    clouds: { name: "☁️ World 3: Clouds", subtitle: "×7, ×8, ×9" },
+    summit: { name: "🏔️ World 4: Summit", subtitle: "×11, ×12 & 12×12" }
+  };
+
+  const EN_NODES_SHORT = {
+    lvl_1: { title: "1× & 2×", desc: "" },
+    lvl_2: { title: "5×", desc: "" },
+    lvl_3: { title: "10×", desc: "" },
+    lvl_4: { title: "Boss: 1, 2, 5, 10", desc: "" },
+    lvl_5: { title: "3×", desc: "" },
+    lvl_6: { title: "4×", desc: "" },
+    lvl_7: { title: "6×", desc: "" },
+    lvl_8: { title: "Boss: 3, 4 & 6", desc: "" },
+    lvl_9: { title: "9×", desc: "" },
+    lvl_10: { title: "7×", desc: "" },
+    lvl_11: { title: "8×", desc: "" },
+    lvl_12: { title: "Boss: 7, 8 & 9", desc: "" },
+    lvl_13: { title: "11×", desc: "" },
+    lvl_14: { title: "12×", desc: "" },
+    lvl_15: { title: "Mix: 6–12", desc: "" },
+    lvl_16: { title: "12×12 Crown", desc: "" }
   };
 
   // Swedish translations for all 24 Pet Species & Bios in data.js
@@ -541,39 +621,37 @@
     pet_pegasus: { species: "Norrskenspegasus", bio: "Flyger genom stjärnvalvet när en hel värld har erövrats!" }
   };
 
-  // Swedish translations for Default Shop Items
+  // Short Shop Item Titles (Kid-Minimal)
+  const EN_SHOP_SHORT = {
+    reward_sticker_pack: { title: "✨ Sticker Pack", description: "" },
+    reward_mystery_egg: { title: "🥚 Mystery Egg", description: "" },
+    reward_screen_time_15: { title: "📺 +15m Screen", description: "" },
+    reward_ice_cream: { title: "🍦 Ice Cream", description: "" },
+    reward_movie_pick: { title: "🍿 Pick a Movie", description: "" },
+    reward_bedtime_15: { title: "🌙 +15m Bedtime", description: "" }
+  };
+
   const SV_SHOP_ITEMS = {
-    reward_sticker_pack: {
-      title: "Hemligt Klistermärkespaket",
-      description: "Öppna ett glittrande paket och vinn ett nytt flyttbart klistermärke till ditt djurrum!"
-    },
-    reward_mystery_egg: {
-      title: "Mystiskt Magiskt Djurägg",
-      description: "Kläck ett nytt slumpmässigt husdjur till din fristad! (Eller +25 bonus-ädelstenar om alla är samlade)"
-    },
-    reward_screen_time_15: {
-      title: "15 minuter extra skärmtid",
-      description: "Lös in mot en guldkupong som ger 15 minuter extra skärmtid på iPad/TV!"
-    },
-    reward_ice_cream: {
-      title: "Glass eller speciellt fika",
-      description: "Lös in mot en god glass eller fika med mamma eller pappa!"
-    },
-    reward_movie_pick: {
-      title: "Välj familjefilm till myskvällen",
-      description: "Guldkupong för att få bestämma vilken film familjen ska titta på!"
-    },
-    reward_bedtime_15: {
-      title: "Vara uppe 15 minuter längre",
-      description: "Lös in på helgen för att få stanna uppe 15 minuter längre än vanligt!"
-    }
+    reward_sticker_pack: { title: "✨ Klistermärke", description: "" },
+    reward_mystery_egg: { title: "🥚 Mystiskt ägg", description: "" },
+    reward_screen_time_15: { title: "📺 +15m Skärmtid", description: "" },
+    reward_ice_cream: { title: "🍦 Glass / Fika", description: "" },
+    reward_movie_pick: { title: "🍿 Välj film", description: "" },
+    reward_bedtime_15: { title: "🌙 +15m Läggdags", description: "" }
   };
 
   const SV_BACKDROPS = {
-    bg_meadow: "🌈 Regnbågsäng",
-    bg_castle: "🏰 Kristallmoln",
-    bg_galaxy: "🌌 Stjärngalax",
-    bg_beach: "🏖️ Solig lagun"
+    bg_meadow: "🌈 Äng",
+    bg_castle: "🏰 Slott",
+    bg_galaxy: "🌌 Rymd",
+    bg_beach: "🏖️ Strand"
+  };
+
+  const EN_BACKDROPS_SHORT = {
+    bg_meadow: "🌈 Meadow",
+    bg_castle: "🏰 Castle",
+    bg_galaxy: "🌌 Space",
+    bg_beach: "🏖️ Beach"
   };
 
   const SV_STICKERS = {
@@ -603,12 +681,20 @@
     stk_trophy: "Mästarbuckla"
   };
 
+  const EN_CHEERS = [
+    "⚡ Awesome!",
+    "🌟 Super!",
+    "🔥 Yes!",
+    "🎉 Magic!",
+    "🚀 Fast!"
+  ];
+
   const SV_CHEERS = [
-    "Blixtsnabbt! Fantastiskt jobbat!",
-    "Vilken superhjärna! Fortsätt så!",
-    "Du flyger fram genom tabellerna!",
-    "Magiskt rätt svar!",
-    "Skattkistan kommer allt närmare!"
+    "⚡ Toppen!",
+    "🌟 Super!",
+    "🔥 Jaa!",
+    "🎉 Magiskt!",
+    "🚀 Snabbt!"
   ];
 
   function getLang() {
@@ -631,6 +717,60 @@
       template = template.replace(new RegExp(`\\{${k}\\}`, "g"), v);
     });
     return template;
+  }
+
+  // Ultra-short visual 1-liner for kids during a miss (pure numbers/symbols + 1-2 words)
+  function getKidStrategy(a, b) {
+    const min = Math.min(a, b);
+    const max = Math.max(a, b);
+    const prod = a * b;
+    const key = `${min}x${max}`;
+
+    const shortRhymes = {
+      "7x8": `🎵 5, 6, 7, 8 ➔ 56`,
+      "6x8": `🎵 6 × 8 = 48`,
+      "6x6": `🎵 6 × 6 = 36`,
+      "7x7": `🎵 7 × 7 = 49`,
+      "8x8": `♟️ 8 × 8 = 64`
+    };
+    if (shortRhymes[key]) return shortRhymes[key];
+
+    if (min === 1) return `💡 1 × ${max} = ${prod}`;
+    if (min === 2) return `💡 ${max} + ${max} = ${prod}`;
+    if (min === 10 || max === 10) {
+      const other = a === 10 ? b : a;
+      return `💡 ${other}0 = ${prod}`;
+    }
+    if (min === 5 || max === 5) {
+      const other = a === 5 ? b : a;
+      return `💡 ½ × ${other * 10} = ${prod}`;
+    }
+    if (min === 9 || max === 9) {
+      const other = min === 9 ? max : min;
+      return `🖐️ ${other * 10} − ${other} = ${prod}`;
+    }
+    if (min === 4 || max === 4) {
+      const other = min === 4 ? max : min;
+      return `⚡ ${other} ➔ ${other * 2} ➔ ${prod}`;
+    }
+    if (min === 3 || max === 3) {
+      const other = min === 3 ? max : min;
+      return `💡 ${other * 2} + ${other} = ${prod}`;
+    }
+    if (min === 6 || max === 6) {
+      const other = min === 6 ? max : min;
+      return `💡 ${other * 5} + ${other} = ${prod}`;
+    }
+    if (min === 11 || max === 11) {
+      const other = min === 11 ? max : min;
+      if (other <= 9) return `🪞 ${other}${other} = ${prod}`;
+      return `💡 ${other * 10} + ${other} = ${prod}`;
+    }
+    if (min === 12 || max === 12) {
+      const other = min === 12 ? max : min;
+      return `💡 ${other * 10} + ${other * 2} = ${prod}`;
+    }
+    return `💡 ${5 * max} + ${(min - 5) * max} = ${prod}`;
   }
 
   function getPedagogicalStrategyLocalized(a, b) {
@@ -745,6 +885,25 @@
       const el = document.getElementById(id);
       if (el) el.textContent = val;
     };
+    const setHtml = (id, val) => {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = val;
+    };
+
+    // Expandable "For Parents" Boxes
+    setTxt("parent-info-adventure-sum", t("parentInfoAdventureSum"));
+    setHtml("parent-info-adventure-body", t("parentInfoAdventureBody", { name: playerName }));
+    setTxt("parent-info-tricky-sum", t("parentInfoTrickySum"));
+    setHtml("parent-info-tricky-body", t("parentInfoTrickyBody", { name: playerName }));
+    setTxt("parent-info-custom-sum", t("parentInfoCustomSum"));
+    setHtml("parent-info-custom-body", t("parentInfoCustomBody", { name: playerName }));
+    setTxt("parent-info-pets-sum", t("parentInfoPetsSum"));
+    setHtml("parent-info-pets-body", t("parentInfoPetsBody", { name: playerName }));
+    setTxt("parent-info-shop-sum", t("parentInfoShopSum"));
+    setHtml("parent-info-shop-body", t("parentInfoShopBody", { name: playerName }));
+    setTxt("parent-info-stats-sum", t("parentInfoStatsSum"));
+    setHtml("parent-info-stats-body", t("parentInfoStatsBody", { name: playerName }));
+    setTxt("game-parent-info-sum", t("gameParentInfoSum"));
 
     // Welcome Modal
     setTxt("onboarding-title-text", t("welcomeTitle"));
@@ -927,16 +1086,23 @@
     t,
     getLang,
     applyStaticTranslations,
+    getKidStrategy,
     getPedagogicalStrategyLocalized,
     getWorldText: (world) => {
       if (getLang() === "sv" && SV_WORLDS[world.id]) {
         return SV_WORLDS[world.id];
+      }
+      if (EN_WORLDS_SHORT[world.id]) {
+        return EN_WORLDS_SHORT[world.id];
       }
       return { name: world.name, subtitle: world.subtitle };
     },
     getNodeText: (node) => {
       if (getLang() === "sv" && SV_NODES[node.id]) {
         return { title: SV_NODES[node.id].title, description: SV_NODES[node.id].desc };
+      }
+      if (EN_NODES_SHORT[node.id]) {
+        return { title: EN_NODES_SHORT[node.id].title, description: EN_NODES_SHORT[node.id].desc };
       }
       return { title: node.title, description: node.description };
     },
@@ -959,10 +1125,14 @@
       if (getLang() === "sv" && SV_SHOP_ITEMS[item.id]) {
         return SV_SHOP_ITEMS[item.id];
       }
-      return { title: item.title, description: item.description };
+      if (EN_SHOP_SHORT[item.id]) {
+        return EN_SHOP_SHORT[item.id];
+      }
+      return { title: item.title, description: "" };
     },
     getBackdropName: (bg) => {
       if (getLang() === "sv" && SV_BACKDROPS[bg.id]) return SV_BACKDROPS[bg.id];
+      if (EN_BACKDROPS_SHORT[bg.id]) return EN_BACKDROPS_SHORT[bg.id];
       return bg.name;
     },
     getStickerName: (stk) => {
@@ -973,7 +1143,7 @@
       if (getLang() === "sv") {
         return SV_CHEERS[streak % SV_CHEERS.length];
       }
-      return pet.cheerQuotes[streak % pet.cheerQuotes.length];
+      return EN_CHEERS[streak % EN_CHEERS.length];
     }
   };
 })();
