@@ -271,7 +271,20 @@
     }
 
     if (statusBadge && statusText) {
-      statusText.textContent = statusMessage;
+      const isSv = window.CURRENT_LANG === "sv";
+      let displayMsg = statusMessage;
+      if (isSv) {
+        if (syncStatus === "local" && !currentUser) {
+          displayMsg = "Redo att logga in med magisk föräldralänk (Valfritt)";
+        } else if (syncStatus === "synced" && currentUser) {
+          displayMsg = `Synkad live med ${currentUser.email || "Föräldrakonto"}`;
+        } else if (syncStatus === "connecting") {
+          displayMsg = "Ansluter till molnet...";
+        } else if (syncStatus === "syncing") {
+          displayMsg = "Sparar i molnet...";
+        }
+      }
+      statusText.textContent = displayMsg;
       statusBadge.className = `cloud-status-pill status-${syncStatus}`;
     }
   }

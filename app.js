@@ -286,6 +286,9 @@
     if (window.I18N) {
       window.I18N.applyStaticTranslations(state.settings.playerName, state.settings.defaultStreakLength);
     }
+    if (window.CLOUD_SYNC) {
+      window.CLOUD_SYNC.updateUI();
+    }
     const pet = getActivePet();
     document.getElementById("hud-pet-emoji").textContent = pet.emoji;
     document.getElementById("hud-pet-name").textContent = pet.name;
@@ -583,7 +586,7 @@
     const drawer = document.getElementById("lobby-sticker-drawer");
     const btn = document.getElementById("btn-toggle-sticker-drawer");
     drawer.style.display = stickerDrawerOpen ? "block" : "none";
-    btn.textContent = stickerDrawerOpen ? "✓ Done Decorating" : "🎨 Decorate & Stickers";
+    btn.textContent = stickerDrawerOpen ? t("btnDoneDecorating") : t("btnDecorate");
     if (!stickerDrawerOpen) {
       selectedPlacedStickerId = null;
     }
@@ -763,33 +766,33 @@
     const tricky = getTrickyFactsList(6);
     const summaryEl = document.getElementById("practice-tricky-summary");
     if (tricky.length === 0) {
-      summaryEl.textContent = `No missed facts logged yet! Complete a few runs or click to practice the classic tricky 6s, 7s, 8s, 9s, and 12s.`;
+      summaryEl.textContent = t("trickyBoosterEmpty");
     } else {
-      const labels = tricky.map((t) => `${t.a}×${t.b}`).join(", ");
-      summaryEl.textContent = `${state.settings.playerName}'s current top tricky facts: ${labels}`;
+      const labels = tricky.map((tf) => `${tf.a}×${tf.b}`).join(", ");
+      summaryEl.textContent = t("trickyBoosterFound", { name: state.settings.playerName, list: labels });
     }
 
     const grid = document.getElementById("custom-tables-grid");
     grid.innerHTML = "";
-    for (let t = 1; t <= 12; t++) {
-      // Calculate quick mastery % for table t (combining t×b and b×t)
+    for (let tbl = 1; tbl <= 12; tbl++) {
+      // Calculate quick mastery % for table tbl (combining tbl×b and b×tbl)
       let masteredCount = 0;
       for (let b = 1; b <= 12; b++) {
-        const stStatus = evaluateTablePairMastery(t, b);
+        const stStatus = evaluateTablePairMastery(tbl, b);
         if (stStatus === "gold" || stStatus === "green") masteredCount++;
       }
       const btn = document.createElement("button");
-      btn.className = `table-toggle-btn ${customSelectedTables.has(t) ? "selected" : ""}`;
+      btn.className = `table-toggle-btn ${customSelectedTables.has(tbl) ? "selected" : ""}`;
       btn.innerHTML = `
-        <span>×${t} Table</span>
-        <span class="table-sub">${masteredCount}/12 strong</span>
+        <span>${t("tableBtnTitle", { t: tbl })}</span>
+        <span class="table-sub">${t("tableBtnSub", { count: masteredCount })}</span>
       `;
       btn.addEventListener("click", () => {
         window.soundFX.tap();
-        if (customSelectedTables.has(t)) {
-          if (customSelectedTables.size > 1) customSelectedTables.delete(t);
+        if (customSelectedTables.has(tbl)) {
+          if (customSelectedTables.size > 1) customSelectedTables.delete(tbl);
         } else {
-          customSelectedTables.add(t);
+          customSelectedTables.add(tbl);
         }
         renderCustomPractice();
       });
@@ -855,7 +858,7 @@
     startGameSession({
       mode: "custom",
       nodeId: null,
-      title: `Custom Practice (×${tables.join(", ×")})`,
+      title: t("customPracticeSessionTitle", { tables: tables.join(", ×") }),
       tables,
       questionStyle: customQuestionStyle,
       timerSeconds: customTimerSec,
@@ -868,12 +871,12 @@
   function launchTrickyFactsSession() {
     window.soundFX.tap();
     const tricky = getTrickyFactsList(10);
-    const customFactPairs = tricky.map((t) => ({ a: t.a, b: t.b }));
+    const customFactPairs = tricky.map((tf) => ({ a: tf.a, b: tf.b }));
     const fallbackTables = [6, 7, 8, 9, 12];
     startGameSession({
       mode: "tricky",
       nodeId: null,
-      title: "⚡ Tricky Facts Booster",
+      title: t("trickyBoosterTitle"),
       tables: fallbackTables,
       customFactPairs: customFactPairs.length > 0 ? customFactPairs : null,
       timerSeconds: Number(state.settings.defaultTimerSeconds),
@@ -900,27 +903,29 @@
     allPets.forEach((pet) => {
       const isUnlocked = state.unlockedPets.includes(pet.id);
       const isActive = state.activePetId === pet.id;
+      const pTxt = window.I18N ? window.I18N.getPetText(pet) : { species: pet.species, bio: pet.bio };
+      const rarityLbl = window.I18N ? window.I18N.getRarityLabel(pet.rarity) : pet.rarity;
 
       const card = document.createElement("div");
       card.className = `pet-card ${isUnlocked ? "" : "locked"} ${isActive ? "active-companion" : ""}`;
 
       card.innerHTML = `
         <div style="display:flex; flex-direction:column; align-items:center;">
-          <span class="rarity-badge rarity-${pet.rarity}">${pet.rarity}</span>
+          <span class="rarity-badge rarity-${pet.rarity}">${rarityLbl}</span>
           <div class="pet-avatar-circle" style="background:${pet.bg};">
             ${isUnlocked ? pet.emoji : "❓"}
           </div>
           <h3 class="pet-name">${isUnlocked ? pet.name : "???"}</h3>
-          <p class="pet-species">${pet.species}</p>
-          <p class="pet-bio">${isUnlocked ? pet.bio : "Beat Adventure levels or open Mystery Eggs in the Shop to hatch this friend!"}</p>
+          <p class="pet-species">${pTxt.species}</p>
+          <p class="pet-bio">${isUnlocked ? pTxt.bio : t("petLockedBio")}</p>
         </div>
         <div style="width:100%;">
           ${
             isUnlocked
               ? `<button class="btn-3d ${isActive ? "btn-purple" : "btn-white"}" style="width:100%; padding:8px 12px; font-size:0.88rem;" ${isActive ? "disabled" : ""}>
-                  ${isActive ? "★ Active Companion" : "Pick as Companion"}
+                  ${isActive ? t("btnActiveCompanion") : t("btnPickCompanion")}
                 </button>`
-              : `<button class="btn-3d btn-white" style="width:100%; padding:8px 12px; font-size:0.84rem;" disabled>🔒 Locked</button>`
+              : `<button class="btn-3d btn-white" style="width:100%; padding:8px 12px; font-size:0.84rem;" disabled>${t("btnLocked")}</button>`
           }
         </div>
       `;
@@ -948,18 +953,21 @@
 
     state.shopRewards.forEach((item) => {
       const canAfford = state.gems >= item.cost;
+      const itemTxt = window.I18N
+        ? window.I18N.getShopItemText(item)
+        : { title: item.title, description: item.description };
       const card = document.createElement("div");
       card.className = "shop-item-card";
       card.innerHTML = `
         <div style="display:flex; gap:14px; align-items:flex-start;">
           <div class="shop-icon">${item.icon}</div>
           <div style="flex:1;">
-            <h3 style="margin:0 0 4px; font-size:1.08rem; font-weight:900;">${item.title}</h3>
-            <p style="margin:0; font-size:0.85rem; color:var(--text-muted); font-weight:700;">${item.description}</p>
+            <h3 style="margin:0 0 4px; font-size:1.08rem; font-weight:900;">${itemTxt.title}</h3>
+            <p style="margin:0; font-size:0.85rem; color:var(--text-muted); font-weight:700;">${itemTxt.description}</p>
           </div>
         </div>
         <button class="btn-3d ${canAfford ? "btn-blue" : "btn-white"}" style="width:100%;" ${canAfford ? "" : "disabled"}>
-          💎 Redeem for ${item.cost} Gems
+          ${t("btnRedeemFor", { cost: item.cost })}
         </button>
       `;
 
@@ -978,7 +986,7 @@
     if (state.coupons.length === 0) {
       couponList.innerHTML = `
         <div style="text-align:center; padding:18px; color:var(--text-muted); font-weight:700;">
-          No Golden Coupons redeemed yet! Earn Gems in Streak Runs and redeem them above.
+          ${t("noCouponsYet")}
         </div>
       `;
     } else {
@@ -990,15 +998,15 @@
             <span style="font-size:2rem;">${cp.icon}</span>
             <div>
               <div style="font-weight:900; font-size:1.05rem;">
-                ${cp.title} ${cp.used ? '<span style="color:#64748b; font-size:0.82rem;">(✓ Redeemed)</span>' : '<span style="color:#b45309; font-size:0.82rem;">(✨ Active Ticket)</span>'}
+                ${cp.title} ${cp.used ? `<span style="color:#64748b; font-size:0.82rem;">${t("couponRedeemedTag")}</span>` : `<span style="color:#b45309; font-size:0.82rem;">${t("couponActiveTag")}</span>`}
               </div>
               <div style="font-size:0.8rem; font-weight:700; color:var(--text-muted);">
-                Claimed by ${state.settings.playerName} on ${cp.dateStr}
+                ${t("couponClaimedBy", { name: state.settings.playerName, date: cp.dateStr })}
               </div>
             </div>
           </div>
           <button class="btn-3d ${cp.used ? "btn-white" : "btn-orange"}" style="padding:8px 14px; font-size:0.85rem;">
-            ${cp.used ? "Completed ✓" : "Mark Used (Parent)"}
+            ${cp.used ? t("btnCompleted") : t("btnMarkUsed")}
           </button>
         `;
 
@@ -1030,23 +1038,24 @@
         const won = lockedStickers[Math.floor(Math.random() * lockedStickers.length)];
         state.unlockedStickers.push(won.id);
         addStickerToLobby(won.id);
+        const stkName = window.I18N ? window.I18N.getStickerName(won) : won.name;
         popupContent.innerHTML = `
-          <h2 style="font-size:1.7rem; font-weight:900; margin:0 0 8px;">✨ Sticker Pack Opened!</h2>
+          <h2 style="font-size:1.7rem; font-weight:900; margin:0 0 8px;">${t("popupStickerOpenedTitle")}</h2>
           <div class="hatched-pet-box">
             <div style="font-size:4.2rem; margin:8px 0;">${won.emoji}</div>
-            <h3 style="margin:0; font-size:1.4rem; font-weight:900;">${won.name}</h3>
+            <h3 style="margin:0; font-size:1.4rem; font-weight:900;">${stkName}</h3>
             <p style="margin:6px 0 0; font-size:0.9rem; font-weight:700;">
-              Added straight to ${state.settings.playerName}'s Pet Lobby! Drag it anywhere you like!
+              ${t("popupStickerOpenedSub", { name: state.settings.playerName })}
             </p>
           </div>
-          <button class="btn-3d btn-green" id="btn-close-reward-popup" style="width:100%;">Awesome! 🎨</button>
+          <button class="btn-3d btn-green" id="btn-close-reward-popup" style="width:100%;">${t("popupStickerAwesomeBtn")}</button>
         `;
       } else {
         state.gems += 25;
         popupContent.innerHTML = `
-          <h2 style="font-size:1.6rem; font-weight:900;">🌟 All 24 Stickers Collected!</h2>
-          <p style="font-weight:700;">${state.settings.playerName} already owns every sticker! Here are your 25 Gems back!</p>
-          <button class="btn-3d btn-green" id="btn-close-reward-popup" style="width:100%;">Yay!</button>
+          <h2 style="font-size:1.6rem; font-weight:900;">${t("popupAllStickersTitle")}</h2>
+          <p style="font-weight:700;">${t("popupAllStickersSub", { name: state.settings.playerName })}</p>
+          <button class="btn-3d btn-green" id="btn-close-reward-popup" style="width:100%;">${t("popupYayBtn")}</button>
         `;
       }
     } else if (item.type === "egg") {
@@ -1056,27 +1065,32 @@
         const hatched = lockedPets[Math.floor(Math.random() * lockedPets.length)];
         state.unlockedPets.push(hatched.id);
         state.activePetId = hatched.id;
+        const pTxt = window.I18N ? window.I18N.getPetText(hatched) : { species: hatched.species, bio: hatched.bio };
+        const rarityLbl = window.I18N ? window.I18N.getRarityLabel(hatched.rarity) : hatched.rarity;
         popupContent.innerHTML = `
-          <h2 style="font-size:1.7rem; font-weight:900; margin:0 0 8px;">🥚 Mystery Egg Hatched!</h2>
+          <h2 style="font-size:1.7rem; font-weight:900; margin:0 0 8px;">${t("popupEggHatchedTitle")}</h2>
           <div class="hatched-pet-box">
-            <span class="rarity-badge rarity-${hatched.rarity}">${hatched.rarity}</span>
+            <span class="rarity-badge rarity-${hatched.rarity}">${rarityLbl}</span>
             <div style="font-size:4.2rem; margin:8px 0;">${hatched.emoji}</div>
             <h3 style="margin:0; font-size:1.4rem; font-weight:900;">${hatched.name}</h3>
-            <p style="margin:2px 0 8px; font-weight:800; color:var(--text-muted);">${hatched.species}</p>
-            <p style="margin:0; font-size:0.92rem; font-weight:700;">${hatched.bio}</p>
+            <p style="margin:2px 0 8px; font-weight:800; color:var(--text-muted);">${pTxt.species}</p>
+            <p style="margin:0; font-size:0.92rem; font-weight:700;">${pTxt.bio}</p>
           </div>
-          <button class="btn-3d btn-green" id="btn-close-reward-popup" style="width:100%;">Awesome! 🐾</button>
+          <button class="btn-3d btn-green" id="btn-close-reward-popup" style="width:100%;">${t("popupEggAwesomeBtn")}</button>
         `;
       } else {
         // All 24 pets already unlocked! Refund + bonus
         state.gems += 25;
         popupContent.innerHTML = `
-          <h2 style="font-size:1.6rem; font-weight:900;">🌟 All 24 Pets Collected!</h2>
-          <p style="font-weight:700;">${state.settings.playerName} has already unlocked every Magical Pet in the Sanctuary! Here are +25 Starlight Gems back!</p>
-          <button class="btn-3d btn-green" id="btn-close-reward-popup" style="width:100%;">Yay!</button>
+          <h2 style="font-size:1.6rem; font-weight:900;">${t("popupAllPetsTitle")}</h2>
+          <p style="font-weight:700;">${t("popupAllPetsSub", { name: state.settings.playerName })}</p>
+          <button class="btn-3d btn-green" id="btn-close-reward-popup" style="width:100%;">${t("popupYayBtn")}</button>
         `;
       }
     } else {
+      const itemTxt = window.I18N
+        ? window.I18N.getShopItemText(item)
+        : { title: item.title, description: item.description };
       const nowStr = new Date().toLocaleDateString(undefined, {
         month: "short",
         day: "numeric",
@@ -1085,7 +1099,7 @@
       });
       const coupon = {
         id: "cp_" + Date.now(),
-        title: item.title,
+        title: itemTxt.title,
         icon: item.icon,
         cost: item.cost,
         dateStr: nowStr,
@@ -1096,16 +1110,16 @@
       popupContent.innerHTML = `
         <div style="background:linear-gradient(135deg,#fffbeb,#fef3c7); border:3px solid #f59e0b; border-radius:22px; padding:20px; margin-bottom:16px;">
           <div style="font-size:0.85rem; font-weight:900; color:#b45309; text-transform:uppercase; letter-spacing:1px;">
-            ✨ Official Golden Reward Coupon ✨
+            ${t("popupCouponHeader")}
           </div>
           <div style="font-size:4rem; margin:10px 0;">${item.icon}</div>
-          <h2 style="margin:0 0 6px; font-size:1.5rem; font-weight:900; color:#78350f;">${item.title}</h2>
-          <p style="margin:0; font-weight:800; color:#92400e;">Earned by ${state.settings.playerName} • ${nowStr}</p>
+          <h2 style="margin:0 0 6px; font-size:1.5rem; font-weight:900; color:#78350f;">${itemTxt.title}</h2>
+          <p style="margin:0; font-weight:800; color:#92400e;">${t("popupCouponEarnedBy", { name: state.settings.playerName, date: nowStr })}</p>
         </div>
         <p style="font-weight:800; color:var(--text-muted); margin-bottom:16px;">
-          Show this Golden Coupon to Mum or Dad! It is saved in your Shop Coupon list.
+          ${t("popupCouponSub")}
         </p>
-        <button class="btn-3d btn-green" id="btn-close-reward-popup" style="width:100%;">🎉 Keep Golden Coupon</button>
+        <button class="btn-3d btn-green" id="btn-close-reward-popup" style="width:100%;">${t("popupKeepCouponBtn")}</button>
       `;
     }
 
@@ -1155,23 +1169,23 @@
     kpiGrid.innerHTML = `
       <div class="kpi-card">
         <div class="kpi-val" style="color:var(--duo-blue-dark);">${totalAttempts}</div>
-        <div class="kpi-label">Questions Answered</div>
+        <div class="kpi-label">${t("kpiQuestionsAnswered")}</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-val" style="color:var(--duo-green-dark);">${overallAcc}%</div>
-        <div class="kpi-label">Overall Accuracy</div>
+        <div class="kpi-label">${t("kpiOverallAccuracy")}</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-val" style="color:var(--duo-orange-dark);">${overallAvgSec}</div>
-        <div class="kpi-label">Avg Response Speed</div>
+        <div class="kpi-label">${t("kpiAvgSpeed")}</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-val" style="color:var(--duo-purple-dark);">${masteredFactsCount} / 144</div>
-        <div class="kpi-label">12×12 Facts Strong/Mastered</div>
+        <div class="kpi-label">${t("kpiFactsMastered")}</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-val" style="color:#e11d48;">🏆 ${totalRunsCompleted}</div>
-        <div class="kpi-label">Streaks Conquered</div>
+        <div class="kpi-label">${t("kpiStreaksConquered")}</div>
       </div>
     `;
 
@@ -1180,7 +1194,7 @@
     const trickyContainer = document.getElementById("tricky-facts-pills");
     trickyContainer.innerHTML = "";
     if (trickyList.length === 0) {
-      trickyContainer.innerHTML = `<span style="color:var(--text-muted); font-weight:700;">No tricky facts flagged yet—play a few rounds and any missed or slow facts will appear here automatically!</span>`;
+      trickyContainer.innerHTML = `<span style="color:var(--text-muted); font-weight:700;">${t("noTrickyYet")}</span>`;
     } else {
       trickyList.forEach((item) => {
         const pill = document.createElement("div");
@@ -1190,10 +1204,15 @@
         pill.style.color = "#9f1239";
         pill.innerHTML = `
           <span><strong>${item.a} × ${item.b} = ${item.a * item.b}</strong></span>
-          <span style="font-size:0.8rem; opacity:0.85;">(${item.accuracy}% acc • ${(item.avgMs / 1000).toFixed(1)}s • ${item.misses} miss)</span>
+          <span style="font-size:0.8rem; opacity:0.85;">${t("trickyPillStats", { acc: item.accuracy, sec: (item.avgMs / 1000).toFixed(1), misses: item.misses })}</span>
         `;
         trickyContainer.appendChild(pill);
       });
+    }
+
+    const detailBanner = document.getElementById("heatmap-fact-detail");
+    if (detailBanner && !detailBanner.querySelector("button")) {
+      detailBanner.textContent = t("heatmapTapHint");
     }
 
     // 3. Render 12x12 Interactive Mastery Heatmap
@@ -1233,16 +1252,16 @@
     // 4. Render Per-Table Progress (×1 to ×12)
     const perTableContainer = document.getElementById("per-table-progress-list");
     perTableContainer.innerHTML = "";
-    for (let t = 1; t <= 12; t++) {
+    for (let tbl = 1; tbl <= 12; tbl++) {
       let strongOrGold = 0;
       let tableAttempts = 0;
       let tableTimeMs = 0;
       let tableCorrect = 0;
 
       for (let b = 1; b <= 12; b++) {
-        const stStatus = evaluateTablePairMastery(t, b);
+        const stStatus = evaluateTablePairMastery(tbl, b);
         if (stStatus === "gold" || stStatus === "green") strongOrGold++;
-        const comb = getCombinedPairStats(t, b);
+        const comb = getCombinedPairStats(tbl, b);
         if (comb.attempts > 0) {
           tableAttempts += comb.attempts;
           tableTimeMs += comb.totalTimeMs;
@@ -1258,8 +1277,8 @@
       row.className = "table-stat-row";
       row.innerHTML = `
         <div class="table-stat-header">
-          <span>×${t} Times Table</span>
-          <span style="color:var(--text-muted);">${strongOrGold}/12 mastered • Acc: ${accPct} • Avg: ${avgSec}</span>
+          <span>${t("perTableRowTitle", { t: tbl })}</span>
+          <span style="color:var(--text-muted);">${t("perTableRowStats", { strong: strongOrGold, acc: accPct, avg: avgSec })}</span>
         </div>
         <div class="mini-bar-bg">
           <div class="mini-bar-fill" style="width:${pct}%;"></div>
@@ -1271,7 +1290,7 @@
     // 5. Render Recent Streak Runs History
     const runsContainer = document.getElementById("recent-runs-list");
     if (state.recentRuns.length === 0) {
-      runsContainer.innerHTML = `<p style="color:var(--text-muted); font-weight:700; margin:0;">No streak runs completed yet—start an Adventure level to see run logs here!</p>`;
+      runsContainer.innerHTML = `<p style="color:var(--text-muted); font-weight:700; margin:0;">${t("noRunsYet")}</p>`;
     } else {
       runsContainer.innerHTML = state.recentRuns
         .slice(0, 12)
@@ -1280,11 +1299,11 @@
           <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 14px; border-bottom:1px solid var(--border-light); font-weight:800; font-size:0.9rem; flex-wrap:wrap; gap:8px;">
             <div>
               <span>🏆 ${r.title}</span>
-              <span style="color:var(--text-muted); font-size:0.8rem; margin-left:6px;">(${r.streakLength} in a row • ${r.timerSeconds}s timer)</span>
+              <span style="color:var(--text-muted); font-size:0.8rem; margin-left:6px;">${t("runRowMeta", { streak: r.streakLength, timer: r.timerSeconds })}</span>
             </div>
             <div style="display:flex; gap:12px; color:var(--text-muted); font-size:0.84rem;">
-              <span>⚡ Avg: ${(r.avgMs / 1000).toFixed(2)}s</span>
-              <span>🔄 Resets: ${r.resets}</span>
+              <span>${t("runRowAvg", { sec: (r.avgMs / 1000).toFixed(2) })}</span>
+              <span>${t("runRowResets", { resets: r.resets })}</span>
               <span>${r.dateStr}</span>
             </div>
           </div>
@@ -1297,11 +1316,11 @@
   function showFactDetail(a, b) {
     const banner = document.getElementById("heatmap-fact-detail");
     const st = state.factStats[getFactKey(a, b)];
-    const btnLabel = a === b ? `Practice ×${a} Table` : `Practice ×${a} &amp; ×${b}`;
+    const btnLabel = a === b ? t("btnPracticeSingleTable", { a }) : t("btnPracticeTwoTables", { a, b });
     if (!st || st.attempts === 0) {
       banner.innerHTML = `
         <div>
-          <strong>${a} × ${b} = ${a * b}</strong> — Not practiced yet!
+          <strong>${a} × ${b} = ${a * b}</strong> ${t("factNotPracticedYet")}
         </div>
         <button class="btn-3d btn-blue" style="padding:7px 14px; font-size:0.85rem;" id="btn-drill-this-fact">
           ${btnLabel}
@@ -1313,10 +1332,18 @@
       const bestSec = st.bestTimeMs ? (st.bestTimeMs / 1000).toFixed(2) + "s" : "—";
       banner.innerHTML = `
         <div>
-          <strong>${a} × ${b} = ${a * b}</strong> •
-          Seen <strong>${st.attempts}</strong> times •
-          Accuracy: <strong>${acc}%</strong> (${st.correct}✓, ${st.wrong}✗, ${st.timeouts}⏱️) •
-          Avg Speed: <strong>${avgSec}s</strong> (Fastest: ${bestSec})
+          ${t("factDetailStats", {
+            a,
+            b,
+            prod: a * b,
+            attempts: st.attempts,
+            acc,
+            correct: st.correct,
+            wrong: st.wrong,
+            timeouts: st.timeouts,
+            avg: avgSec,
+            best: bestSec
+          })}
         </div>
         <button class="btn-3d btn-blue" style="padding:7px 14px; font-size:0.85rem;" id="btn-drill-this-fact">
           ${btnLabel}
@@ -1332,7 +1359,7 @@
         startGameSession({
           mode: "custom",
           nodeId: null,
-          title: `Focused Drill (×${tables.join(", ×")})`,
+          title: t("focusedDrillSessionTitle", { tables: tables.join(", ×") }),
           tables,
           timerSeconds: Number(state.settings.defaultTimerSeconds),
           streakLength: Number(state.settings.defaultStreakLength),
@@ -1573,7 +1600,7 @@
       if (step === 2 && !session.redemptionStage1Done) {
         session.redemptionStage1Done = true;
         return applyQuestionStyle(
-          { a: rf.a, b: rf.b, badge: "🔄 Spaced Review (1/3)", badgeClass: "" },
+          { a: rf.a, b: rf.b, badge: t("badgeSpaced1"), badgeClass: "" },
           session
         );
       }
@@ -1581,14 +1608,14 @@
         session.redemptionStage2Done = true;
         // Commutative Twin (b × a)
         return applyQuestionStyle(
-          { a: rf.b, b: rf.a, badge: `🪞 Commutative Twin (${rf.b}×${rf.a} = ${rf.a}×${rf.b})`, badgeClass: "" },
+          { a: rf.b, b: rf.a, badge: t("badgeTwin", { a: rf.a, b: rf.b }), badgeClass: "" },
           session
         );
       }
       if (step === finalStep && !session.redemptionStage3Done) {
         session.redemptionStage3Done = true;
         return applyQuestionStyle(
-          { a: rf.a, b: rf.b, badge: "👑 Final Redemption Boss Fact!", badgeClass: "badge-boss" },
+          { a: rf.a, b: rf.b, badge: t("badgeBoss"), badgeClass: "badge-boss" },
           session
         );
       }
@@ -1599,21 +1626,21 @@
       const nextRetry = session.retryQueue.shift();
       session.questionsSinceLastRetry = 0;
       return applyQuestionStyle(
-        { a: nextRetry.a, b: nextRetry.b, badge: "🔄 Tricky Fact Review", badgeClass: "" },
+        { a: nextRetry.a, b: nextRetry.b, badge: t("badgeRetry"), badgeClass: "" },
         session
       );
     }
 
     // 3. 18% Interleaved Anchor Review when practicing single tables (prevents rote +N counting)
     if (session.tables.length === 1 && step >= 2 && Math.random() < 0.18) {
-      const anchors = [2, 5, 10].filter((t) => !session.tables.includes(t));
+      const anchors = [2, 5, 10].filter((tbl) => !session.tables.includes(tbl));
       const anchorT = anchors[Math.floor(Math.random() * anchors.length)];
       const targetT = session.tables[0];
       return applyQuestionStyle(
         {
           a: anchorT,
           b: targetT,
-          badge: "⚓ Anchor Fact Link",
+          badge: t("badgeAnchor"),
           badgeClass: ""
         },
         session
@@ -1695,8 +1722,11 @@
       streak: currentSession.streakLength
     });
 
-    document.getElementById("game-mode-footer").textContent =
-      `${currentSession.title} • ⏱️ ${currentSession.timerSeconds}s Timer • Goal: ${currentSession.streakLength} in a row`;
+    document.getElementById("game-mode-footer").textContent = t("gameModeFooter", {
+      title: currentSession.title,
+      timer: currentSession.timerSeconds,
+      streak: currentSession.streakLength
+    });
 
     updateStreakBarUI(false);
     dealNextQuestion();
@@ -2072,11 +2102,13 @@
     };
 
     document.getElementById("victory-title").textContent =
-      currentSession.resets === 0 ? `Flawless Streak, ${state.settings.playerName}! 🎉` : `Streak Complete! 🎉`;
+      currentSession.resets === 0
+        ? t("victoryFlawlessTitle", { name: state.settings.playerName })
+        : t("victoryCompleteTitle");
     document.getElementById("victory-subtitle").textContent =
       currentSession.resets === 0
-        ? `${currentSession.streakLength} in a row with ZERO resets!`
-        : `${state.settings.playerName} conquered all ${currentSession.streakLength} in a row!`;
+        ? t("victoryFlawlessSub", { streak: currentSession.streakLength })
+        : t("victoryCompleteSub", { name: state.settings.playerName, streak: currentSession.streakLength });
 
     document.getElementById("chest-unopened-view").style.display = "block";
     document.getElementById("chest-opened-view").style.display = "none";
@@ -2119,15 +2151,18 @@
     }
 
     if (unlockedPetObj) {
+      const pTxt = window.I18N
+        ? window.I18N.getPetText(unlockedPetObj)
+        : { species: unlockedPetObj.species, bio: unlockedPetObj.bio };
       petContainer.style.display = "block";
       petContainer.innerHTML = `
         <div class="hatched-pet-box">
           <div style="font-size:0.8rem; font-weight:900; color:#6b21a8; text-transform:uppercase;">
-            🐾 New Magical Pet Unlocked!
+            ${t("victoryNewPetHeader")}
           </div>
           <div style="font-size:3.8rem; margin:6px 0;">${unlockedPetObj.emoji}</div>
-          <h3 style="margin:0; font-size:1.3rem; font-weight:900;">${unlockedPetObj.name} (${unlockedPetObj.species})</h3>
-          <p style="margin:4px 0 0; font-size:0.88rem; font-weight:700;">${unlockedPetObj.bio}</p>
+          <h3 style="margin:0; font-size:1.3rem; font-weight:900;">${unlockedPetObj.name} (${pTxt.species})</h3>
+          <p style="margin:4px 0 0; font-size:0.88rem; font-weight:700;">${pTxt.bio}</p>
         </div>
       `;
     }
@@ -2146,15 +2181,16 @@
         const wonStk = lockedStickers[Math.floor(Math.random() * lockedStickers.length)];
         state.unlockedStickers.push(wonStk.id);
         addStickerToLobby(wonStk.id);
+        const stkName = window.I18N ? window.I18N.getStickerName(wonStk) : wonStk.name;
         stickerContainer.style.display = "block";
         stickerContainer.innerHTML = `
           <div style="background:#f0fdf4; border:2px solid #86efac; border-radius:16px; padding:10px 14px; margin-top:10px;">
             <div style="font-size:0.76rem; font-weight:900; color:#15803d; text-transform:uppercase;">
-              🎨 Bonus Lobby Sticker Won!
+              ${t("victoryNewStickerHeader")}
             </div>
             <div style="font-size:2.4rem; margin:4px 0;">${wonStk.emoji}</div>
-            <div style="font-size:1rem; font-weight:900;">${wonStk.name}</div>
-            <div style="font-size:0.78rem; font-weight:700; color:var(--text-muted);">Placed in your Pet Lobby!</div>
+            <div style="font-size:1rem; font-weight:900;">${stkName}</div>
+            <div style="font-size:0.78rem; font-weight:700; color:var(--text-muted);">${t("victoryPlacedInLobby")}</div>
           </div>
         `;
       }
@@ -2180,7 +2216,7 @@
     saveState();
     renderHUD();
 
-    document.getElementById("victory-gems-earned").textContent = `+${totalGemsEarned} Gems`;
+    document.getElementById("victory-gems-earned").textContent = t("victoryGemsEarned", { gems: totalGemsEarned });
     document.getElementById("victory-avg-speed").textContent = `${(avgMs / 1000).toFixed(2)}s`;
 
     document.getElementById("chest-unopened-view").style.display = "none";
@@ -2238,12 +2274,15 @@
     container.innerHTML = "";
     state.shopRewards.forEach((r, idx) => {
       if (r.type === "egg" || r.type === "sticker_pack") return; // keep Mystery Egg & Sticker Pack permanent
+      const itemTxt = window.I18N
+        ? window.I18N.getShopItemText(r)
+        : { title: r.title, description: r.description };
       const row = document.createElement("div");
       row.style.cssText =
         "display:flex; justify-content:space-between; align-items:center; padding:6px 10px; background:var(--bg-main); border-radius:10px; margin-bottom:6px; font-weight:800; font-size:0.88rem;";
       row.innerHTML = `
-        <span>${r.icon} ${r.title} (💎 ${r.cost})</span>
-        <button class="btn-3d btn-white" style="padding:4px 10px; font-size:0.78rem;" data-del="${idx}">Remove</button>
+        <span>${r.icon} ${itemTxt.title} (💎 ${r.cost})</span>
+        <button class="btn-3d btn-white" style="padding:4px 10px; font-size:0.78rem;" data-del="${idx}">${t("btnRemoveReward")}</button>
       `;
       row.querySelector("button").addEventListener("click", () => {
         state.shopRewards.splice(idx, 1);
@@ -2372,17 +2411,18 @@
     const feedbackEl = document.getElementById("cloud-magic-feedback");
     const btn = document.getElementById("btn-send-magic-link");
     const email = emailInput.value.trim();
+    const isSv = window.CURRENT_LANG === "sv";
 
     feedbackEl.style.display = "block";
-    feedbackEl.textContent = "⏳ Sending free Magic Login Link...";
+    feedbackEl.textContent = isSv ? "⏳ Skickar gratis magisk inloggningslänk..." : "⏳ Sending free Magic Login Link...";
     btn.disabled = true;
 
     try {
       await window.CLOUD_SYNC.sendMagicLink(email);
       window.soundFX.correct(2);
-      feedbackEl.innerHTML =
-        `✅ <strong>Magic Link sent to ${email}!</strong><br/>` +
-        `Open the email on this device (or forward/AirDrop the link to Jemima's iPad) and tap it to permanently link the device.`;
+      feedbackEl.innerHTML = isSv
+        ? `✅ <strong>Magisk länk skickad till ${email}!</strong><br/>Öppna mejlet på den här enheten (eller vidarebefordra/AirDroppa länken till ${state.settings.playerName}s iPad) och tryck på den för att koppla enheten permanent.`
+        : `✅ <strong>Magic Link sent to ${email}!</strong><br/>Open the email on this device (or forward/AirDrop the link to ${state.settings.playerName}'s iPad) and tap it to permanently link the device.`;
     } catch (err) {
       feedbackEl.textContent = `⚠️ ${err.message}`;
     } finally {
@@ -2398,7 +2438,7 @@
       window.soundFX.chestOpen();
     } catch (err) {
       feedbackEl.style.display = "block";
-      feedbackEl.textContent = `⚠️ Google Sign-In error: ${err.message}`;
+      feedbackEl.textContent = `⚠️ Google Sign-In: ${err.message}`;
     }
   });
 
@@ -2409,19 +2449,23 @@
     }
     const fb = document.getElementById("cloud-signedin-feedback");
     fb.style.display = "block";
-    fb.textContent = "✅ Synced latest progress to your cloud account!";
+    fb.textContent =
+      window.CURRENT_LANG === "sv"
+        ? "✅ Senaste framstegen har synkats till molnkontot!"
+        : "✅ Synced latest progress to your cloud account!";
   });
 
   document.getElementById("btn-copy-device-setup-link").addEventListener("click", async () => {
     const user = window.CLOUD_SYNC ? window.CLOUD_SYNC.getCurrentUser() : null;
     const fb = document.getElementById("cloud-signedin-feedback");
+    const isSv = window.CURRENT_LANG === "sv";
     fb.style.display = "block";
     if (user && user.email) {
       try {
         await window.CLOUD_SYNC.sendMagicLink(user.email);
-        fb.innerHTML =
-          `✉️ <strong>Sent a fresh Magic Link to ${user.email}!</strong><br/>` +
-          `Open your email on the other device (or AirDrop the link from your email to Jemima's iPad) to link it permanently!`;
+        fb.innerHTML = isSv
+          ? `✉️ <strong>Ny magisk länk skickad till ${user.email}!</strong><br/>Öppna mejlet på den andra enheten (eller AirDroppa länken till ${state.settings.playerName}s iPad) för att koppla den permanent!`
+          : `✉️ <strong>Sent a fresh Magic Link to ${user.email}!</strong><br/>Open your email on the other device (or AirDrop the link from your email to ${state.settings.playerName}'s iPad) to link it permanently!`;
       } catch (err) {
         fb.textContent = `⚠️ ${err.message}`;
       }
