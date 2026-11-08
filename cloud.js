@@ -81,12 +81,25 @@
   }
 
   function getEffectiveFirebaseConfig() {
+    const fixDbUrl = (c) => {
+      if (!c) return c;
+      if (c.projectId === "jemima-pet-academy") {
+        c.databaseURL = "https://jemima-pet-academy-default-rtdb.europe-west1.firebasedatabase.app";
+      } else if (!c.databaseURL) {
+        c.databaseURL = `https://${c.projectId}-default-rtdb.firebaseio.com`;
+      }
+      if (!c.authDomain) {
+        c.authDomain = `${c.projectId}.firebaseapp.com`;
+      }
+      return c;
+    };
+
     // 1. Check URL param `?fb_cfg=` (allows 1-tap sharing of project config across devices)
     try {
       const params = new URLSearchParams(window.location.search);
       const fbParam = params.get("fb_cfg");
       if (fbParam) {
-        const decoded = JSON.parse(atob(fbParam));
+        const decoded = fixDbUrl(JSON.parse(atob(fbParam)));
         if (decoded && decoded.apiKey && decoded.projectId) {
           localStorage.setItem(CFG_STORAGE_KEY, JSON.stringify(decoded));
         }
@@ -97,17 +110,14 @@
 
     // 2. Check firebase-config.js global
     if (window.FIREBASE_CONFIG && window.FIREBASE_CONFIG.apiKey && window.FIREBASE_CONFIG.projectId) {
-      const c = { ...window.FIREBASE_CONFIG };
-      if (!c.authDomain) c.authDomain = `${c.projectId}.firebaseapp.com`;
-      if (!c.databaseURL) c.databaseURL = `https://${c.projectId}-default-rtdb.firebaseio.com`;
-      return c;
+      return fixDbUrl({ ...window.FIREBASE_CONFIG });
     }
 
     // 3. Check localStorage saved config
     try {
       const saved = localStorage.getItem(CFG_STORAGE_KEY);
       if (saved) {
-        const parsed = JSON.parse(saved);
+        const parsed = fixDbUrl(JSON.parse(saved));
         if (parsed && parsed.apiKey && parsed.projectId) return parsed;
       }
     } catch (e) {
@@ -354,43 +364,40 @@
     }
   }
 
-  let unsubscribeSnapshot = null;
   let lastKnownCloudTs = 0;
   let initialSnapshotHandled = false;
   let pushDebounceTimer = null;
 
+  function detachRealtimeListener() {
+    if (userStateRef) {
+      try {
+        userStateRef.off();
+      } catch (_) {}
+      userStateRef = null;
+    }
+  }
+
   function attachRealtimeListener(user) {
     if (!db || !user) return;
-    if (unsubscribeSnapshot) {
-      unsubscribeSnapshot();
-      unsubscribeSnapshot = null;
-    }
+    detachRealtimeListener();
     initialSnapshotHandled = false;
 
-    userStateRef = db.collection("users").doc(user.uid);
-    const deviceRef = userStateRef.collection("devices").doc(getOrCreateDeviceId());
+    userStateRef = db.ref(`users/${user.uid}/state`);
+    const deviceRef = db.ref(`users/${user.uid}/devices/${getOrCreateDeviceId()}`);
 
     // Register this device under the parent's account
     deviceRef
-      .set(
-        {
-          deviceId: getOrCreateDeviceId(),
-          label: getDeviceLabel(),
-          lastSeen: Date.now()
-        },
-        { merge: true }
-      )
+      .set({
+        deviceId: getOrCreateDeviceId(),
+        label: getDeviceLabel(),
+        lastSeen: Date.now()
+      })
       .catch(() => {});
 
-    unsubscribeSnapshot = userStateRef.onSnapshot(
-      (docSnap) => {
-        // Ignore local echo events from our own pending writes so we never re-render in a loop
-        if (docSnap.metadata && docSnap.metadata.hasPendingWrites) {
-          return;
-        }
-
-        const docData = docSnap.exists ? docSnap.data() : null;
-        const remoteState = docData && docData.state ? docData.state : null;
+    userStateRef.on(
+      "value",
+      (snapshot) => {
+        const remoteState = snapshot.val();
         const localState = getLocalStateCallback ? getLocalStateCallback() : null;
 
         if (!remoteState && localState) {
@@ -404,10 +411,10 @@
         }
 
         if (remoteState && localState) {
-          const remoteTs = Number(remoteState.updatedAt || docData.updatedAt || 0);
+          const remoteTs = Number(remoteState.updatedAt || 0);
           const localTs = Number(localState.updatedAt || 0);
 
-          // If we already processed this exact cloud timestamp after initial load, skip re-rendering
+          // Skip local echo or already-applied snapshots so we never re-render in a loop
           if (initialSnapshotHandled && remoteTs > 0 && remoteTs <= lastKnownCloudTs) {
             syncStatus = "synced";
             statusMessage = `Synced live with ${user.email || "Parent Account"}`;
@@ -431,17 +438,7 @@
             const syncTs = Date.now();
             lastKnownCloudTs = syncTs;
             merged.updatedAt = syncTs;
-            userStateRef
-              .set(
-                {
-                  state: merged,
-                  updatedAt: syncTs,
-                  email: user.email || "",
-                  lastModifiedByDevice: getOrCreateDeviceId()
-                },
-                { merge: true }
-              )
-              .catch(() => {});
+            userStateRef.set(merged).catch(() => {});
           }
         }
 
@@ -450,7 +447,7 @@
         updateCloudUI();
       },
       (err) => {
-        console.warn("Firestore listener error:", err);
+        console.warn("Realtime Database listener error:", err);
         syncStatus = "error";
         statusMessage = `Cloud sync notice: ${err.message}`;
         updateCloudUI();
@@ -477,15 +474,7 @@
       };
 
       userStateRef
-        .set(
-          {
-            state: stateWithTs,
-            updatedAt: nowTs,
-            email: currentUser.email || "",
-            lastModifiedByDevice: getOrCreateDeviceId()
-          },
-          { merge: true }
-        )
+        .set(stateWithTs)
         .then(() => {
           syncStatus = "synced";
           statusMessage = `Synced live with ${currentUser.email || "Parent Account"}`;
@@ -521,7 +510,7 @@
           ? window.firebase.app()
           : window.firebase.initializeApp(cfg);
         auth = window.firebase.auth();
-        db = window.firebase.firestore();
+        db = window.firebase.database();
 
         // Persist auth indefinitely in localStorage/IndexedDB without expiry
         auth.setPersistence(window.firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
@@ -534,11 +523,7 @@
             updateCloudUI();
             attachRealtimeListener(user);
           } else {
-            if (unsubscribeSnapshot) {
-              unsubscribeSnapshot();
-              unsubscribeSnapshot = null;
-            }
-            userStateRef = null;
+            detachRealtimeListener();
             syncStatus = "local";
             statusMessage = "Ready to sign in with Parent Magic Link (Optional)";
             updateCloudUI();
@@ -594,11 +579,7 @@
   }
 
   async function signOutCloud() {
-    if (unsubscribeSnapshot) {
-      unsubscribeSnapshot();
-      unsubscribeSnapshot = null;
-    }
-    userStateRef = null;
+    detachRealtimeListener();
     if (auth) {
       await auth.signOut();
     }
