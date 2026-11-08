@@ -1602,11 +1602,17 @@
   }
 
   function applyQuestionStyle(rawQ, session) {
+    if (rawQ.isEndRetry) {
+      return {
+        ...rawQ,
+        questionType: "standard"
+      };
+    }
     const style = session.questionStyle || state.settings.questionStyle || "mix";
     let qType = "standard";
     if (style === "mystery") {
       qType = Math.random() < 0.5 ? "mystery_b" : "mystery_a";
-    } else if (style === "mix" && session.currentStreak >= 1 && Math.random() < 0.25) {
+    } else if (style === "mix" && session.currentStreak >= 1 && Math.random() < 0.22) {
       qType = Math.random() < 0.65 ? "mystery_b" : "mystery_a";
     }
     return {
@@ -1619,6 +1625,25 @@
     const step = session.currentStreak;
     const midStep = Math.max(3, Math.floor(session.streakLength / 2));
     const finalStep = session.streakLength - 1;
+
+    // 0. END-OF-RUN RETRY QUEUE: Missed standard facts are retried at the end of the run!
+    if (
+      session.endRetryQueue &&
+      session.endRetryQueue.length > 0 &&
+      step >= session.streakLength - session.endRetryQueue.length
+    ) {
+      const retryItem = session.endRetryQueue.shift();
+      const fKey = `${retryItem.a}x${retryItem.b}`;
+      const tryNum = Math.min(3, (session.factMisses[fKey] || 1) + 1);
+      return {
+        a: retryItem.a,
+        b: retryItem.b,
+        isEndRetry: true,
+        questionType: "standard",
+        badge: t("badgeEndRetry", { tryNum }),
+        badgeClass: "badge-boss"
+      };
+    }
 
     // 1. EXPANDING SPACED RETRIEVAL SCHEDULE (Step 2 -> Midpoint Twin -> Final Boss Question!)
     if (session.redemptionFact) {
@@ -1718,6 +1743,10 @@
       questionStyle: config.questionStyle || state.settings.questionStyle || "mix",
       currentStreak: 0,
       resets: 0,
+      endRetryQueue: [],
+      factMisses: {},
+      bonusGems: 0,
+      lastMissWasReset: false,
       redemptionFact: null,
       redemptionStage1Done: false,
       redemptionStage2Done: false,
@@ -1809,7 +1838,7 @@
     strategyBox.style.display = "none";
     visualArray.style.display = "none";
 
-    // Render badge if Spaced Review, Commutative Twin, Boss Fact, or Mystery Factor
+    // Render badge if End-of-Run Retry, Spaced Review, Commutative Twin, Boss Fact, or Bonus Mystery Factor
     const badgeEl = document.getElementById("game-question-badge");
     if (q.badge) {
       badgeEl.textContent = q.badge;
@@ -1905,10 +1934,18 @@
     window.soundFX.tap();
     const bubble = document.getElementById("stage-speech-bubble");
     bubble.className = "speech-bubble";
-    bubble.textContent = t("gameFreshStartBubble", {
-      name: state.settings.playerName,
-      streak: currentSession.streakLength
-    });
+    if (currentSession.lastMissWasReset) {
+      bubble.textContent = t("gameFreshStartBubble", {
+        name: state.settings.playerName,
+        streak: currentSession.streakLength
+      });
+    } else {
+      bubble.textContent = t("gameKeepGoingBubble", {
+        name: state.settings.playerName,
+        current: currentSession.currentStreak,
+        streak: currentSession.streakLength
+      });
+    }
     dealNextQuestion();
   }
 
@@ -1930,13 +1967,17 @@
 
     const elapsedMs = performance.now() - currentSession.questionStartTime;
     const { a, b } = currentSession.currentQuestion;
+    const isBonusMystery =
+      currentSession.currentQuestion.questionType === "mystery_a" ||
+      currentSession.currentQuestion.questionType === "mystery_b";
     const expectedAns = currentSession.expectedAnswer;
-    const fullProduct = a * b;
     const selectedVal = choiceIdx >= 0 ? currentSession.currentChoices[choiceIdx] : null;
     const isCorrect = !isTimeout && selectedVal === expectedAns;
 
-    // Record metrics for this fact
-    recordFactOutcome(a, b, isCorrect, isTimeout, elapsedMs);
+    // Record metrics for this fact (Bonus Mystery misses do NOT count as fails!)
+    if (isCorrect || !isBonusMystery) {
+      recordFactOutcome(a, b, isCorrect, isTimeout, elapsedMs);
+    }
 
     const card = document.getElementById("game-problem-card");
     const bubble = document.getElementById("stage-speech-bubble");
@@ -1952,14 +1993,30 @@
       });
 
       currentSession.currentStreak += 1;
+      // Ensure queued End-of-Run retries are always completed before reaching streakLength
+      if (
+        currentSession.endRetryQueue &&
+        currentSession.endRetryQueue.length > 0 &&
+        currentSession.currentStreak >= currentSession.streakLength
+      ) {
+        currentSession.currentStreak = Math.max(
+          0,
+          currentSession.streakLength - currentSession.endRetryQueue.length
+        );
+      }
+
+      if (isBonusMystery) {
+        currentSession.bonusGems = (currentSession.bonusGems || 0) + 3;
+      }
+
       currentSession.streakResponseTimesMs.push(elapsedMs);
       window.soundFX.correct(currentSession.currentStreak);
 
       card.classList.add("correct-flash");
       document.getElementById("game-equation").textContent = formatSolvedEquation(currentSession.currentQuestion);
-      document.getElementById("game-sub-hint").textContent = t("gameCorrectSpeed", {
-        sec: (elapsedMs / 1000).toFixed(2)
-      });
+      document.getElementById("game-sub-hint").textContent = isBonusMystery
+        ? t("gameBonusCorrectSpeed", { sec: (elapsedMs / 1000).toFixed(2) })
+        : t("gameCorrectSpeed", { sec: (elapsedMs / 1000).toFixed(2) });
 
       const quote = window.I18N
         ? window.I18N.getCheerQuote(pet, currentSession.currentStreak)
@@ -1969,7 +2026,10 @@
 
       updateStreakBarUI(false);
 
-      if (currentSession.currentStreak >= currentSession.streakLength) {
+      if (
+        currentSession.currentStreak >= currentSession.streakLength &&
+        (!currentSession.endRetryQueue || currentSession.endRetryQueue.length === 0)
+      ) {
         nextQuestionTimeoutId = setTimeout(() => {
           triggerStreakVictory();
         }, 380);
@@ -1978,38 +2038,23 @@
           dealNextQuestion();
         }, 340);
       }
-    } else {
-      // WRONG OR TIME OUT -> Active Error Encoding + Strategy Coach + Visual Dot Array + Spaced Schedule!
-      window.soundFX.reset();
-      currentSession.resets += 1;
-      currentSession.currentStreak = 0;
-      currentSession.streakResponseTimesMs = [];
-
-      // Set Expanding Spaced Retrieval schedule (Step 2 -> Midpoint Twin -> Final Boss #10)
-      if (currentSession.redemptionFact) {
-        const prevRf = currentSession.redemptionFact;
-        const alreadyQueued = currentSession.retryQueue.some((q) => q.a === prevRf.a && q.b === prevRf.b);
-        if (!alreadyQueued) currentSession.retryQueue.push(prevRf);
-      }
-      currentSession.redemptionFact = { a, b };
-      currentSession.redemptionStage1Done = false;
-      currentSession.redemptionStage2Done = false;
-      currentSession.redemptionStage3Done = false;
+    } else if (isBonusMystery) {
+      // BONUS MYSTERY QUESTION MISS -> Fails are NOT counted, no streak penalty, no retry queue!
+      window.soundFX.tap();
+      currentSession.lastMissWasReset = false;
 
       const solvedEq = formatSolvedEquation(currentSession.currentQuestion);
       card.classList.add("wrong-shake");
       document.getElementById("game-equation").textContent = solvedEq;
 
-      // Show Derived Fact Strategy / Rhyme
       const strategyBox = document.getElementById("game-strategy-box");
       strategyBox.textContent = getPedagogicalStrategy(a, b);
       strategyBox.style.display = "block";
 
-      // Show CRA Visual Anchor Dot Array
       const visualArray = document.getElementById("game-visual-array");
       renderVisualDotArray(a, b, visualArray);
 
-      updateStreakBarUI(true);
+      updateStreakBarUI(false);
 
       const useTapToContinue = state.settings.requireTapOnMiss !== false;
       const buttons = document.querySelectorAll("#game-choices-grid .choice-btn");
@@ -2026,12 +2071,13 @@
           }
         });
 
-        document.getElementById("game-sub-hint").textContent = t("gameTapGreenHint", { ans: expectedAns });
-
-        bubble.className = "speech-bubble reset-bubble";
-        bubble.textContent = isTimeout
-          ? t("gameTimeoutBubbleTap", { name: state.settings.playerName, eq: solvedEq, ans: expectedAns })
-          : t("gameWrongBubbleTap", { name: state.settings.playerName, eq: solvedEq, ans: expectedAns });
+        document.getElementById("game-sub-hint").textContent = t("gameBonusMissSubHint", { ans: expectedAns });
+        bubble.className = "speech-bubble";
+        bubble.textContent = t("gameBonusMissBubbleTap", {
+          name: state.settings.playerName,
+          eq: solvedEq,
+          ans: expectedAns
+        });
       } else {
         buttons.forEach((btn, idx) => {
           btn.disabled = true;
@@ -2042,22 +2088,163 @@
           }
         });
 
-        document.getElementById("game-sub-hint").textContent = isTimeout
-          ? t("gameTimeoutSubAuto", { eq: solvedEq })
-          : t("gameWrongSubAuto", { eq: solvedEq });
-
-        bubble.className = "speech-bubble reset-bubble";
-        bubble.textContent = isTimeout
-          ? t("gameTimeoutBubbleAuto", { name: state.settings.playerName, eq: solvedEq })
-          : t("gameWrongBubbleAuto", { name: state.settings.playerName, eq: solvedEq });
+        document.getElementById("game-sub-hint").textContent = t("gameBonusMissSubHint", { ans: expectedAns });
+        bubble.className = "speech-bubble";
+        bubble.textContent = t("gameBonusMissBubbleAuto", {
+          name: state.settings.playerName,
+          eq: solvedEq
+        });
 
         autoResetTimeoutId = setTimeout(() => {
           if (!currentSession) return;
           bubble.className = "speech-bubble";
-          bubble.textContent = t("gameFreshStartBubble", {
+          bubble.textContent = t("gameKeepGoingBubble", {
             name: state.settings.playerName,
+            current: currentSession.currentStreak,
             streak: currentSession.streakLength
           });
+          dealNextQuestion();
+        }, Number(state.settings.teachingPauseMs) || 1700);
+      }
+    } else {
+      // STANDARD QUESTION MISS -> 1st or 2nd miss adds to End-of-Run Retry Queue; 3rd miss on SAME fact fails the run!
+      const fKey = `${a}x${b}`;
+      currentSession.factMisses[fKey] = (currentSession.factMisses[fKey] || 0) + 1;
+      const missCount = currentSession.factMisses[fKey];
+      const isThirdStrike = missCount >= 3;
+
+      window.soundFX.reset();
+
+      const solvedEq = formatSolvedEquation(currentSession.currentQuestion);
+      card.classList.add("wrong-shake");
+      document.getElementById("game-equation").textContent = solvedEq;
+
+      // Show Derived Fact Strategy / Rhyme
+      const strategyBox = document.getElementById("game-strategy-box");
+      strategyBox.textContent = getPedagogicalStrategy(a, b);
+      strategyBox.style.display = "block";
+
+      // Show CRA Visual Anchor Dot Array
+      const visualArray = document.getElementById("game-visual-array");
+      renderVisualDotArray(a, b, visualArray);
+
+      if (isThirdStrike) {
+        // 3rd failure on the SAME fact fails & resets the run
+        currentSession.lastMissWasReset = true;
+        currentSession.resets += 1;
+        currentSession.currentStreak = 0;
+        currentSession.endRetryQueue = [];
+        currentSession.factMisses = {};
+        currentSession.streakResponseTimesMs = [];
+
+        if (currentSession.redemptionFact) {
+          const prevRf = currentSession.redemptionFact;
+          const alreadyQueued = currentSession.retryQueue.some((q) => q.a === prevRf.a && q.b === prevRf.b);
+          if (!alreadyQueued) currentSession.retryQueue.push(prevRf);
+        }
+        currentSession.redemptionFact = { a, b };
+        currentSession.redemptionStage1Done = false;
+        currentSession.redemptionStage2Done = false;
+        currentSession.redemptionStage3Done = false;
+
+        updateStreakBarUI(true);
+      } else {
+        // 1st or 2nd miss on this fact -> Add to End of Run to retry!
+        currentSession.lastMissWasReset = false;
+        const alreadyInEndQueue = currentSession.endRetryQueue.some(
+          (item) => item.a === a && item.b === b
+        );
+        if (!alreadyInEndQueue) {
+          currentSession.endRetryQueue.push({ a, b, factKey: fKey, isEndRetry: true });
+        }
+        // Ensure room at the end of the progress bar for all queued end-of-run retries
+        currentSession.currentStreak = Math.min(
+          currentSession.currentStreak,
+          Math.max(0, currentSession.streakLength - currentSession.endRetryQueue.length)
+        );
+        updateStreakBarUI(false);
+      }
+
+      const useTapToContinue = state.settings.requireTapOnMiss !== false;
+      const buttons = document.querySelectorAll("#game-choices-grid .choice-btn");
+
+      if (useTapToContinue) {
+        currentSession.waitingForMissTap = true;
+        buttons.forEach((btn, idx) => {
+          if (currentSession.currentChoices[idx] === expectedAns) {
+            btn.disabled = false;
+            btn.classList.add("choice-correct", "tap-to-continue");
+          } else {
+            btn.disabled = true;
+            if (idx === choiceIdx) btn.classList.add("choice-wrong");
+          }
+        });
+
+        if (isThirdStrike) {
+          document.getElementById("game-sub-hint").textContent = t("gameTapGreenHint", { ans: expectedAns });
+          bubble.className = "speech-bubble reset-bubble";
+          bubble.textContent = isTimeout
+            ? t("gameTimeoutBubbleTap", { name: state.settings.playerName, eq: solvedEq, ans: expectedAns })
+            : t("gameWrongBubbleTap", { name: state.settings.playerName, eq: solvedEq, ans: expectedAns });
+        } else {
+          document.getElementById("game-sub-hint").textContent = t("gameRetryLaterSubHint", {
+            ans: expectedAns,
+            missCount
+          });
+          bubble.className = "speech-bubble";
+          bubble.textContent = t("gameRetryLaterBubbleTap", {
+            name: state.settings.playerName,
+            eq: solvedEq,
+            ans: expectedAns,
+            triesLeft: 3 - missCount
+          });
+        }
+      } else {
+        buttons.forEach((btn, idx) => {
+          btn.disabled = true;
+          if (currentSession.currentChoices[idx] === expectedAns) {
+            btn.classList.add("choice-correct");
+          } else if (idx === choiceIdx) {
+            btn.classList.add("choice-wrong");
+          }
+        });
+
+        if (isThirdStrike) {
+          document.getElementById("game-sub-hint").textContent = isTimeout
+            ? t("gameTimeoutSubAuto", { eq: solvedEq })
+            : t("gameWrongSubAuto", { eq: solvedEq });
+          bubble.className = "speech-bubble reset-bubble";
+          bubble.textContent = isTimeout
+            ? t("gameTimeoutBubbleAuto", { name: state.settings.playerName, eq: solvedEq })
+            : t("gameWrongBubbleAuto", { name: state.settings.playerName, eq: solvedEq });
+        } else {
+          document.getElementById("game-sub-hint").textContent = t("gameRetryLaterSubHint", {
+            ans: expectedAns,
+            missCount
+          });
+          bubble.className = "speech-bubble";
+          bubble.textContent = t("gameRetryLaterBubbleAuto", {
+            name: state.settings.playerName,
+            eq: solvedEq,
+            triesLeft: 3 - missCount
+          });
+        }
+
+        autoResetTimeoutId = setTimeout(() => {
+          if (!currentSession) return;
+          bubble.className = "speech-bubble";
+          if (isThirdStrike) {
+            bubble.textContent = t("gameFreshStartBubble", {
+              name: state.settings.playerName,
+              streak: currentSession.streakLength
+            });
+          } else {
+            bubble.textContent = t("gameKeepGoingBubble", {
+              name: state.settings.playerName,
+              current: currentSession.currentStreak,
+              streak: currentSession.streakLength
+            });
+          }
           dealNextQuestion();
         }, Number(state.settings.teachingPauseMs) || 1700);
       }
@@ -2118,7 +2305,10 @@
       window.GAME_DATA.timerModes.find((m) => m.seconds === currentSession.timerSeconds) ||
       window.GAME_DATA.timerModes[0];
     const zeroResetBonus = currentSession.resets === 0 ? 10 : 0;
-    const totalGemsEarned = Math.round(currentSession.baseGems * timerMode.gemMultiplier) + zeroResetBonus;
+    const totalGemsEarned =
+      Math.round(currentSession.baseGems * timerMode.gemMultiplier) +
+      zeroResetBonus +
+      (currentSession.bonusGems || 0);
 
     currentSession.chestOpened = false;
     currentSession.computedReward = {
