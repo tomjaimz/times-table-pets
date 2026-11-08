@@ -67,24 +67,67 @@
     return merged;
   }
 
+  // ---------------------------------------------------------
+  // MULTI-CHILD PROFILES: root = { profiles: {id: childState}, order: [ids], deleted: {id: ts}, updatedAt }
+  // `state` always points at the active child's state, so the rest of the game is unchanged.
+  // The active child is remembered per device (not synced).
+  // ---------------------------------------------------------
+  const ROOT_KEY = "jemima_pet_academy_profiles_v2";
+  const ACTIVE_KEY = "jemima_active_profile_v1";
+  const LEGACY_PROFILE_ID = "p1";
+
+  let root = null;
+  let activeProfileId = LEGACY_PROFILE_ID;
   let state = loadState();
+
+  function newProfileId() {
+    return "p" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+  }
+
+  function normalizeRoot(raw) {
+    const out = { profiles: {}, order: [], deleted: {}, updatedAt: Number(raw && raw.updatedAt) || 0 };
+    if (raw && raw.profiles && typeof raw.profiles === "object") {
+      out.deleted = raw.deleted && typeof raw.deleted === "object" ? { ...raw.deleted } : {};
+      Object.entries(raw.profiles).forEach(([id, st]) => {
+        if (!out.deleted[id]) out.profiles[id] = normalizeState(st);
+      });
+      const order = Array.isArray(raw.order) ? raw.order : [];
+      out.order = [...order.filter((id) => out.profiles[id]), ...Object.keys(out.profiles).filter((id) => !order.includes(id))];
+    } else if (raw && typeof raw === "object") {
+      // Legacy single-child state
+      out.profiles[LEGACY_PROFILE_ID] = normalizeState(raw);
+      out.order = [LEGACY_PROFILE_ID];
+    }
+    if (out.order.length === 0) {
+      out.profiles[LEGACY_PROFILE_ID] = createDefaultState();
+      out.order = [LEGACY_PROFILE_ID];
+    }
+    return out;
+  }
 
   function loadState() {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return createDefaultState();
-      return normalizeState(JSON.parse(raw));
+      let rawRoot = localStorage.getItem(ROOT_KEY);
+      if (!rawRoot) rawRoot = localStorage.getItem(STORAGE_KEY); // migrate old single-child save
+      root = normalizeRoot(rawRoot ? JSON.parse(rawRoot) : null);
     } catch (e) {
-      return createDefaultState();
+      root = normalizeRoot(null);
     }
+    const saved = localStorage.getItem(ACTIVE_KEY);
+    activeProfileId = root.profiles[saved] ? saved : root.order[0];
+    return root.profiles[activeProfileId];
   }
 
   function saveState(skipCloud = false) {
     try {
-      state.updatedAt = Date.now();
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      const now = Date.now();
+      state.updatedAt = now;
+      root.profiles[activeProfileId] = state;
+      root.updatedAt = now;
+      localStorage.setItem(ROOT_KEY, JSON.stringify(root));
+      localStorage.setItem(ACTIVE_KEY, activeProfileId);
       if (!skipCloud && window.CLOUD_SYNC) {
-        window.CLOUD_SYNC.pushState(state);
+        window.CLOUD_SYNC.pushState(root);
       }
     } catch (e) {
       console.warn("Could not save state to localStorage:", e);
@@ -313,6 +356,8 @@
     document.getElementById("hud-academy-title").textContent = t("academyTitle", {
       name: state.settings.playerName
     });
+    const profBtn = document.getElementById("hud-profile-btn");
+    if (profBtn) profBtn.textContent = `👤 ${state.settings.playerName}`;
     document.getElementById("hud-daily-streak").textContent = state.dailyStreak.count;
     document.getElementById("hud-gems").textContent = state.gems;
     document.getElementById("hud-sound-btn").textContent = state.settings.soundEnabled ? "🔊" : "🔇";
@@ -2687,7 +2732,7 @@
   document.getElementById("btn-cloud-force-sync").addEventListener("click", () => {
     window.soundFX.tap();
     if (window.CLOUD_SYNC) {
-      window.CLOUD_SYNC.pushState(state);
+      window.CLOUD_SYNC.pushState(root);
     }
     const fb = document.getElementById("cloud-signedin-feedback");
     fb.style.display = "block";
@@ -2802,9 +2847,11 @@
 
   if (window.CLOUD_SYNC) {
     window.CLOUD_SYNC.init({
-      getLocalState: () => state,
-      onRemoteStateMerge: (mergedState) => {
-        state = normalizeState(mergedState);
+      getLocalState: () => root,
+      onRemoteStateMerge: (mergedRoot) => {
+        root = normalizeRoot(mergedRoot);
+        if (!root.profiles[activeProfileId]) activeProfileId = root.order[0];
+        state = root.profiles[activeProfileId];
         state.onboardingCompleted = true;
         customStreakLen = state.settings.defaultStreakLength || 10;
         customTimerSec = state.settings.defaultTimerSeconds || 3;
@@ -2817,5 +2864,166 @@
         document.getElementById("onboarding-modal").classList.remove("active");
       }
     });
+  }
+
+  // =========================================================
+  // MULTIPLE CHILDREN: PROFILE PICKER
+  // =========================================================
+  const profileModal = document.getElementById("profile-modal");
+  let profileManageMode = false;
+
+  function checkParentPin() {
+    const pin = String((state.settings && state.settings.parentPin) || "1212");
+    const entered = window.prompt(t("profilePinPrompt"));
+    if (entered === null) return false;
+    if (entered.trim() === pin) return true;
+    window.alert(t("profilePinWrong"));
+    return false;
+  }
+
+  function renderProfileButton() {
+    const btn = document.getElementById("hud-profile-btn");
+    if (btn) btn.textContent = `👤 ${state.settings.playerName}`;
+  }
+
+  function renderProfilePicker() {
+    const grid = document.getElementById("profile-grid");
+    grid.innerHTML = "";
+    root.order.forEach((id) => {
+      const st = root.profiles[id];
+      if (!st) return;
+      const petDef = (window.GAME_DATA.pets || []).find((p) => p.id === st.activePetId) || window.GAME_DATA.pets[0];
+      const card = document.createElement("div");
+      card.className = `profile-card ${id === activeProfileId ? "active" : ""}`;
+      card.innerHTML = `
+        <span class="profile-avatar">${petDef.emoji}</span>
+        <span class="profile-name"></span>
+        <span class="profile-meta">💎 ${st.gems} • 🐾 ${st.unlockedPets.length}</span>
+        ${
+          profileManageMode
+            ? `<div class="profile-tools"><button data-act="rename" title="Rename">✏️</button><button data-act="delete" title="Remove">🗑️</button></div>`
+            : ""
+        }
+      `;
+      card.querySelector(".profile-name").textContent = st.settings.playerName;
+      card.addEventListener("click", (e) => {
+        const act = e.target && e.target.dataset ? e.target.dataset.act : null;
+        if (act === "rename") {
+          e.stopPropagation();
+          const nn = window.prompt(t("profileRenamePrompt"), st.settings.playerName);
+          if (nn && nn.trim()) {
+            st.settings.playerName = nn.trim().slice(0, 20);
+            st.updatedAt = Date.now();
+            saveState();
+            renderHUD();
+            renderProfilePicker();
+          }
+          return;
+        }
+        if (act === "delete") {
+          e.stopPropagation();
+          if (root.order.length <= 1) {
+            window.alert(t("profileCannotDeleteLast"));
+            return;
+          }
+          if (!window.confirm(t("profileDeleteConfirm", { name: st.settings.playerName }))) return;
+          delete root.profiles[id];
+          root.order = root.order.filter((x) => x !== id);
+          root.deleted[id] = Date.now();
+          if (id === activeProfileId) {
+            switchProfile(root.order[0], true);
+          } else {
+            saveState();
+          }
+          renderProfilePicker();
+          return;
+        }
+        if (id !== activeProfileId) switchProfile(id);
+        else closeProfilePicker();
+      });
+      grid.appendChild(card);
+    });
+  }
+
+  function switchProfile(id, skipSaveCurrent = false) {
+    if (!root.profiles[id] || currentSession) return;
+    if (!skipSaveCurrent) saveState();
+    activeProfileId = id;
+    state = root.profiles[id];
+    localStorage.setItem(ACTIVE_KEY, id);
+    window.CURRENT_LANG = state.settings.language || "en";
+    customStreakLen = state.settings.defaultStreakLength || 10;
+    customTimerSec = state.settings.defaultTimerSeconds || 3;
+    customQuestionStyle = state.settings.questionStyle || "mix";
+    selectedPlacedStickerId = null;
+    checkDailyStreak();
+    window.soundFX.correct(3);
+    renderHUD();
+    refreshActiveTabUI();
+    closeProfilePicker();
+  }
+
+  function openProfilePicker() {
+    if (currentSession) return;
+    window.soundFX.tap();
+    profileManageMode = false;
+    document.getElementById("profile-add-row").style.display = "none";
+    renderProfilePicker();
+    profileModal.classList.add("active");
+  }
+
+  function closeProfilePicker() {
+    profileModal.classList.remove("active");
+  }
+
+  function addChildProfile(name) {
+    const fresh = createDefaultState();
+    fresh.settings.playerName = name.trim().slice(0, 20);
+    fresh.settings.language = state.settings.language;
+    fresh.settings.parentPin = state.settings.parentPin;
+    fresh.shopRewards = JSON.parse(JSON.stringify(state.shopRewards));
+    fresh.onboardingCompleted = true;
+    const id = newProfileId();
+    root.profiles[id] = fresh;
+    root.order.push(id);
+    saveState();
+    switchProfile(id);
+  }
+
+  document.getElementById("hud-profile-btn").addEventListener("click", openProfilePicker);
+  document.getElementById("btn-close-profile").addEventListener("click", closeProfilePicker);
+
+  document.getElementById("btn-profile-manage").addEventListener("click", () => {
+    window.soundFX.tap();
+    if (!profileManageMode && !checkParentPin()) return;
+    profileManageMode = !profileManageMode;
+    renderProfilePicker();
+  });
+
+  document.getElementById("btn-profile-add").addEventListener("click", () => {
+    window.soundFX.tap();
+    const row = document.getElementById("profile-add-row");
+    if (row.style.display === "none") {
+      if (!checkParentPin()) return;
+      row.style.display = "flex";
+      document.getElementById("profile-input-new-name").focus();
+    } else {
+      row.style.display = "none";
+    }
+  });
+
+  document.getElementById("btn-profile-add-confirm").addEventListener("click", () => {
+    const input = document.getElementById("profile-input-new-name");
+    const name = input.value.trim();
+    if (!name) return;
+    input.value = "";
+    document.getElementById("profile-add-row").style.display = "none";
+    addChildProfile(name);
+  });
+
+  // With more than one child, ask who is playing at startup
+  renderProfileButton();
+  if (root.order.length > 1 && !window.location.search.includes("magic_email=")) {
+    openProfilePicker();
   }
 })();

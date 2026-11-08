@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=7" />
+  <link rel="stylesheet" href="styles.css?v=8" />
 </head>
 <body>
   <!-- Confetti Canvas -->
@@ -35,6 +35,7 @@
         <span>💎</span>
         <span id="hud-gems">50</span>
       </div>
+      <button class="icon-btn lang-toggle-btn" id="hud-profile-btn" title="Switch child">👤 Jemima</button>
       <button class="icon-btn lang-toggle-btn" id="hud-lang-btn" title="Switch Language (English / Svenska)">🇬🇧 EN</button>
       <button class="icon-btn" id="hud-cloud-btn" title="Cloud Sync &amp; Parent Magic Link">☁️</button>
       <button class="icon-btn" id="hud-sound-btn" title="Toggle Sound">🔊</button>
@@ -783,15 +784,42 @@
     </div>
   </div>
 
+  <!-- =========================================================
+       CHILD PROFILE PICKER (one parent, many children)
+       ========================================================= -->
+  <div class="modal-backdrop" id="profile-modal">
+    <div class="modal-card" style="max-width:520px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <h2 style="margin:0; font-weight:900;" id="profile-modal-title">👨‍👩‍👧 Who is playing?</h2>
+        <button class="icon-btn" id="btn-close-profile">✕</button>
+      </div>
+      <div class="profile-grid" id="profile-grid"></div>
+      <div class="profile-add-row" id="profile-add-row" style="display:none;">
+        <input type="text" class="form-input" id="profile-input-new-name" maxlength="20" placeholder="Name" />
+        <button class="btn-3d btn-green" id="btn-profile-add-confirm" style="padding:8px 14px;">➕</button>
+      </div>
+      <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:12px;">
+        <button class="btn-3d btn-blue" id="btn-profile-add" style="padding:8px 14px; font-size:0.9rem;">➕ Add child</button>
+        <button class="btn-3d btn-white" id="btn-profile-manage" style="padding:8px 14px; font-size:0.9rem;">⚙️ Manage</button>
+      </div>
+      <details class="parent-info-box" style="margin-top:12px;">
+        <summary id="profile-parent-info-sum">ℹ️ For Parents: Multiple children</summary>
+        <div class="parent-info-body" id="profile-parent-info-body">
+          Each child has their own gems, pets, stickers, stats and coupons. With cloud sync on, every child is saved to the same parent account and appears on all linked devices. Adding, renaming or removing a child asks for the parent PIN.
+        </div>
+      </details>
+    </div>
+  </div>
+
   <!-- Firebase Official SDK (Compat for Static Zero-Build Hosting) -->
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
-  <script src="firebase-config.js?v=7"></script>
-  <script src="cloud.js?v=7"></script>
-  <script src="data.js?v=7"></script>
-  <script src="i18n.js?v=7"></script>
-  <script src="sound.js?v=7"></script>
-  <script src="app.js?v=7"></script>
+  <script src="firebase-config.js?v=8"></script>
+  <script src="cloud.js?v=8"></script>
+  <script src="data.js?v=8"></script>
+  <script src="i18n.js?v=8"></script>
+  <script src="sound.js?v=8"></script>
+  <script src="app.js?v=8"></script>
 </body>
 </html>

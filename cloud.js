@@ -126,8 +126,48 @@
     return null;
   }
 
-  // Smartly merge two states so progress, pets, stars, and fact stats are never lost
+  // Merge two parent accounts (each holding several children). A legacy flat single-child
+  // state is treated as the child "p1" so older cloud data upgrades seamlessly.
+  function toRoot(s) {
+    if (!s || typeof s !== "object") return null;
+    if (s.profiles && typeof s.profiles === "object") return s;
+    return { profiles: { p1: s }, order: ["p1"], deleted: {}, updatedAt: Number(s.updatedAt) || 0 };
+  }
+
   function mergeGameStates(local, remote) {
+    const l = toRoot(local);
+    const r = toRoot(remote);
+    if (!r) return l;
+    if (!l) return r;
+
+    const deleted = { ...(r.deleted || {}), ...(l.deleted || {}) };
+    const profiles = {};
+    const ids = new Set([...Object.keys(l.profiles || {}), ...Object.keys(r.profiles || {})]);
+    ids.forEach((id) => {
+      if (deleted[id]) return;
+      const a = (l.profiles || {})[id];
+      const b = (r.profiles || {})[id];
+      profiles[id] = a && b ? mergeProfileStates(a, b) : a || b;
+    });
+
+    const order = [];
+    [...(l.order || []), ...(r.order || [])].forEach((id) => {
+      if (profiles[id] && !order.includes(id)) order.push(id);
+    });
+    Object.keys(profiles).forEach((id) => {
+      if (!order.includes(id)) order.push(id);
+    });
+
+    return {
+      profiles,
+      order,
+      deleted,
+      updatedAt: Math.max(Number(l.updatedAt) || 0, Number(r.updatedAt) || 0)
+    };
+  }
+
+  // Smartly merge two states so progress, pets, stars, and fact stats are never lost
+  function mergeProfileStates(local, remote) {
     if (!remote || typeof remote !== "object") return local;
     if (!local || typeof local !== "object") return remote;
 

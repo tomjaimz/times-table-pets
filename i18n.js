@@ -217,6 +217,19 @@
         "<strong>Bonus Mystery Factor Question:</strong> Missing a bonus question has zero penalty and is not counted as a fail.",
 
       // Victory Modal (Kid-Minimal)
+      profileModalTitle: "👨‍👩‍👧 Who is playing?",
+      profileAddBtn: "➕ Add child",
+      profileManageBtn: "⚙️ Manage",
+      profileNamePlaceholder: "Name",
+      profileInfoSum: "ℹ️ For Parents: Multiple children",
+      profileInfoBody:
+        "Each child has their own gems, pets, stickers, stats and coupons. With cloud sync on, every child is saved to the same parent account and appears on all linked devices. Adding, renaming or removing a child asks for the parent PIN.",
+      profilePinPrompt: "Parent PIN?",
+      profilePinWrong: "Wrong PIN",
+      profileRenamePrompt: "New name:",
+      profileCannotDeleteLast: "At least one child is needed.",
+      profileDeleteConfirm: "Remove {name} and all their progress? This cannot be undone.",
+
       victoryFlawlessTitle: "🎉 You Did It, {name}!",
       victoryCompleteTitle: "🎉 You Did It!",
       victoryFlawlessSub: "⭐ {streak} / {streak}!",
@@ -479,6 +492,19 @@
         "<strong>Bonusfråga (Hemlig faktor):</strong> Missar på bonusfrågor räknas inte som fel och påverkar inte sviten.",
 
       // Victory Modal (Kid-Minimal)
+      profileModalTitle: "👨‍👩‍👧 Vem spelar?",
+      profileAddBtn: "➕ Lägg till barn",
+      profileManageBtn: "⚙️ Hantera",
+      profileNamePlaceholder: "Namn",
+      profileInfoSum: "ℹ️ För föräldrar: Flera barn",
+      profileInfoBody:
+        "Varje barn har egna ädelstenar, husdjur, klistermärken, statistik och kuponger. Med molnsynk sparas alla barn på samma föräldrakonto och syns på alla kopplade enheter. Att lägga till, byta namn på eller ta bort ett barn kräver föräldrakoden.",
+      profilePinPrompt: "Föräldrakod?",
+      profilePinWrong: "Fel kod",
+      profileRenamePrompt: "Nytt namn:",
+      profileCannotDeleteLast: "Minst ett barn behövs.",
+      profileDeleteConfirm: "Ta bort {name} och alla framsteg? Det går inte att ångra.",
+
       victoryFlawlessTitle: "🎉 Du klarade det, {name}!",
       victoryCompleteTitle: "🎉 Du klarade det!",
       victoryFlawlessSub: "⭐ {streak} / {streak}!",
@@ -904,6 +930,15 @@
     setTxt("parent-info-stats-sum", t("parentInfoStatsSum"));
     setHtml("parent-info-stats-body", t("parentInfoStatsBody", { name: playerName }));
     setTxt("game-parent-info-sum", t("gameParentInfoSum"));
+
+    // Profile picker
+    setTxt("profile-modal-title", t("profileModalTitle"));
+    setTxt("btn-profile-add", t("profileAddBtn"));
+    setTxt("btn-profile-manage", t("profileManageBtn"));
+    setTxt("profile-parent-info-sum", t("profileInfoSum"));
+    setTxt("profile-parent-info-body", t("profileInfoBody"));
+    const profNameInput = document.getElementById("profile-input-new-name");
+    if (profNameInput) profNameInput.placeholder = t("profileNamePlaceholder");
 
     // Welcome Modal
     setTxt("onboarding-title-text", t("welcomeTitle"));

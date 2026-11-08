@@ -2405,3 +2405,74 @@ html, body {
   font-weight: 900;
   color: #78350f;
 }
+
+/* =========================================================
+   CHILD PROFILE PICKER
+   ========================================================= */
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 12px;
+}
+
+.profile-card {
+  position: relative;
+  background: #fff;
+  border: 3px solid var(--border-light);
+  border-bottom-width: 6px;
+  border-radius: 20px;
+  padding: 14px 8px 10px;
+  text-align: center;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 900;
+  color: var(--text-main);
+  transition: transform 0.1s;
+}
+
+.profile-card:active { transform: translateY(2px); }
+.profile-card.active { border-color: var(--duo-green); background: #f4fce8; }
+
+.profile-card .profile-avatar {
+  font-size: 2.6rem;
+  line-height: 1.1;
+  display: block;
+}
+
+.profile-card .profile-name {
+  display: block;
+  margin-top: 4px;
+  font-size: 1.05rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-card .profile-meta {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: 800;
+}
+
+.profile-card .profile-tools {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.profile-card .profile-tools button {
+  border: 2px solid var(--border-light);
+  background: #f8fafc;
+  border-radius: 10px;
+  padding: 3px 9px;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.profile-add-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
