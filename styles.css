@@ -168,7 +168,6 @@ html, body {
 
 .icon-btn:active {
   transform: translateY(2px);
-  border-bottom-width: 2px;
 }
 
 /* Main App Container */
@@ -243,8 +242,7 @@ html, body {
 }
 
 .btn-3d:active:not(:disabled) {
-  transform: translateY(3px);
-  border-bottom-width: 2px;
+  transform: translateY(2px);
 }
 
 .btn-3d:disabled {
@@ -440,8 +438,8 @@ html, body {
   transform: translateX(12px);
 }
 
-.path-node-card:active {
-  transform: scale(0.98);
+.path-node-card:hover {
+  border-color: var(--duo-blue);
 }
 
 .path-node-card.completed {

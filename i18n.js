@@ -456,70 +456,71 @@
     }
   };
 
-  // Swedish translations for Worlds & Nodes
+  // Swedish translations for Worlds & Nodes (matching exact IDs in data.js)
   const SV_WORLDS = {
-    world_1: {
-      name: "🌱 Värld 1: Soliga Ängen",
-      subtitle: "Grundtabellerna — 1:ans, 2:ans, 5:ans & 10:ans tabell"
+    woods: {
+      name: "🌱 Värld 1: Viskande Skogen",
+      subtitle: "Bygg en oslagbar rytm med 1:ans, 2:ans, 5:ans och 10:ans tabell!"
     },
-    world_2: {
-      name: "🌊 Värld 2: Kristallagunen",
-      subtitle: "Bygg fart — 3:ans, 4:ans & 11:ans tabell"
+    caves: {
+      name: "💎 Värld 2: Kristallgrottorna",
+      subtitle: "Lys upp de glittrande grottorna med 3:ans, 4:ans och 6:ans tabell!"
     },
-    world_3: {
+    clouds: {
       name: "☁️ Värld 3: Molnriket",
-      subtitle: "Kluriga höjder — 6:ans, 7:ans, 8:ans & 9:ans tabell"
+      subtitle: "Sväva högt bland molnen med de kluriga 7:ans, 8:ans och 9:ans tabeller!"
     },
-    world_4: {
-      name: "🔮 Värld 4: Stjärncitadellet",
-      subtitle: "Mästarnivå — 12:ans tabell & Stora Mästarprovet"
+    summit: {
+      name: "🏔️ Värld 4: Stjärntoppen",
+      subtitle: "Nå bergstoppen med 11:ans och 12:ans tabell & Stora Mästarkronan!"
     }
   };
 
   const SV_NODES = {
-    w1_n1: { title: "1× & 2× Groddstigen", desc: "Dubbla upp och värm upp tassarna!" },
-    w1_n2: { title: "5× Klöverhoppet", desc: "Räkna med 5:or över blomsterängen!" },
-    w1_n3: { title: "10× Solskensspurten", desc: "Superkraft med tiotal i blixtfart!" },
-    w1_boss: { title: "👑 Ängens Boss (1, 2, 5, 10)", desc: "10 i rad på alla fyra grundtabellerna!" },
-    w2_n1: { title: "3× Koralltrippeln", desc: "Trippelhopp genom det glittrande revet!" },
-    w2_n2: { title: "4× Delfindubbeln", desc: "Dubbla dubbeln för att bemästra 4:orna!" },
-    w2_n3: { title: "11× Spegelvågor", desc: "Tvillingtal längs hela vägen till 11×12!" },
-    w2_boss: { title: "👑 Lagunens Boss (3, 4, 11)", desc: "Besegra lagunens alla tabeller i en svit!" },
-    w3_n1: { title: "6× Regnbågstrappan", desc: "Bygg från 5:ans tabell för att klara 6:orna!" },
-    w3_n2: { title: "9× Magiska Nior", desc: "Siffrorna blir alltid 9 tillsammans!" },
-    w3_n3: { title: "7× & 8× Himlavalvet", desc: "5, 6, 7, 8 -> 56 = 7 × 8! Du fixar det!" },
-    w3_boss: { title: "👑 Molnrikets Boss (6, 7, 8, 9)", desc: "Ultimat fokus på de klurigaste tabellerna!" },
-    w4_n1: { title: "12× Stjärndussinet", desc: "10 gånger + 2 gånger = 12:ans magi!" },
-    w4_n2: { title: "🔥 Kluriga Eliten (6, 7, 8, 9, 12)", desc: "De svåraste multiplikationerna i ett eldprov!" },
-    w4_boss: { title: "🏆 Akademins Stormästare (1–12)", desc: "Alla tabeller 1 till 12! Den ultimata kronan!" }
+    lvl_1: { title: "1× & 2× Groddstigen", desc: "Dubbla upp! Värm upp fingrarna med 1:or och 2:or." },
+    lvl_2: { title: "5× High-Five-Ängen", desc: "Räkna med 5:or hela vägen upp till 60!" },
+    lvl_3: { title: "10× Stjärnbäcken", desc: "Supersnabba tiotal! Lägg till en nolla med stil." },
+    lvl_4: { title: "Skogens Boss: 1, 2, 5, 10", desc: "Blanda alla fyra skogstabellerna i en svit!" },
+    lvl_5: { title: "3× Magiska Trianglar", desc: "Bemästra rytmen i 3:ans tabell upp till 3 × 12!" },
+    lvl_6: { title: "4× Kvartsgrottan", desc: "Dubbel-dubbel! Erövra 4:ans multiplikationstabell." },
+    lvl_7: { title: "6× Safirbron", desc: "Kliv över de lysande kristallerna med 6:ans tabell!" },
+    lvl_8: { title: "Grottans Boss: 3, 4 & 6 Mix", desc: "Kan du besegra Kristallgrottans väktare i rad?" },
+    lvl_9: { title: "9× Fingerkneps-himlen", desc: "Siffrorna blir alltid 9 tillsammans! Flyg genom 9:orna." },
+    lvl_10: { title: "7× Regnbågscitadellet", desc: "Tämj den berömda 7:ans multiplikationstabell!" },
+    lvl_11: { title: "8× Åskmolnet", desc: "Kraftfull fart från 8 × 1 hela vägen till 8 × 12!" },
+    lvl_12: { title: "Molnens Boss: 7, 8 & 9 Mix", desc: "Erövra Molnrikets klurigaste trio!" },
+    lvl_13: { title: "11× Tvillingstjärnans Topp", desc: "Tvillingsiffror upp till 99, plus 110, 121 och 132!" },
+    lvl_14: { title: "12× Drakryggen", desc: "Bemästra de mäktiga 12:orna upp till 12 × 12 = 144!" },
+    lvl_15: { title: "Kluriga Höjdmixen (6–12)", desc: "Alla de stora tabellerna tillsammans i en episk klättring!" },
+    lvl_16: { title: "Stora 12×12 Mästarkronan", desc: "Alla tabeller från 1 till 12! Visa att du är Stormästare!" }
   };
 
-  // Swedish translations for Pet Species & Bios
+  // Swedish translations for all 24 Pet Species & Bios in data.js
   const SV_PETS = {
-    pet_owl: { species: "Stjärnuggla", bio: "Älskar sena mattestunder och hoar glatt vid varje snabb svit!" },
-    pet_bunny: { species: "Klöverkanin", bio: "Skuttar genom 2:ans och 5:ans tabell snabbare än vinden!" },
-    pet_fox: { species: "Solstråleräv", bio: "Smart och kvick — kan alla genvägar i 10:ans tabell!" },
-    pet_corgi: { species: "Kunglig Ängscorgi", bio: "Viftar på svansen varje gång du klarar en svit utan missar!" },
-    pet_otter: { species: "Korallutter", bio: "Flyter på rygg och jonglerar glänsande snäckor i 3-grupper." },
-    pet_dolphin: { species: "Spegeldelfin", bio: "Gör dubbla volter över vågorna med perfekt precision!" },
-    pet_seahorse: { species: "Glittersjöhäst", bio: "Glittrar i takt med 11:ans tvillingtal i korallrevet." },
-    pet_turtle: { species: "Smaragdsköldpadda", bio: "Lugn i sinnet men blixtsnabb på huvudräkning!" },
-    pet_redpanda: { species: "Molnpanda", bio: "Klättrar på regnbågar och älskar knepet med 5 plus 1!" },
+    pet_owl: { species: "Snöuggla", bio: "Älskar sena mattestunder och hejar glatt från trädtopparna!" },
+    pet_fox: { species: "Stjärnräv", bio: "Snabb som blixten! Lunas svans glittrar starkare vid varje snabbt svar." },
+    pet_axolotl: { species: "Bubbel-axolotl", bio: "Flyter glatt i kristallbäckar och blåser rosa magiska bubblor när du tar poäng!" },
+    pet_redpanda: { species: "Bambu-rödpanda", bio: "Dansar en glad tassdans varje gång en skattkista öppnas!" },
+    pet_hedgehog: { species: "Kristalligelkott", bio: "Hans taggar är gjorda av ametistkristaller som klingar som små klockor!" },
+    pet_penguin: { species: "Frostpingvin", bio: "Glider på magen över isiga multiplikationer i 3-sekunders blixtfart!" },
+    pet_seadragon: { species: "Bladsjödrake", bio: "Glider genom safirlagunens grottor och samlar lysande visdomspärlor." },
     pet_unicorn: { species: "Molnenhörning", bio: "Galopperar över regnbågsbroar och lämnar stjärnstoft efter sig." },
-    pet_koala: { species: "Molnbärskoala", bio: "Sover på fluffiga moln och vaknar direkt för 9:ans tabell!" },
+    pet_koala: { species: "Hjortronkoala", bio: "Vilar på fluffiga moln och vaknar blixtsnabbt för 9:ans tabell!" },
     pet_snowleopard: { species: "Frostsnöleopard", bio: "Hoppar från bergstopp till bergstopp på under 3 sekunder!" },
-    pet_griffin: { species: "Guldvingad Grip", bio: "Hälften örn, hälften lejon — Molnrikets trogna väktare." },
+    pet_griffin: { species: "Guldvingad Grip", bio: "Hälften örn, hälften lejon — 100% trogen väktare av Molnriket." },
     pet_kitsune: { species: "Niosvansad Galaxräv", bio: "Fick en lysande svans för varje klurig tabell som bemästrades!" },
     pet_narwhal: { species: "Stjärnnarval", bio: "Simmar genom norrskenet och pekar ut rätt svar med sitt horn." },
-    pet_dragon: { species: "Rubindrake", bio: "Vaktar 12×12-skatten och sprutar ofarlig regnbågskonfetti!" },
-    pet_phoenix: { species: "Solfenix", bio: "Reser sig ur varje omstart ännu starkare och snabbare än förut!" },
-    pet_pegasus: { species: "Kometpegasus", bio: "Flyger i överljudsfart genom alla tabeller från 1 till 12!" },
-    pet_kitty: { species: "Nebulosakatt", bio: "Spinner så högt att hela Stjärncitadellet vibrerar av glädje!" },
-    pet_penguin: { species: "Glaciärpingvin", bio: "Glider på magen rakt in i mål när skattkistan öppnas!" },
-    pet_hedgehog: { species: "Stjärnigelkott", bio: "Rullar ihop sig till en gyllene komet vid varje rätt svar!" },
-    pet_axolotl: { species: "Kristallaxolotl", bio: "Ler hela dagen i den magiska lagunen och älskar tvillingtal!" },
-    pet_peacock: { species: "Prisma-påfågel", bio: "Slår ut 144 skimrande fjädrar — en för varje tal i 12×12-kartan!" },
-    pet_hamster: { species: "Turbokindad Hamster", bio: "Springer i ett gyllene hjul som drivs av snabba multiplikationssviter!" }
+    pet_dragon: { species: "Rubindrake", bio: "Vaktar 12×12-skatten av ädelstenar och sprutar regnbågskonfetti!" },
+    pet_phoenix: { species: "Solstrålefenix", bio: "Även om sviten börjar om på noll reser sig Solara starkare varje gång!" },
+    pet_celestial_cat: { species: "Stjärnkronans Kattunge", bio: "Bär Stora 12×12-mästarkronan och spinner som ett äkta mattegeni." },
+    pet_bunny: { species: "Sammetskanin", bio: "Kläckt ur ett mystiskt ägg! Hoppar i glada cirklar när du slår timern." },
+    pet_otter: { species: "Pärlutter", bio: "Har alltid sin favorit-lyckosten för multiplikation i fickan!" },
+    pet_flamingo: { species: "Solnedgångsflamingo", bio: "Balanserar på ett ben medan hon löser 12:ans tabell på under 3 sekunder!" },
+    pet_dolphin: { species: "Prismadelfin", bio: "Gör bakåtvolter över mätaren varje gång du klarar 5 rätt i rad!" },
+    pet_buttercup: { species: "Honungsbjörn", bio: "Söt som honung och alltid redo med en varm kram efter en klurig runda." },
+    pet_peacock: { species: "Stjärnpåfågel", bio: "Slår ut 144 skimrande ögon på stjärten — ett för varje tal i 12×12-kartan!" },
+    pet_hamster: { species: "Komet-hamster", bio: "Springer i ett gyllene hjul som drivs av snabba 3-sekunderssvar!" },
+    pet_pegasus: { species: "Norrskenspegasus", bio: "Flyger genom stjärnvalvet när en hel värld har erövrats!" }
   };
 
   // Swedish translations for Default Shop Items

@@ -723,7 +723,9 @@
           </button>
         `;
 
-        card.addEventListener("click", () => {
+        const launchNodeLevel = (e) => {
+          if (e) e.stopPropagation();
+          if (currentSession) return;
           window.soundFX.tap();
           startGameSession({
             mode: "adventure",
@@ -735,7 +737,13 @@
             baseGems: node.baseGems,
             unlockPetId: node.unlockPetId
           });
-        });
+        };
+
+        const playBtn = card.querySelector(".node-play-btn");
+        if (playBtn) {
+          playBtn.addEventListener("click", launchNodeLevel);
+        }
+        card.addEventListener("click", launchNodeLevel);
 
         pathDiv.appendChild(card);
       });
@@ -2509,7 +2517,6 @@
     const chosenTimer = Number(onboardingTimerSelect && onboardingTimerSelect.value) || 3;
     state.settings.playerName = chosenName;
     state.settings.defaultTimerSeconds = chosenTimer;
-    mapTimerSeconds = chosenTimer;
     customTimerSec = chosenTimer;
     state.onboardingCompleted = true;
     saveState();
