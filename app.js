@@ -29,33 +29,51 @@
     };
   }
 
+  function normalizeState(parsed) {
+    const def = createDefaultState();
+    if (!parsed || typeof parsed !== "object") return def;
+    const merged = {
+      ...def,
+      ...parsed,
+      settings: { ...def.settings, ...(parsed.settings || {}) },
+      dailyStreak: {
+        count: Number(parsed.dailyStreak?.count) || 1,
+        lastDate: parsed.dailyStreak?.lastDate || def.dailyStreak.lastDate
+      },
+      levelProgress:
+        parsed.levelProgress && typeof parsed.levelProgress === "object" ? parsed.levelProgress : {},
+      factStats: parsed.factStats && typeof parsed.factStats === "object" ? parsed.factStats : {},
+      unlockedPets:
+        Array.isArray(parsed.unlockedPets) && parsed.unlockedPets.length > 0
+          ? parsed.unlockedPets
+          : [...def.unlockedPets],
+      unlockedStickers:
+        Array.isArray(parsed.unlockedStickers) && parsed.unlockedStickers.length > 0
+          ? parsed.unlockedStickers
+          : [...def.unlockedStickers],
+      lobbyStickers: Array.isArray(parsed.lobbyStickers) ? parsed.lobbyStickers : [...def.lobbyStickers],
+      shopRewards:
+        Array.isArray(parsed.shopRewards) && parsed.shopRewards.length > 0
+          ? parsed.shopRewards
+          : [...def.shopRewards],
+      coupons: Array.isArray(parsed.coupons) ? parsed.coupons : [],
+      recentRuns: Array.isArray(parsed.recentRuns) ? parsed.recentRuns : []
+    };
+    if (!merged.shopRewards.some((r) => r && r.type === "sticker_pack")) {
+      merged.shopRewards.unshift(JSON.parse(JSON.stringify(window.GAME_DATA.defaultShopRewards[0])));
+    }
+    merged.settings.defaultTimerSeconds = Number(merged.settings.defaultTimerSeconds) || 3;
+    merged.settings.defaultStreakLength = Number(merged.settings.defaultStreakLength) || 10;
+    return merged;
+  }
+
   let state = loadState();
 
   function loadState() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return createDefaultState();
-      const parsed = JSON.parse(raw);
-      const def = createDefaultState();
-      const merged = {
-        ...def,
-        ...parsed,
-        settings: { ...def.settings, ...(parsed.settings || {}) },
-        dailyStreak: { ...def.dailyStreak, ...(parsed.dailyStreak || {}) }
-      };
-      if (!Array.isArray(merged.unlockedStickers) || merged.unlockedStickers.length === 0) {
-        merged.unlockedStickers = [...def.unlockedStickers];
-      }
-      if (!Array.isArray(merged.lobbyStickers)) {
-        merged.lobbyStickers = [...def.lobbyStickers];
-      }
-      if (
-        Array.isArray(merged.shopRewards) &&
-        !merged.shopRewards.some((r) => r.type === "sticker_pack")
-      ) {
-        merged.shopRewards.unshift(JSON.parse(JSON.stringify(window.GAME_DATA.defaultShopRewards[0])));
-      }
-      return merged;
+      return normalizeState(JSON.parse(raw));
     } catch (e) {
       return createDefaultState();
     }
@@ -656,7 +674,8 @@
 
   function renderAdventureMap() {
     renderLobbyScene();
-    document.getElementById("map-streak-label").textContent = state.settings.defaultStreakLength;
+    const mapStreakLbl = document.getElementById("map-streak-label");
+    if (mapStreakLbl) mapStreakLbl.textContent = state.settings.defaultStreakLength;
 
     // Sync speed selector pills
     document.querySelectorAll("#map-speed-pills .speed-pill").forEach((pill) => {
@@ -725,15 +744,14 @@
 
         const launchNodeLevel = (e) => {
           if (e) e.stopPropagation();
-          if (currentSession) return;
           window.soundFX.tap();
           startGameSession({
             mode: "adventure",
             nodeId: node.id,
             title: nTxt.title,
             tables: node.tables,
-            timerSeconds: Number(state.settings.defaultTimerSeconds),
-            streakLength: Number(state.settings.defaultStreakLength),
+            timerSeconds: Number(state.settings.defaultTimerSeconds) || 3,
+            streakLength: Number(state.settings.defaultStreakLength) || 10,
             baseGems: node.baseGems,
             unlockPetId: node.unlockPetId
           });
@@ -2570,14 +2588,16 @@
     window.CLOUD_SYNC.init({
       getLocalState: () => state,
       onRemoteStateMerge: (mergedState) => {
-        state = mergedState;
+        state = normalizeState(mergedState);
         state.onboardingCompleted = true;
         customStreakLen = state.settings.defaultStreakLength || 10;
         customTimerSec = state.settings.defaultTimerSeconds || 3;
         customQuestionStyle = state.settings.questionStyle || "mix";
         saveState(true);
         renderHUD();
-        refreshActiveTabUI();
+        if (!currentSession) {
+          refreshActiveTabUI();
+        }
         document.getElementById("onboarding-modal").classList.remove("active");
       }
     });

@@ -199,6 +199,7 @@
     else if (remoteHasProgress && !localHasProgress) gems = remote.gems;
 
     return {
+      ...older,
       ...newer,
       gems,
       unlockedPets,
@@ -209,12 +210,22 @@
       factStats,
       coupons,
       recentRuns,
-      settings: { ...(older.settings || {}), ...(newer.settings || {}) },
+      shopRewards:
+        Array.isArray(newer.shopRewards) && newer.shopRewards.length > 0
+          ? newer.shopRewards
+          : Array.isArray(older.shopRewards) && older.shopRewards.length > 0
+            ? older.shopRewards
+            : (window.GAME_DATA ? JSON.parse(JSON.stringify(window.GAME_DATA.defaultShopRewards)) : []),
+      settings: {
+        ...(window.GAME_DATA ? window.GAME_DATA.defaultSettings : {}),
+        ...(older.settings || {}),
+        ...(newer.settings || {})
+      },
       dailyStreak:
         (newer.dailyStreak?.count || 0) >= (older.dailyStreak?.count || 0)
-          ? newer.dailyStreak
-          : older.dailyStreak,
-      updatedAt: Math.max(localTs, remoteTs, Date.now())
+          ? newer.dailyStreak || { count: 1, lastDate: new Date().toISOString().slice(0, 10) }
+          : older.dailyStreak || { count: 1, lastDate: new Date().toISOString().slice(0, 10) },
+      updatedAt: Math.max(localTs, remoteTs)
     };
   }
 
@@ -344,6 +355,9 @@
   }
 
   let unsubscribeSnapshot = null;
+  let lastKnownCloudTs = 0;
+  let initialSnapshotHandled = false;
+  let pushDebounceTimer = null;
 
   function attachRealtimeListener(user) {
     if (!db || !user) return;
@@ -351,6 +365,7 @@
       unsubscribeSnapshot();
       unsubscribeSnapshot = null;
     }
+    initialSnapshotHandled = false;
 
     userStateRef = db.collection("users").doc(user.uid);
     const deviceRef = userStateRef.collection("devices").doc(getOrCreateDeviceId());
@@ -369,12 +384,18 @@
 
     unsubscribeSnapshot = userStateRef.onSnapshot(
       (docSnap) => {
+        // Ignore local echo events from our own pending writes so we never re-render in a loop
+        if (docSnap.metadata && docSnap.metadata.hasPendingWrites) {
+          return;
+        }
+
         const docData = docSnap.exists ? docSnap.data() : null;
-        const remoteState = docData && docData.state ? docData.state : docData;
+        const remoteState = docData && docData.state ? docData.state : null;
         const localState = getLocalStateCallback ? getLocalStateCallback() : null;
 
         if (!remoteState && localState) {
           // First time this account syncs: upload current local progress to cloud
+          initialSnapshotHandled = true;
           pushStateToCloud(localState);
           syncStatus = "synced";
           statusMessage = `Synced live with ${user.email || "Parent Account"}`;
@@ -383,6 +404,21 @@
         }
 
         if (remoteState && localState) {
+          const remoteTs = Number(remoteState.updatedAt || docData.updatedAt || 0);
+          const localTs = Number(localState.updatedAt || 0);
+
+          // If we already processed this exact cloud timestamp after initial load, skip re-rendering
+          if (initialSnapshotHandled && remoteTs > 0 && remoteTs <= lastKnownCloudTs) {
+            syncStatus = "synced";
+            statusMessage = `Synced live with ${user.email || "Parent Account"}`;
+            updateCloudUI();
+            return;
+          }
+
+          const isFirstSnapshot = !initialSnapshotHandled;
+          initialSnapshotHandled = true;
+          lastKnownCloudTs = Math.max(lastKnownCloudTs, remoteTs, localTs);
+
           const merged = mergeGameStates(localState, remoteState);
           isApplyingRemote = true;
           if (stateChangeCallback) {
@@ -390,13 +426,16 @@
           }
           isApplyingRemote = false;
 
-          // If merging added local progress not yet in remote, push merged back
-          if ((merged.updatedAt || 0) > (remoteState.updatedAt || 0)) {
+          // Only push back on initial connect if local had newer progress than cloud
+          if (isFirstSnapshot && localTs > remoteTs) {
+            const syncTs = Date.now();
+            lastKnownCloudTs = syncTs;
+            merged.updatedAt = syncTs;
             userStateRef
               .set(
                 {
                   state: merged,
-                  updatedAt: merged.updatedAt,
+                  updatedAt: syncTs,
                   email: user.email || "",
                   lastModifiedByDevice: getOrCreateDeviceId()
                 },
@@ -421,36 +460,43 @@
 
   function pushStateToCloud(stateObj) {
     if (!db || !currentUser || !userStateRef || isApplyingRemote) return;
-    syncStatus = "syncing";
-    updateCloudUI();
+    if (pushDebounceTimer) {
+      clearTimeout(pushDebounceTimer);
+    }
+    pushDebounceTimer = setTimeout(() => {
+      if (!db || !currentUser || !userStateRef || isApplyingRemote) return;
+      syncStatus = "syncing";
+      updateCloudUI();
 
-    const nowTs = Date.now();
-    const stateWithTs = {
-      ...stateObj,
-      updatedAt: nowTs,
-      lastModifiedByDevice: getOrCreateDeviceId()
-    };
+      const nowTs = Date.now();
+      lastKnownCloudTs = Math.max(lastKnownCloudTs, nowTs);
+      const stateWithTs = {
+        ...stateObj,
+        updatedAt: nowTs,
+        lastModifiedByDevice: getOrCreateDeviceId()
+      };
 
-    userStateRef
-      .set(
-        {
-          state: stateWithTs,
-          updatedAt: nowTs,
-          email: currentUser.email || "",
-          lastModifiedByDevice: getOrCreateDeviceId()
-        },
-        { merge: true }
-      )
-      .then(() => {
-        syncStatus = "synced";
-        statusMessage = `Synced live with ${currentUser.email || "Parent Account"}`;
-        updateCloudUI();
-      })
-      .catch((err) => {
-        syncStatus = "error";
-        statusMessage = `Could not save to cloud: ${err.message}`;
-        updateCloudUI();
-      });
+      userStateRef
+        .set(
+          {
+            state: stateWithTs,
+            updatedAt: nowTs,
+            email: currentUser.email || "",
+            lastModifiedByDevice: getOrCreateDeviceId()
+          },
+          { merge: true }
+        )
+        .then(() => {
+          syncStatus = "synced";
+          statusMessage = `Synced live with ${currentUser.email || "Parent Account"}`;
+          updateCloudUI();
+        })
+        .catch((err) => {
+          syncStatus = "error";
+          statusMessage = `Could not save to cloud: ${err.message}`;
+          updateCloudUI();
+        });
+    }, 350);
   }
 
   function initFirebaseIfConfigured() {
