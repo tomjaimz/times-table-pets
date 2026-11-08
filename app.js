@@ -1885,8 +1885,8 @@
   }
 
   // Time ladder: each earlier miss on the same fact, and Bonus questions, step up one rung
-  // (3s -> 5s -> 8s -> 12s). Rewards still use the chosen base speed.
-  const TIMER_LADDER = [3, 5, 8, 12];
+  // (3s -> 5s -> 8s, capped at 8s). Rewards still use the chosen base speed.
+  const TIMER_LADDER = [3, 5, 8];
 
   function getQuestionSeconds(session, q) {
     const base = Number(session.timerSeconds) || 3;
