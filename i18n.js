@@ -192,7 +192,7 @@
       // Expandable "For Parents" Boxes
       parentInfoAdventureSum: "ℹ️ For Parents: How Levels, Retries & Bonus Questions Work",
       parentInfoAdventureBody:
-        "<p>• <strong>End-of-Run Retry (3-Strikes Rule):</strong> Missing a standard question does <em>not</em> reset the run! It moves to the end of the run so {name} can retry it. Only 3 misses on the <em>exact same fact</em> resets the run.</p><p>• <strong>🌟 Bonus Questions (<code>7 × ❓ = 56</code>):</strong> Award <strong>+3 Bonus Gems</strong> if right, and have <strong>zero penalty</strong> if missed.</p><p>• <strong>Timer Speeds:</strong> 8s = 1★ (1× Gems), 5s = 2★ (1.5× Gems), 3s = 3★ (2× Gems). Beating a level unlocks its Pet!</p>",
+        "<p>• <strong>End-of-Run Retry (3-Strikes Rule):</strong> Missing a standard question does <em>not</em> reset the run! It moves to the end of the run so {name} can retry it. Only 3 misses on the <em>exact same fact</em> resets the run.</p><p>• <strong>🌟 Bonus Questions (<code>7 × ❓ = 56</code>):</strong> Award <strong>+3 Bonus Gems</strong> if right, and have <strong>zero penalty</strong> if missed.</p><p>• <strong>More time when needed:</strong> After a miss, that question gets a longer timer on its retry (3s → 5s → 8s). 🌟 Bonus questions also get one step more time. Gem rewards still follow the speed you chose.</p><p>• <strong>Timer Speeds:</strong> 8s = 1★ (1× Gems), 5s = 2★ (1.5× Gems), 3s = 3★ (2× Gems). Beating a level unlocks its Pet!</p>",
       parentInfoTrickySum: "ℹ️ For Parents: Tricky Facts Booster",
       parentInfoTrickyBody:
         "Automatically selects the multiplication facts {name} has missed or answered slowly so she can conquer them without having to configure anything.",
@@ -467,7 +467,7 @@
       // Expandable "For Parents" Boxes (Swedish)
       parentInfoAdventureSum: "ℹ️ För föräldrar: Så fungerar banor, försök & bonusfrågor",
       parentInfoAdventureBody:
-        "<p>• <strong>Försök igen på slutet (3-missregeln):</strong> Om {name} missar en vanlig fråga nollställs <em>inte</em> sviten! Frågan läggs sist i rundan så hon får prova igen. Bara 3 missar på <em>exakt samma tal</em> startar om rundan.</p><p>• <strong>🌟 Bonusfrågor (<code>7 × ❓ = 56</code>):</strong> Ger <strong>+3 bonus-ädelstenar</strong> vid rätt svar och <strong>inget avdrag alls</strong> vid miss.</p><p>• <strong>Tidsgränser:</strong> 8s = 1★ (1× ädelstenar), 5s = 2★ (1.5× ädelstenar), 3s = 3★ (2× ädelstenar). Första vinsten på en bana låser upp dess husdjur!</p>",
+        "<p>• <strong>Försök igen på slutet (3-missregeln):</strong> Om {name} missar en vanlig fråga nollställs <em>inte</em> sviten! Frågan läggs sist i rundan så hon får prova igen. Bara 3 missar på <em>exakt samma tal</em> startar om rundan.</p><p>• <strong>🌟 Bonusfrågor (<code>7 × ❓ = 56</code>):</strong> Ger <strong>+3 bonus-ädelstenar</strong> vid rätt svar och <strong>inget avdrag alls</strong> vid miss.</p><p>• <strong>Mer tid vid behov:</strong> Efter en miss får frågan längre tid vid nästa försök (3s → 5s → 8s). 🌟 Bonusfrågor får också ett steg extra tid. Ädelstensbelöningen följer fortfarande vald hastighet.</p><p>• <strong>Tidsgränser:</strong> 8s = 1★ (1× ädelstenar), 5s = 2★ (1.5× ädelstenar), 3s = 3★ (2× ädelstenar). Första vinsten på en bana låser upp dess husdjur!</p>",
       parentInfoTrickySum: "ℹ️ För föräldrar: Träna kluriga tal",
       parentInfoTrickyBody:
         "Väljer automatiskt ut de multiplikationer som {name} har missat eller svarat långsamt på i tidigare rundor.",

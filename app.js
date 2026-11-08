@@ -1884,6 +1884,23 @@
     box.style.display = "block";
   }
 
+  // Time ladder: each earlier miss on the same fact, and Bonus questions, step up one rung
+  // (3s -> 5s -> 8s -> 12s). Rewards still use the chosen base speed.
+  const TIMER_LADDER = [3, 5, 8, 12];
+
+  function getQuestionSeconds(session, q) {
+    const base = Number(session.timerSeconds) || 3;
+    let idx = TIMER_LADDER.findIndex((s) => s >= base);
+    if (idx < 0) idx = TIMER_LADDER.length - 1;
+    const isBonus = q.questionType === "mystery_a" || q.questionType === "mystery_b";
+    if (isBonus) {
+      idx += 1;
+    } else {
+      idx += (session.factMisses && session.factMisses[`${q.a}x${q.b}`]) || 0;
+    }
+    return TIMER_LADDER[Math.min(idx, TIMER_LADDER.length - 1)];
+  }
+
   function dealNextQuestion() {
     if (!currentSession) return;
     stopTimerLoop();
@@ -1959,9 +1976,11 @@
       btn.blur();
     });
 
-    // Start precision timer
+    // Start precision timer (extra time after a miss on this fact, and for Bonus questions)
     currentSession.questionStartTime = performance.now();
-    const durationMs = currentSession.timerSeconds * 1000;
+    const questionSeconds = getQuestionSeconds(currentSession, q);
+    currentSession.questionSeconds = questionSeconds;
+    const durationMs = questionSeconds * 1000;
     const timerFill = document.getElementById("game-timer-fill");
     const timerText = document.getElementById("game-timer-text");
 
